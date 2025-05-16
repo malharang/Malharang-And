@@ -7,6 +7,7 @@ lifecycleRuntimeComposeAndroid = "2.8.7"
 kotlin = "2.0.21"
 kotlinxSerializationJson = "1.7.3"
 ksp = "2.0.21-1.0.27"
+ktlint = "11.5.1"
 
 # Core
 coreKtx = "1.16.0"
@@ -36,6 +37,7 @@ timber = "5.0.1"
 
 # SDK
 accompanist = "0.25.1"
+junitKtx = "1.2.1"
 
 [libraries]
 # Core
@@ -75,6 +77,7 @@ coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 # Logging
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -84,3 +87,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
