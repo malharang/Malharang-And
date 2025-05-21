@@ -1,0 +1,22 @@
+package com.malharang.app.presentation.screen.chat.navigation
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
+import com.malharang.app.core.navigation.MainTabRoute
+import com.malharang.app.presentation.screen.chat.ChatRoute
+
+fun NavController.navigateToChat(navOptions: NavOptions) {
+    navigate(MainTabRoute.Chat, navOptions)
+}
+
+fun NavGraphBuilder.chatNavGraph(
+    padding: PaddingValues,
+    navController: NavController
+) {
+    composable<MainTabRoute.Chat> {
+        ChatRoute(padding = padding)
+    }
+}
