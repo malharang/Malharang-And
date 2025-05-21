@@ -15,3 +15,5 @@ sealed interface MainTabRoute {
     @Serializable
     data object Profile : MainTabRoute
 }
+
+sealed interface DummyRoute
