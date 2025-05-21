@@ -3,7 +3,6 @@ package com.malharang.app.presentation.screen.main
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import com.malharang.app.R
 import com.malharang.app.core.navigation.MainTabRoute
 

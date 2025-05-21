@@ -8,13 +8,12 @@ import androidx.navigation.compose.composable
 import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.mission.MissionRoute
 
-
 fun NavController.navigateToMission(navOptions: NavOptions) {
     navigate(MainTabRoute.Mission, navOptions)
 }
 
 fun NavGraphBuilder.missionNavGraph(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     composable<MainTabRoute.Mission> {
         MissionRoute(padding = padding)

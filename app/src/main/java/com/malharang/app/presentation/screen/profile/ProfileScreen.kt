@@ -8,17 +8,17 @@ import com.malharang.app.ui.theme.MalHaRangTheme
 
 @Composable
 fun ProfileRoute(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     ProfileScreen(padding = padding)
 }
 
 @Composable
 private fun ProfileScreen(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     Text(
-        text = "ProfileScreen",
+        text = "ProfileScreen"
     )
 }
 
@@ -27,7 +27,7 @@ private fun ProfileScreen(
 private fun PreviewProfileScreen() {
     MalHaRangTheme {
         ProfileScreen(
-            padding = PaddingValues(),
+            padding = PaddingValues()
         )
     }
 }

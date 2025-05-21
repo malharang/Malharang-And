@@ -68,7 +68,6 @@ class MainNavigator(
         val currentRoute = currentDestination?.route
         currentRoute == it::class.qualifiedName && currentRoute != MainTabRoute.Chat::class.qualifiedName
     }
-
 }
 
 @Composable

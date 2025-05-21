@@ -9,10 +9,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 
-
 @Immutable
 data class MalHaRangTypography(
-    val labelMedium: TextStyle,
+    val labelMedium: TextStyle
 )
 
 val defaultMalHaRangTypography = MalHaRangTypography(
@@ -21,8 +20,8 @@ val defaultMalHaRangTypography = MalHaRangTypography(
         fontSize = 12.sp,
         lineHeight = 18.sp,
         fontFamily = FontFamily(Font(R.font.plus_jakarta_sans_medium)),
-        fontWeight = FontWeight(500),
-        )
+        fontWeight = FontWeight(500)
+    )
 )
 
 val LocalMalHaRangTypographyProvider = staticCompositionLocalOf { defaultMalHaRangTypography }

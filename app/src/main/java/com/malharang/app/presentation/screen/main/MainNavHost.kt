@@ -33,7 +33,7 @@ fun MainNavHost(
             chatNavGraph(
                 padding = padding,
                 navController = navigator.navController
-                )
+            )
 
             missionNavGraph(padding)
 

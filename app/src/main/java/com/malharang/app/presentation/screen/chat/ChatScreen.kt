@@ -8,17 +8,17 @@ import com.malharang.app.ui.theme.MalHaRangTheme
 
 @Composable
 fun ChatRoute(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     ChatScreen(padding = padding)
 }
 
 @Composable
 private fun ChatScreen(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     Text(
-        text = "ChatScreen",
+        text = "ChatScreen"
     )
 }
 
@@ -27,7 +27,7 @@ private fun ChatScreen(
 private fun PreviewChatScreen() {
     MalHaRangTheme {
         ChatScreen(
-            padding = PaddingValues(),
+            padding = PaddingValues()
         )
     }
 }

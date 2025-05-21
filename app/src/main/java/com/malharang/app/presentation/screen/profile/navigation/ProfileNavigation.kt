@@ -13,7 +13,7 @@ fun NavController.navigateToProfile(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.profileNavGraph(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     composable<MainTabRoute.Profile> {
         ProfileRoute(padding = padding)

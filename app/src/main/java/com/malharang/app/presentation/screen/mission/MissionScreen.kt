@@ -8,17 +8,17 @@ import com.malharang.app.ui.theme.MalHaRangTheme
 
 @Composable
 fun MissionRoute(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     MissionScreen(padding = padding)
 }
 
 @Composable
 private fun MissionScreen(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     Text(
-        text = "MissionScreen",
+        text = "MissionScreen"
     )
 }
 
@@ -27,7 +27,7 @@ private fun MissionScreen(
 private fun PreviewMissionScreen() {
     MalHaRangTheme {
         MissionScreen(
-            padding = PaddingValues(),
+            padding = PaddingValues()
         )
     }
 }

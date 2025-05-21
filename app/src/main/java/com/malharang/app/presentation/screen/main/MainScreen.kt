@@ -14,7 +14,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator(),
+    navigator: MainNavigator = rememberMainNavigator()
 ) {
     MainScreenContent(
         navigator = navigator
@@ -25,7 +25,7 @@ fun MainScreen(
 @Composable
 private fun MainScreenContent(
     modifier: Modifier = Modifier,
-    navigator: MainNavigator,
+    navigator: MainNavigator
 ) {
     Scaffold(
         modifier = modifier

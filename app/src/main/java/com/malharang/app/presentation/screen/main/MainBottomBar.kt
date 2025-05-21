@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +41,7 @@ fun MainBottomBar(
     currentTab: MainTab?,
     onTabSelected: (MainTab) -> Unit,
     tabs: List<MainTab>,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -82,7 +81,7 @@ private fun RowScope.MainBottomBarItem(
     tab: MainTab,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -98,12 +97,15 @@ private fun RowScope.MainBottomBarItem(
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)
-    )
-    {
+    ) {
         Icon(
-            imageVector = if (selected) ImageVector.vectorResource(tab.activeIconResId) else ImageVector.vectorResource(
-                tab.inactiveIconResId
-            ),
+            imageVector = if (selected) {
+                ImageVector.vectorResource(tab.activeIconResId)
+            } else {
+                ImageVector.vectorResource(
+                    tab.inactiveIconResId
+                )
+            },
             contentDescription = null,
             tint = if (selected) colors.green2 else colors.green1,
             modifier = Modifier.size(36.dp)

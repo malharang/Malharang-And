@@ -8,15 +8,14 @@ import com.malharang.app.ui.theme.MalHaRangTheme
 
 @Composable
 fun HomeRoute(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     HomeScreen(padding = padding)
 }
 
-
 @Composable
 private fun HomeScreen(
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     Text("HomeScreen")
 }
