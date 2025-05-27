@@ -1,5 +1,3 @@
 package com.malharang.app.core
 
-class MissionUi {
-
-}
+class MissionUi
