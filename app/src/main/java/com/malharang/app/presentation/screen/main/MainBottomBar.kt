@@ -107,13 +107,13 @@ private fun RowScope.MainBottomBarItem(
                 )
             },
             contentDescription = null,
-            tint = if (selected) colors.green2 else colors.green1,
+            tint = if (selected) colors.greenDark else colors.greenLight,
             modifier = Modifier.size(36.dp)
         )
         Text(
             text = stringResource(tab.title),
-            style = typography.labelMedium,
-            color = if (selected) colors.green2 else colors.green1
+            style = typography.bodyMedium,
+            color = if (selected) colors.greenDark else colors.greenLight
         )
     }
 }
