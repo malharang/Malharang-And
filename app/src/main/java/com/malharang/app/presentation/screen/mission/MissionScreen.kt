@@ -18,7 +18,7 @@ private fun MissionScreen(
     padding: PaddingValues
 ) {
     Text(
-        text = "MissionScreen"
+        text = "Available Missions"
     )
 }
 
