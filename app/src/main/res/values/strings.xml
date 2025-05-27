@@ -5,4 +5,9 @@
     <string name="navi_chat_title">Chatbot</string>
     <string name="navi_mission_title">Mission</string>
     <string name="navi_profile_title">Profile</string>
+
+    <!-- Mission -->
+    <string name="mission_card_start_btn">Start</string>
+    <string name="mission_card_emoji">\uD83C\uDF31</string>
+
 </resources>
