@@ -14,8 +14,9 @@ val White = Color(0xFFFFFFFF)
 val Gray = Color(0xFFF5F0E5)
 
 // Green
-val Green1 = Color(0xFFD3EEDD)
-val Green2 = Color(0xFF006358)
+val GreenLight = Color(0xFFD3EEDD)
+val GreenDark = Color(0xFF006358)
+val Green = Color(0xFF00AC6D)
 
 // Android
 val AndSysGray = Color(0xFF858585)
@@ -26,8 +27,9 @@ data class MalHaRangColors(
     val black: Color,
     val white: Color,
     val gray: Color,
-    val green1: Color,
-    val green2: Color,
+    val greenLight: Color,
+    val greenDark: Color,
+    val green: Color,
     val andSysGray: Color,
     val andSysWhite: Color
 )
@@ -36,8 +38,9 @@ val defaultMalHaRangColors = MalHaRangColors(
     black = Black,
     white = White,
     gray = Gray,
-    green1 = Green1,
-    green2 = Green2,
+    greenLight = GreenLight,
+    greenDark = GreenDark,
+    green = Green,
     andSysGray = AndSysGray,
     andSysWhite = AndSysWhite
 )
