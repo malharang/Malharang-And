@@ -32,7 +32,7 @@ fun UserStatusBar(
     level: Int,
     exp: Int,
     modifier: Modifier = Modifier,
-    paddingValues: PaddingValues = PaddingValues(horizontal = 20.dp),
+    paddingValues: PaddingValues = PaddingValues(horizontal = 20.dp)
 ) {
     Row(
         modifier = modifier
@@ -76,7 +76,6 @@ fun UserStatusBar(
                             .background(colors.green)
                     )
                 }
-
             }
         }
     }
