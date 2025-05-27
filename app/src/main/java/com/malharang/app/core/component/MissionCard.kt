@@ -49,7 +49,7 @@ fun MissionCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_leaf), // 리소스명 수정
+                        painter = painterResource(id = R.drawable.img_core_missioncard_leaf),
                         contentDescription = null,
                         tint = Color(0xFF22C55E),
                         modifier = Modifier
