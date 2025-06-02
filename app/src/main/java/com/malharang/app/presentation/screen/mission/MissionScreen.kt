@@ -14,13 +14,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.ui.theme.MalHaRangTheme
+import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun MissionRoute(
@@ -52,7 +54,7 @@ private fun MissionScreen(padding: PaddingValues) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "More options",
-                tint = Color.Black
+                tint = colors.black
             )
         }
 
@@ -88,21 +90,29 @@ private fun MissionScreen(padding: PaddingValues) {
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
-            DropdownItem("Review Mission")
+            DropdownItems("Review Mission")
             DropdownItem("Export Sentences")
         }
     }
 }
 
 @Composable
-fun DropdownItem(title: String) {
+fun DropdownItems(title: String) {
     var expanded by remember { mutableStateOf(false) }
+
+    val completedMissions = listOf(
+        "Order food - 2025.05.01",
+        "Ask for directions - 2025.05.03",
+        "Introduce yourself - 2025.05.04",
+        "Buy a ticket - 2025.05.05",
+        "Make a reservation - 2025.05.06"
+    )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(1.dp, RoundedCornerShape(12.dp))
-            .background(Color.White, RoundedCornerShape(12.dp))
+            .background(colors.white, RoundedCornerShape(12.dp))
             .clickable { expanded = !expanded }
             .padding(16.dp)
     ) {
@@ -115,7 +125,7 @@ fun DropdownItem(title: String) {
                 text = title,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Black
+                color = colors.black
             )
             Icon(
                 imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -124,12 +134,80 @@ fun DropdownItem(title: String) {
         }
 
         if (expanded) {
+            Spacer(modifier = Modifier.height(12.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp), // 스크롤 높이 제한
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(completedMissions) { mission ->
+                    Text(
+                        text = mission,
+                        fontSize = 12.sp,
+                        color = colors.black,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DropdownItem(title: String) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val completedMissions = listOf(
+        "Order food - 2025.05.01",
+        "Ask for directions - 2025.05.03",
+        "Introduce yourself - 2025.05.04",
+        "Buy a ticket - 2025.05.05",
+        "Make a reservation - 2025.05.06"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(1.dp, RoundedCornerShape(12.dp))
+            .background(colors.white, RoundedCornerShape(12.dp))
+            .clickable { expanded = !expanded }
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = "미션 결과나 저장된 문장이 여기에 표시됩니다.",
-                fontSize = 12.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(top = 8.dp)
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = colors.black
             )
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null
+            )
+        }
+
+        if (expanded) {
+            Spacer(modifier = Modifier.height(12.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp), // 스크롤 높이 제한
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(completedMissions) { mission ->
+                    Text(
+                        text = mission,
+                        fontSize = 12.sp,
+                        color = colors.black,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
         }
     }
 }
