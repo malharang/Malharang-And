@@ -28,7 +28,6 @@ fun MissionCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(5f)
             .shadow(
                 elevation = 6.dp,
                 shape = RoundedCornerShape(16.dp),
@@ -39,7 +38,6 @@ fun MissionCard(
             .padding(16.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

@@ -1,10 +1,28 @@
 package com.malharang.app.presentation.screen.mission
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.malharang.app.core.component.MissionCard
 import com.malharang.app.ui.theme.MalHaRangTheme
+import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun MissionRoute(
@@ -14,20 +32,190 @@ fun MissionRoute(
 }
 
 @Composable
-private fun MissionScreen(
-    padding: PaddingValues
-) {
-    Text(
-        text = "Available Missions"
+private fun MissionScreen(padding: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        // 상단: 타이틀과 필터 아이콘
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Missions",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            )
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More options",
+                tint = colors.black
+            )
+        }
+
+        // 섹션: Available Missions
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                text = "Available Missions",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+            MissionCard(
+                title = "Order food",
+                description = "Learn to order food in Korean",
+                onClick = {},
+                onStartClick = {}
+            )
+            MissionCard(
+                title = "Ask for directions",
+                description = "Practice asking for directions",
+                onClick = {},
+                onStartClick = {}
+            )
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Completed Missions",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+            DropdownItems("Review Mission")
+            DropdownItem("Export Sentences")
+        }
+    }
+}
+
+@Composable
+fun DropdownItems(title: String) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val completedMissions = listOf(
+        "Order food - 2025.05.01",
+        "Ask for directions - 2025.05.03",
+        "Introduce yourself - 2025.05.04",
+        "Buy a ticket - 2025.05.05",
+        "Make a reservation - 2025.05.06"
     )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(1.dp, RoundedCornerShape(12.dp))
+            .background(colors.white, RoundedCornerShape(12.dp))
+            .clickable { expanded = !expanded }
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = colors.black
+            )
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null
+            )
+        }
+
+        if (expanded) {
+            Spacer(modifier = Modifier.height(12.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp), // 스크롤 높이 제한
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(completedMissions) { mission ->
+                    Text(
+                        text = mission,
+                        fontSize = 12.sp,
+                        color = colors.black,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DropdownItem(title: String) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val completedMissions = listOf(
+        "Order food - 2025.05.01",
+        "Ask for directions - 2025.05.03",
+        "Introduce yourself - 2025.05.04",
+        "Buy a ticket - 2025.05.05",
+        "Make a reservation - 2025.05.06"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(1.dp, RoundedCornerShape(12.dp))
+            .background(colors.white, RoundedCornerShape(12.dp))
+            .clickable { expanded = !expanded }
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = colors.black
+            )
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null
+            )
+        }
+
+        if (expanded) {
+            Spacer(modifier = Modifier.height(12.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp), // 스크롤 높이 제한
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(completedMissions) { mission ->
+                    Text(
+                        text = mission,
+                        fontSize = 12.sp,
+                        color = colors.black,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PreviewMissionScreen() {
     MalHaRangTheme {
-        MissionScreen(
-            padding = PaddingValues()
-        )
+        MissionScreen(padding = PaddingValues())
     }
 }
