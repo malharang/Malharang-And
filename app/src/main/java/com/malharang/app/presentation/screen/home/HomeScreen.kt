@@ -32,6 +32,7 @@ import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.core.component.UserStatusBar
 import com.malharang.app.core.util.noRippleClickable
+import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
@@ -39,22 +40,26 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 fun HomeRoute(
     padding: PaddingValues
 ) {
-    HomeScreen(
-        padding = padding,
+
+    val userStatusModel = UserStatusModel(
         profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
         name = "Malssi",
         level = 5,
         exp = 70,
+    )
+
+    HomeScreen(
+        padding = padding,
+        userStatusModel = userStatusModel,
+        currentLocation = "한신대학교 경삼관",
     )
 }
 
 @Composable
 private fun HomeScreen(
     padding: PaddingValues,
-    profileUrl: String,
-    name: String,
-    level: Int,
-    exp: Int,
+    userStatusModel: UserStatusModel,
+    currentLocation: String,
     onLoadMoreContents: () -> Unit = {},
 ) {
     Column(
@@ -62,12 +67,7 @@ private fun HomeScreen(
             .padding(padding)
             .fillMaxSize()
     ) {
-        UserStatusBar(
-            profileUrl = profileUrl,
-            name = name,
-            level = level,
-            exp = exp,
-        )
+        UserStatusBar(userStatusModel)
 
         Box(
             modifier = Modifier
@@ -95,7 +95,7 @@ private fun HomeScreen(
                         .clip(RoundedCornerShape(10.dp))
                 )
                 Text(
-                    text = "\uD83D\uDCCD현재 위치: 한신대학교 경삼관",
+                    text = "\uD83D\uDCCD 현재 위치: $currentLocation",
                     modifier = Modifier
                         .padding(bottom = 20.dp),
                 )
@@ -132,10 +132,13 @@ private fun PreviewHomeScreen() {
     MalHaRangTheme {
         HomeScreen(
             padding = PaddingValues(),
-            profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
-            name = "Malssi",
-            level = 5,
-            exp = 70
+            userStatusModel = UserStatusModel(
+                profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
+                name = "Malssi",
+                level = 5,
+                exp = 70,
+            ),
+            currentLocation = "한신대학교 경삼관"
         )
     }
 }

@@ -21,16 +21,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
 @Composable
 fun UserStatusBar(
-    profileUrl: String,
-    name: String,
-    level: Int,
-    exp: Int,
+    userStatusModel: UserStatusModel,
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues = PaddingValues(horizontal = 20.dp)
 ) {
@@ -40,7 +38,7 @@ fun UserStatusBar(
             .padding(paddingValues)
     ) {
         AsyncImage(
-            model = profileUrl,
+            model = userStatusModel.profileUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -50,7 +48,7 @@ fun UserStatusBar(
 
         Column {
             Text(
-                text = name,
+                text = userStatusModel.name,
                 style = typography.bodyMediumBold
             )
             Row(
@@ -58,7 +56,7 @@ fun UserStatusBar(
                 modifier = Modifier.padding(end = 100.dp)
             ) {
                 Text(
-                    text = "Lv $level",
+                    text = "Lv ${userStatusModel.level}",
                     modifier = Modifier.padding(end = 5.dp)
                 )
                 Box(
@@ -70,7 +68,7 @@ fun UserStatusBar(
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(exp * 0.01f)
+                            .fillMaxWidth(userStatusModel.exp * 0.01f)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(3.dp))
                             .background(colors.green)
@@ -86,10 +84,12 @@ fun UserStatusBar(
 private fun UserStatusBarPreview() {
     MalHaRangTheme {
         UserStatusBar(
-            profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
-            name = "Malssi",
-            level = 5,
-            exp = 70,
+            userStatusModel = UserStatusModel(
+                profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
+                name = "Malssi",
+                level = 5,
+                exp = 70,
+            ),
             modifier = Modifier.background(colors.white)
         )
     }
