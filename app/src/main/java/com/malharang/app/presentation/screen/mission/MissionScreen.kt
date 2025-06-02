@@ -23,6 +23,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun MissionRoute(
@@ -93,29 +94,31 @@ private fun MissionScreen(padding: PaddingValues) {
         }
     }
 }
+data class MissionData(val title: String, val description: String)
 
 @Composable
 fun DropdownItems(title: String) {
     var expanded by remember { mutableStateOf(false) }
 
     val completedMissions = listOf(
-        "Order food - 2025.05.01",
-        "Ask for directions - 2025.05.03",
-        "Introduce yourself - 2025.05.04",
-        "Buy a ticket - 2025.05.05",
-        "Make a reservation - 2025.05.06"
+        MissionData("Order food", "Learn to order food in Korean"),
+        MissionData("Ask for directions", "Practice asking for directions"),
+        MissionData("Buy a ticket", "Handle ticket buying situation"),
+        MissionData("Introduce yourself", "Practice self introduction"),
+        MissionData("Make a reservation", "Phone call reservation practice")
     )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(1.dp, RoundedCornerShape(12.dp))
-            .background(colors.white, RoundedCornerShape(12.dp))
-            .clickable { expanded = !expanded }
+            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }, // 아이콘 클릭 처리
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -134,18 +137,24 @@ fun DropdownItems(title: String) {
         if (expanded) {
             Spacer(modifier = Modifier.height(12.dp))
             LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 200.dp), // 스크롤 높이 제한
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .heightIn(max = 280.dp)
             ) {
+                item {
+                    Spacer(modifier = Modifier.height(5.dp))
+                }
                 items(completedMissions) { mission ->
-                    Text(
-                        text = mission,
-                        fontSize = 12.sp,
-                        color = colors.black,
-                        modifier = Modifier.padding(start = 8.dp)
+                    MissionCard(
+                        title = mission.title,
+                        description = mission.description,
+                        onClick = {},
+                        onStartClick = {}
                     )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(5.dp))
                 }
             }
         }
