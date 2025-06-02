@@ -27,6 +27,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", properties["base.url"].toString())
+        manifestPlaceholders["MAPS_API_KEY"] = properties["maps.api.key"] ?: ""
     }
 
     buildTypes {
@@ -96,6 +97,11 @@ dependencies {
 
     // Timber
     implementation(libs.timber)
+
+    // Google Maps
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+    implementation(libs.maps.compose.widgets)
 }
 
 ktlint {

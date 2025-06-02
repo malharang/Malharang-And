@@ -28,6 +28,11 @@ import androidx.compose.ui.graphics.vector.VectorPath
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.core.component.UserStatusBar
@@ -48,10 +53,16 @@ fun HomeRoute(
         exp = 70,
     )
 
+    val seoul = LatLng(37.5665, 126.9780) // 서울시청
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(seoul, 14f)
+    }
+
     HomeScreen(
         padding = padding,
         userStatusModel = userStatusModel,
         currentLocation = "한신대학교 경삼관",
+        cameraPositionState = cameraPositionState
     )
 }
 
@@ -60,6 +71,7 @@ private fun HomeScreen(
     padding: PaddingValues,
     userStatusModel: UserStatusModel,
     currentLocation: String,
+    cameraPositionState: CameraPositionState,
     onLoadMoreContents: () -> Unit = {},
 ) {
     Column(
@@ -76,6 +88,11 @@ private fun HomeScreen(
                 .padding(bottom = 30.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+            )
 
             Column(
                 modifier = Modifier
@@ -138,7 +155,8 @@ private fun PreviewHomeScreen() {
                 level = 5,
                 exp = 70,
             ),
-            currentLocation = "한신대학교 경삼관"
+            currentLocation = "한신대학교 경삼관",
+            cameraPositionState = rememberCameraPositionState()
         )
     }
 }
