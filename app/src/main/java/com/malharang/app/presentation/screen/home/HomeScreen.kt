@@ -1,9 +1,7 @@
 package com.malharang.app.presentation.screen.home
 
-import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,10 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.VectorPainter
-import androidx.compose.ui.graphics.vector.VectorPath
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,12 +41,11 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 fun HomeRoute(
     padding: PaddingValues
 ) {
-
     val userStatusModel = UserStatusModel(
         profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
         name = "Malssi",
         level = 5,
-        exp = 70,
+        exp = 70
     )
 
     val seoul = LatLng(37.5665, 126.9780) // 서울시청
@@ -73,7 +67,7 @@ private fun HomeScreen(
     userStatusModel: UserStatusModel,
     currentLocation: String,
     cameraPositionState: CameraPositionState,
-    onLoadMoreContents: () -> Unit = {},
+    onLoadMoreContents: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -93,19 +87,19 @@ private fun HomeScreen(
                     .fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 uiSettings = MapUiSettings(
-                    zoomControlsEnabled = false,
+                    zoomControlsEnabled = false
                 )
             )
 
             Column(
                 modifier = Modifier
-                    .padding(start = 12.dp, end = 12.dp, bottom =  30.dp)
+                    .padding(start = 12.dp, end = 12.dp, bottom = 30.dp)
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .clip(RoundedCornerShape(16.dp))
                     .background(colors.white)
                     .padding(horizontal = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 HorizontalDivider(
                     thickness = 4.dp,
@@ -117,7 +111,7 @@ private fun HomeScreen(
                 Text(
                     text = "\uD83D\uDCCD 현재 위치: $currentLocation",
                     modifier = Modifier
-                        .padding(bottom = 5.dp),
+                        .padding(bottom = 5.dp)
                 )
                 MissionCard() // TODO: MissionCardData 로 전달
 
@@ -138,12 +132,9 @@ private fun HomeScreen(
                         .noRippleClickable { onLoadMoreContents() }
                         .padding(bottom = 15.dp)
                 )
-
             }
         }
     }
-
-
 }
 
 @Preview(showBackground = true)
@@ -156,7 +147,7 @@ private fun PreviewHomeScreen() {
                 profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
                 name = "Malssi",
                 level = 5,
-                exp = 70,
+                exp = 70
             ),
             currentLocation = "한신대학교 경삼관",
             cameraPositionState = rememberCameraPositionState()

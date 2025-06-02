@@ -39,7 +39,7 @@ fun UserStatusBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(paddingValues),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
             model = userStatusModel.profileUrl,
@@ -97,7 +97,7 @@ private fun UserStatusBarPreview() {
                 profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
                 name = "Malssi",
                 level = 5,
-                exp = 70,
+                exp = 70
             ),
             modifier = Modifier.background(colors.white)
         )
