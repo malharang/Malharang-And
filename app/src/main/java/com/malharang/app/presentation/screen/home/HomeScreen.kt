@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
@@ -79,24 +80,26 @@ private fun HomeScreen(
             .padding(padding)
             .fillMaxSize()
     ) {
-        UserStatusBar(userStatusModel)
+        UserStatusBar(userStatusModel, modifier = Modifier.padding(top = 5.dp, bottom = 3.dp))
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colors.black)
-                .padding(bottom = 30.dp),
+                .background(colors.black),
             contentAlignment = Alignment.BottomCenter
         ) {
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize(),
                 cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    zoomControlsEnabled = false,
+                )
             )
 
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp)
+                    .padding(start = 12.dp, end = 12.dp, bottom =  30.dp)
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .clip(RoundedCornerShape(16.dp))
@@ -114,7 +117,7 @@ private fun HomeScreen(
                 Text(
                     text = "\uD83D\uDCCD 현재 위치: $currentLocation",
                     modifier = Modifier
-                        .padding(bottom = 20.dp),
+                        .padding(bottom = 5.dp),
                 )
                 MissionCard() // TODO: MissionCardData 로 전달
 
