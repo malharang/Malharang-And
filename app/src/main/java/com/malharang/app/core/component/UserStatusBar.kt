@@ -1,15 +1,18 @@
 package com.malharang.app.core.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -35,7 +38,8 @@ fun UserStatusBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(paddingValues)
+            .padding(paddingValues),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
             model = userStatusModel.profileUrl,
@@ -44,8 +48,13 @@ fun UserStatusBar(
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = colors.gray,
+                    shape = CircleShape
+                )
         )
-
+        Spacer(modifier = Modifier.width(10.dp))
         Column {
             Text(
                 text = userStatusModel.name,
