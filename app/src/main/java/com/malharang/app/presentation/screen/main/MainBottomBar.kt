@@ -96,7 +96,7 @@ private fun RowScope.MainBottomBarItem(
                 interactionSource = remember { MutableInteractionSource() }
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = if (selected) {
@@ -108,11 +108,11 @@ private fun RowScope.MainBottomBarItem(
             },
             contentDescription = null,
             tint = if (selected) colors.greenDark else colors.greenLight,
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(32.dp)
         )
         Text(
             text = stringResource(tab.title),
-            style = typography.bodyMedium,
+            style = typography.bodySmall,
             color = if (selected) colors.greenDark else colors.greenLight
         )
     }
