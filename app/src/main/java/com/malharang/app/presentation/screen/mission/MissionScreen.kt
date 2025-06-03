@@ -89,15 +89,15 @@ private fun MissionScreen(padding: PaddingValues) {
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
-            DropdownItems("Review Mission")
-            DropdownItem("Export Sentences")
+            DropdownMissions("Review Mission")
+            SentenceItem("Export Sentences")
         }
     }
 }
 data class MissionData(val title: String, val description: String)
 
 @Composable
-fun DropdownItems(title: String) {
+fun DropdownMissions(title: String) {
     var expanded by remember { mutableStateOf(false) }
 
     val completedMissions = listOf(
@@ -162,7 +162,7 @@ fun DropdownItems(title: String) {
 }
 
 @Composable
-fun DropdownItem(title: String) {
+fun SentenceItem(title: String) {
     var expanded by remember { mutableStateOf(false) }
 
     val completedMissions = listOf(
