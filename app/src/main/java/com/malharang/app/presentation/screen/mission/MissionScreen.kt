@@ -69,14 +69,12 @@ private fun MissionScreen(padding: PaddingValues) {
             MissionCard(
                 title = "Order food",
                 description = "Learn to order food in Korean",
-                onClick = {},
-                onStartClick = {}
+                onClick = {}
             )
             MissionCard(
                 title = "Ask for directions",
                 description = "Practice asking for directions",
-                onClick = {},
-                onStartClick = {}
+                onClick = {}
             )
         }
 

@@ -1,15 +1,18 @@
 package com.malharang.app.core.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -21,36 +24,40 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
 @Composable
 fun UserStatusBar(
-    profileUrl: String,
-    name: String,
-    level: Int,
-    exp: Int,
+    userStatusModel: UserStatusModel,
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues = PaddingValues(horizontal = 20.dp)
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(paddingValues)
+            .padding(paddingValues),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = profileUrl,
+            model = userStatusModel.profileUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = colors.gray,
+                    shape = CircleShape
+                )
         )
-
+        Spacer(modifier = Modifier.width(10.dp))
         Column {
             Text(
-                text = name,
+                text = userStatusModel.name,
                 style = typography.bodyMediumBold
             )
             Row(
@@ -58,7 +65,7 @@ fun UserStatusBar(
                 modifier = Modifier.padding(end = 100.dp)
             ) {
                 Text(
-                    text = "Lv $level",
+                    text = "Lv ${userStatusModel.level}",
                     modifier = Modifier.padding(end = 5.dp)
                 )
                 Box(
@@ -70,7 +77,7 @@ fun UserStatusBar(
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(exp * 0.01f)
+                            .fillMaxWidth(userStatusModel.exp * 0.01f)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(3.dp))
                             .background(colors.green)
@@ -86,10 +93,12 @@ fun UserStatusBar(
 private fun UserStatusBarPreview() {
     MalHaRangTheme {
         UserStatusBar(
-            profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
-            name = "Malssi",
-            level = 5,
-            exp = 70,
+            userStatusModel = UserStatusModel(
+                profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
+                name = "Malssi",
+                level = 5,
+                exp = 70
+            ),
             modifier = Modifier.background(colors.white)
         )
     }

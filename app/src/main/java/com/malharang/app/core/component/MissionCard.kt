@@ -8,8 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,25 +17,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 import com.malharang.app.ui.theme.MalHaRangTheme
+import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
 @Composable
 fun MissionCard(
     title: String = "Order food",
     description: String = "Learn to order food in Korean",
-    onStartClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 6.dp,
+                elevation = 4.dp,
                 shape = RoundedCornerShape(16.dp),
-                clip = false
+                clip = true
             )
-            .background(Color.White, shape = RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .background(colors.white, shape = RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -49,40 +51,40 @@ fun MissionCard(
                     Icon(
                         painter = painterResource(id = R.drawable.img_core_missioncard_leaf),
                         contentDescription = null,
-                        tint = Color(0xFF22C55E),
+                        tint = colors.greenTint,
                         modifier = Modifier
-                            .size(14.dp)
+                            .size(18.dp)
                             .padding(end = 4.dp)
                     )
                     Text(
                         text = title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-                        color = Color.Black
+                        color = colors.black
                     )
                 }
-
-                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = description,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colors.grayDark
                 )
             }
 
-            Button(
-                onClick = onStartClick,
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF22C55E),
-                    contentColor = Color.White
-                ),
+            Box(
                 modifier = Modifier
-                    .defaultMinSize(minHeight = 36.dp)
+                    .defaultMinSize(minHeight = 24.dp)
                     .padding(start = 12.dp)
+                    .clip(RoundedCornerShape(30))
+                    .background(colors.greenTint)
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(text = "Start")
+                Text(
+                    text = "Start",
+                    style = typography.bodySmall,
+                    color = colors.white
+                )
             }
         }
     }
@@ -93,8 +95,7 @@ fun MissionCard(
 private fun PreviewMissionCard() {
     MalHaRangTheme {
         MissionCard(
-            onClick = {},
-            onStartClick = {}
+            onClick = {}
         )
     }
 }
