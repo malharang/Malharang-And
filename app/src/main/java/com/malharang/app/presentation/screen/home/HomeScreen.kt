@@ -111,19 +111,19 @@ private fun HomeScreen(
                 Text(
                     text = "\uD83D\uDCCD 현재 위치: $currentLocation",
                     modifier = Modifier
-                        .padding(bottom = 5.dp)
+                        .padding(bottom = 10.dp)
                 )
                 MissionCard() // TODO: MissionCardData 로 전달
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 MissionCard()
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 MissionCard()
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_home_chevron_down_24),
