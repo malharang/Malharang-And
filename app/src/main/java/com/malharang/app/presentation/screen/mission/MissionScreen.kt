@@ -2,15 +2,31 @@ package com.malharang.app.presentation.screen.mission
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -19,94 +35,119 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.core.component.MissionCard
+import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun MissionRoute(
     padding: PaddingValues
 ) {
-    MissionScreen(padding = padding)
+    val missionCardList = listOf(
+        MissionCardModel(
+            title = "Order food",
+            description = "Learn to order food in Korean"
+        ),
+        MissionCardModel(
+            title = "Ask for directions",
+            description = "Practice asking for directions"
+        )
+    )
+
+    val reviewMissions = listOf(
+        MissionCardModel("Order food", "Learn to order food in Korean"),
+        MissionCardModel("Ask for directions", "Practice asking for directions"),
+        MissionCardModel("Buy a ticket", "Handle ticket buying situation"),
+        MissionCardModel("Introduce yourself", "Practice self introduction"),
+        MissionCardModel("Make a reservation", "Phone call reservation practice")
+    )
+
+    val exportSentences = listOf(
+        "Order food - 2025.05.01",
+        "Ask for directions - 2025.05.03",
+        "Introduce yourself - 2025.05.04",
+        "Buy a ticket - 2025.05.05",
+        "Make a reservation - 2025.05.06"
+    )
+
+    MissionScreen(
+        padding = padding,
+        missionCardList = missionCardList,
+        reviewMissionList = reviewMissions,
+        exportSentences = exportSentences
+
+    )
 }
 
 @Composable
-private fun MissionScreen(padding: PaddingValues) {
-    Column(
+private fun MissionScreen(
+    padding: PaddingValues,
+    missionCardList: List<MissionCardModel>,
+    reviewMissionList: List<MissionCardModel>,
+    exportSentences: List<String>
+) {
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // 상단: 타이틀과 필터 아이콘
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Missions",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "More options",
-                tint = colors.black
-            )
-        }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Missions",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More options",
+                    tint = colors.black
+                )
+            }
 
-        // 섹션: Available Missions
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(
-                text = "Available Missions",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            MissionCard(
-                title = "Order food",
-                description = "Learn to order food in Korean",
-                onClick = {}
-            )
-            MissionCard(
-                title = "Ask for directions",
-                description = "Practice asking for directions",
-                onClick = {}
-            )
-        }
+            // 섹션: Available Missions
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Available Missions",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
 
-        Spacer(modifier = Modifier.height(40.dp))
+                missionCardList.forEach { missionCardData ->
+                    MissionCard(data = missionCardData)
+                }
+            }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Completed Missions",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            DropdownMissions("Review Mission")
-            SentenceItem("Export Sentences")
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Completed Missions",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                DropdownMissions("Review Mission", reviewMissionList)
+                SentenceItem("Export Sentences", exportSentences)
+            }
         }
     }
 }
-data class MissionData(val title: String, val description: String)
 
 @Composable
-fun DropdownMissions(title: String) {
+fun DropdownMissions(
+    title: String,
+    completedMissionList: List<MissionCardModel>
+) {
     var expanded by remember { mutableStateOf(false) }
-
-    val completedMissions = listOf(
-        MissionData("Order food", "Learn to order food in Korean"),
-        MissionData("Ask for directions", "Practice asking for directions"),
-        MissionData("Buy a ticket", "Handle ticket buying situation"),
-        MissionData("Introduce yourself", "Practice self introduction"),
-        MissionData("Make a reservation", "Phone call reservation practice")
-    )
 
     Column(
         modifier = Modifier
@@ -145,13 +186,8 @@ fun DropdownMissions(title: String) {
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
                 }
-                items(completedMissions) { mission ->
-                    MissionCard(
-                        title = mission.title,
-                        description = mission.description,
-                        onClick = {},
-                        onStartClick = {}
-                    )
+                items(completedMissionList) { mission ->
+                    MissionCard(mission)
                 }
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
@@ -162,16 +198,11 @@ fun DropdownMissions(title: String) {
 }
 
 @Composable
-fun SentenceItem(title: String) {
+fun SentenceItem(
+    title: String,
+    exportSentences: List<String>
+) {
     var expanded by remember { mutableStateOf(false) }
-
-    val completedMissions = listOf(
-        "Order food - 2025.05.01",
-        "Ask for directions - 2025.05.03",
-        "Introduce yourself - 2025.05.04",
-        "Buy a ticket - 2025.05.05",
-        "Make a reservation - 2025.05.06"
-    )
 
     Column(
         modifier = Modifier
@@ -206,7 +237,7 @@ fun SentenceItem(title: String) {
                     .heightIn(max = 200.dp), // 스크롤 높이 제한
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(completedMissions) { mission ->
+                items(exportSentences) { mission ->
                     Text(
                         text = mission,
                         fontSize = 12.sp,
@@ -223,6 +254,39 @@ fun SentenceItem(title: String) {
 @Composable
 private fun PreviewMissionScreen() {
     MalHaRangTheme {
-        MissionScreen(padding = PaddingValues())
+        val missionCardList = listOf(
+            MissionCardModel(
+                title = "Order food",
+                description = "Learn to order food in Korean"
+            ),
+            MissionCardModel(
+                title = "Ask for directions",
+                description = "Practice asking for directions"
+            )
+        )
+
+        val reviewMissions = listOf(
+            MissionCardModel("Order food", "Learn to order food in Korean"),
+            MissionCardModel("Ask for directions", "Practice asking for directions"),
+            MissionCardModel("Buy a ticket", "Handle ticket buying situation"),
+            MissionCardModel("Introduce yourself", "Practice self introduction"),
+            MissionCardModel("Make a reservation", "Phone call reservation practice")
+        )
+
+        val exportSentences = listOf(
+            "Order food - 2025.05.01",
+            "Ask for directions - 2025.05.03",
+            "Introduce yourself - 2025.05.04",
+            "Buy a ticket - 2025.05.05",
+            "Make a reservation - 2025.05.06"
+        )
+
+        MissionScreen(
+            padding = PaddingValues(),
+            missionCardList = missionCardList,
+            reviewMissionList = reviewMissions,
+            exportSentences = exportSentences
+
+        )
     }
 }
