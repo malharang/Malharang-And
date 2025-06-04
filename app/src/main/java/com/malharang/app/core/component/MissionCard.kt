@@ -16,14 +16,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R
+import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
 @Composable
 fun MissionCard(
-    title: String = "Order food",
-    description: String = "Learn to order food in Korean",
+    data: MissionCardModel =
+        MissionCardModel(
+            title = "Order food",
+            description = "Learn to order food in Korean"
+        ),
     onClick: () -> Unit = {}
 ) {
     Box(
@@ -57,7 +61,7 @@ fun MissionCard(
                             .padding(end = 4.dp)
                     )
                     Text(
-                        text = title,
+                        text = data.title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = colors.black
@@ -65,7 +69,7 @@ fun MissionCard(
                 }
 
                 Text(
-                    text = description,
+                    text = data.description,
                     fontSize = 12.sp,
                     color = colors.grayDark
                 )
@@ -95,7 +99,10 @@ fun MissionCard(
 private fun PreviewMissionCard() {
     MalHaRangTheme {
         MissionCard(
-            onClick = {}
+            MissionCardModel(
+                title = "Order",
+                description = "Learn to order food in Korean"
+            )
         )
     }
 }
