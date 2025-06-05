@@ -45,6 +45,7 @@ lifecycleRuntimeComposeAndroid = "2.8.7"
 
 # Google Maps
 maps-compose = "4.4.1"
+play-services-location = "21.3.0"
 
 [libraries]
 # Core
@@ -96,6 +97,8 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", vers
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "maps-compose" }
 maps-compose-widgets = { module = "com.google.maps.android:maps-compose-widgets", version.ref = "maps-compose" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

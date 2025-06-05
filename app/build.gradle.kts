@@ -102,6 +102,10 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.compose.widgets)
+
+    // Map permissions
+    implementation(libs.play.services.location)
+    implementation(libs.accompanist.permissions)
 }
 
 ktlint {
