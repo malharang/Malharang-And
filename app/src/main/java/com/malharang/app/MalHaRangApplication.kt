@@ -13,7 +13,7 @@ class MalHaRangApplication : Application() {
 
         // Places API 초기화
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
             Timber.d("Places API가 초기화되었습니다.")
         }
     }

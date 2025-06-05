@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import com.malharang.app.presentation.screen.chat.navigation.chatNavGraph
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
+import com.malharang.app.presentation.screen.placetype.navigation.placeTypeNavGraph
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
@@ -28,7 +29,7 @@ fun MainNavHost(
             navController = navigator.navController,
             startDestination = navigator.startDestination
         ) {
-            homeNavGraph(padding)
+            homeNavGraph(padding, navigator.navController)
 
             chatNavGraph(
                 padding = padding,
@@ -38,6 +39,8 @@ fun MainNavHost(
             missionNavGraph(padding)
 
             profileNavGraph(padding)
+
+            placeTypeNavGraph(padding, navigator.navController)
         }
     }
 }
