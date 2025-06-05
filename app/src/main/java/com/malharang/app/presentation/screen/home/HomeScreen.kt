@@ -6,6 +6,7 @@ import android.Manifest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -29,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,6 +55,8 @@ import com.malharang.app.core.component.MissionCard
 import com.malharang.app.core.component.UserStatusBar
 import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.UserStatusModel
+import com.malharang.app.presentation.screen.home.component.PlaceTypeEmptyView
+import com.malharang.app.presentation.screen.home.component.PlaceTypeListRow
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import timber.log.Timber
@@ -58,6 +64,7 @@ import timber.log.Timber
 @Composable
 fun HomeRoute(
     padding: PaddingValues,
+    navigateToPlaceType: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     // TODO: Dummy Data
@@ -85,6 +92,7 @@ fun HomeRoute(
     }
 
     val selectedPOI by viewModel.selectedPOI.collectAsState()
+    val placeTypes by viewModel.placeTypes.collectAsState()
 
     fun offsetLatLng(location: LatLng): LatLng {
         return LatLng(location.latitude - 0.003, location.longitude)
@@ -107,12 +115,6 @@ fun HomeRoute(
         }
     }
 
-    LaunchedEffect(selectedPOI) {
-        selectedPOI?.let { poi ->
-            viewModel.fetchPlaceTypes(poi.placeId)
-        }
-    }
-
     HomeScreen(
         padding = padding,
         userStatusModel = userStatusModel,
@@ -120,7 +122,9 @@ fun HomeRoute(
             viewModel.fetchCurrentLocation()
             cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f))
         },
+        navigateToPlaceType = navigateToPlaceType,
         selectedPOI = selectedPOI,
+        placeTypes = placeTypes,
         selectPOI = viewModel::selectPOI,
         cameraPositionState = cameraPositionState
     )
@@ -132,6 +136,8 @@ private fun HomeScreen(
     userStatusModel: UserStatusModel,
     cameraPositionState: CameraPositionState,
     selectedPOI: PointOfInterest? = null,
+    placeTypes: List<String>,
+    navigateToPlaceType: () -> Unit = {},
     selectPOI: (PointOfInterest) -> Unit = {},
     onRequestCurrentLocation: () -> Unit = {},
     onLoadMoreContents: () -> Unit = {}
@@ -208,27 +214,33 @@ private fun HomeScreen(
                 Text(
                     text = "\uD83D\uDCCD 현재 위치: ${selectedPOI?.name ?: "한신대학교 경삼관"}",
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
-                MissionCard() // TODO: MissionCardData 로 전달
 
-                Spacer(modifier = Modifier.height(12.dp))
+                if (placeTypes.isNotEmpty()) {
+                    PlaceTypeListRow(
+                        placeTypes = placeTypes,
+                        onAddClick = navigateToPlaceType,
+                    )
+                    MissionCard() // TODO: MissionCardData 로 전달
 
-                MissionCard()
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    MissionCard()
 
-                MissionCard()
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_home_chevron_down_24),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .noRippleClickable { onLoadMoreContents() }
-                        .padding(bottom = 15.dp)
-                )
+                    Image(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_home_chevron_down_24),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .noRippleClickable { onLoadMoreContents() }
+                            .padding(bottom = 15.dp)
+                    )
+                } else {
+                    PlaceTypeEmptyView(onAddPlaceTypeClick = navigateToPlaceType)
+                }
             }
         }
     }
@@ -246,7 +258,8 @@ private fun PreviewHomeScreen() {
                 level = 5,
                 exp = 70
             ),
-            cameraPositionState = rememberCameraPositionState()
+            cameraPositionState = rememberCameraPositionState(),
+            placeTypes = listOf("park", "restaurant", "restaurant", "restaurant", "restaurant", "restaurant"),
         )
     }
 }

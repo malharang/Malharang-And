@@ -82,5 +82,6 @@ class HomeViewModel @Inject constructor(
 
     fun selectPOI(poi: PointOfInterest) {
         _selectedPOI.value = poi
+        fetchPlaceTypes(poi.placeId)
     }
 }
