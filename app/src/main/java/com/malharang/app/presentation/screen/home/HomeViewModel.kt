@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
-    @ApplicationContext private val context: Context,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _location = MutableStateFlow<LatLng>(LatLng(37.5665, 126.9780))
@@ -68,7 +68,8 @@ class HomeViewModel @Inject constructor(
 
     fun fetchCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             locationClient.lastLocation.addOnSuccessListener { loc ->
@@ -79,9 +80,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
     fun selectPOI(poi: PointOfInterest) {
         _selectedPOI.value = poi
     }
 }
-

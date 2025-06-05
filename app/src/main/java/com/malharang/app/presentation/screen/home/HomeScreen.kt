@@ -136,7 +136,6 @@ private fun HomeScreen(
     onRequestCurrentLocation: () -> Unit = {},
     onLoadMoreContents: () -> Unit = {}
 ) {
-
     Column(
         modifier = Modifier
             .padding(padding)
@@ -156,7 +155,7 @@ private fun HomeScreen(
                 cameraPositionState = cameraPositionState,
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = false,
-                    myLocationButtonEnabled = true,
+                    myLocationButtonEnabled = true
                 ),
                 onPOIClick = { poi ->
                     selectPOI(poi)
