@@ -27,6 +27,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", properties["base.url"].toString())
+        buildConfigField("String", "MAPS_API_KEY", properties["maps.api.key"].toString())
         manifestPlaceholders["MAPS_API_KEY"] = properties["maps.api.key"].toString()
     }
 
@@ -102,6 +103,8 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.compose.widgets)
+    implementation(platform(libs.kotlin.bom))
+    implementation(libs.google.places)
 
     // Map permissions
     implementation(libs.play.services.location)
