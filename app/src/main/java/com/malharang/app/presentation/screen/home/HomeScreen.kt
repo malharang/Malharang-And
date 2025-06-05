@@ -107,17 +107,21 @@ fun HomeRoute(
         }
     }
 
+    LaunchedEffect(selectedPOI) {
+        selectedPOI?.let { poi ->
+            viewModel.fetchPlaceTypes(poi.placeId)
+        }
+    }
+
     HomeScreen(
         padding = padding,
         userStatusModel = userStatusModel,
-        location = location,
         onRequestCurrentLocation = {
             viewModel.fetchCurrentLocation()
             cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f))
         },
         selectedPOI = selectedPOI,
         selectPOI = viewModel::selectPOI,
-        currentLocation = "한신대학교 경삼관",
         cameraPositionState = cameraPositionState
     )
 }
@@ -126,8 +130,6 @@ fun HomeRoute(
 private fun HomeScreen(
     padding: PaddingValues,
     userStatusModel: UserStatusModel,
-    location: LatLng = LatLng(37.5665, 126.9780),
-    currentLocation: String,
     cameraPositionState: CameraPositionState,
     selectedPOI: PointOfInterest? = null,
     selectPOI: (PointOfInterest) -> Unit = {},
@@ -157,21 +159,16 @@ private fun HomeScreen(
                     myLocationButtonEnabled = true,
                 ),
                 onPOIClick = { poi ->
-                    Timber.tag("POI_TEST").d("클릭한 장소: %s", poi.name)
                     selectPOI(poi)
                 }
             ) {
-                Marker(
-                    state = MarkerState(position = location),
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
-                    onClick = { true }
-                )
-
                 selectedPOI?.let {
+                    Timber.tag("DEBUG_HOME").d("POI Id: %s", it.placeId)
+
                     Marker(
                         state = MarkerState(position = it.latLng),
                         title = it.name,
-                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                     )
                 }
             }
@@ -210,7 +207,7 @@ private fun HomeScreen(
                         .clip(RoundedCornerShape(10.dp))
                 )
                 Text(
-                    text = "\uD83D\uDCCD 현재 위치: $currentLocation",
+                    text = "\uD83D\uDCCD 현재 위치: ${selectedPOI?.name ?: "한신대학교 경삼관"}",
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                 )
@@ -250,7 +247,6 @@ private fun PreviewHomeScreen() {
                 level = 5,
                 exp = 70
             ),
-            currentLocation = "한신대학교 경삼관",
             cameraPositionState = rememberCameraPositionState()
         )
     }
