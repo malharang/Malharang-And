@@ -29,7 +29,6 @@ fun ProfileRoute(
 @Composable
 fun ProfileScreen(padding: PaddingValues) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // 📦 메인 콘텐츠 덮기
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -76,7 +75,7 @@ fun ProfileScreen(padding: PaddingValues) {
 @Composable
 fun ProfileCharacterImage() {
     Image(
-        painter = painterResource(id = R.drawable.img_profile_massi), // <- .png 리소스로 교체
+        painter = painterResource(id = R.drawable.img_profile_massi),
         contentDescription = "Seed Character",
         modifier = Modifier
             .fillMaxWidth()
@@ -142,7 +141,7 @@ fun BadgeCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.Start // ← 왼쪽 정렬
+            horizontalAlignment = Alignment.Start
         ) {
             Text("Badges", fontWeight = FontWeight.Bold, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(12.dp))
