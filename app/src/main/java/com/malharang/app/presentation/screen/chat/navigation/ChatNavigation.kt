@@ -17,6 +17,9 @@ fun NavGraphBuilder.chatNavGraph(
     navController: NavController
 ) {
     composable<MainTabRoute.Chat> {
-        ChatRoute(padding = padding)
+        ChatRoute(
+            padding = padding,
+            onBackClick = { navController.popBackStack() }
+            )
     }
 }
