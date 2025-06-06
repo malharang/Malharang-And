@@ -46,7 +46,7 @@ fun MalHaRangTheme(
         if (!view.isInEditMode) {
             SideEffect {
                 (view.context as Activity).window.run {
-                    WindowCompat.getInsetsController(this, view).isAppearanceLightStatusBars
+                    WindowCompat.getInsetsController(this, view).isAppearanceLightStatusBars = true
                 }
             }
         }

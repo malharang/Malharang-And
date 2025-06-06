@@ -29,8 +29,7 @@ private fun MainScreenContent(
 ) {
     Scaffold(
         modifier = modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.statusBars),
+            .fillMaxSize(),
         content = { padding ->
             MainNavHost(
                 navigator = navigator,
