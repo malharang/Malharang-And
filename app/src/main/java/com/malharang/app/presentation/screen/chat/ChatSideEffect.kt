@@ -1,5 +1,5 @@
 package com.malharang.app.presentation.screen.chat
 
-sealed class ChatSideEffect {
-
+sealed interface ChatSideEffect {
+    data class ShowToast(val message: String) : ChatSideEffect
 }

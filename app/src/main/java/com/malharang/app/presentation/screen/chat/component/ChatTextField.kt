@@ -42,6 +42,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.typography
 fun ChatTextField(
     chat: String,
     onTextChanged: (String) -> Unit,
+    onSendClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -107,7 +108,7 @@ fun ChatTextField(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(colors.greenTint)
-                    .clickable { },
+                    .clickable { onSendClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -130,6 +131,7 @@ private fun ChatTextFieldPreview() {
         ChatTextField(
             chat = "",
             onTextChanged = {},
+            onSendClick = {},
             modifier = Modifier.padding(16.dp),
         )
     }

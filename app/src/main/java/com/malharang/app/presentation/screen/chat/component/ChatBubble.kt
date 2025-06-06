@@ -43,7 +43,7 @@ fun ChatBubble(
     onVoiceClick: () -> Unit = {},
     onBookmarkClick: () -> Unit = {},
 ) {
-    val maxWidth = LocalConfiguration.current.screenWidthDp.dp
+    val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
     val bubbleColor = if (isFromBot) colors.greenBasic else colors.white
     val shape = RoundedCornerShape(
@@ -67,7 +67,7 @@ fun ChatBubble(
                     else Modifier
                 )
                 .padding(16.dp)
-                .widthIn(max = maxWidth - 100.dp)
+                .widthIn(max = maxWidth)
                 .width(IntrinsicSize.Max),
             horizontalAlignment = if (isFromBot) Alignment.Start else Alignment.End
         ) {
