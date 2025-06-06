@@ -6,7 +6,6 @@ import android.Manifest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -36,6 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -64,6 +63,7 @@ import timber.log.Timber
 @Composable
 fun HomeRoute(
     padding: PaddingValues,
+    navController: NavController,
     navigateToPlaceType: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -74,6 +74,18 @@ fun HomeRoute(
         level = 5,
         exp = 70
     )
+
+    val navBackStackEntry = navController.currentBackStackEntryAsState().value
+    LaunchedEffect(navBackStackEntry) {
+        val type = navBackStackEntry?.savedStateHandle?.get<List<String>>("selected_place_types")
+        if (type != null) {
+            val currentTypes = viewModel.placeTypes.value
+            val updatedTypes = (currentTypes + type).distinct()
+            viewModel.setSelectedPlaceType(updatedTypes)
+
+            navBackStackEntry.savedStateHandle.remove<List<String>>("selected_place_types")
+        }
+    }
 
     // Maps
     val locationPermissions = rememberMultiplePermissionsState(
@@ -94,6 +106,11 @@ fun HomeRoute(
     val selectedPOI by viewModel.selectedPOI.collectAsState()
     val placeTypes by viewModel.placeTypes.collectAsState()
 
+    val navigateToPlaceTypeWithData = {
+        navController.currentBackStackEntry?.savedStateHandle?.set("existing_types", placeTypes)
+        navigateToPlaceType()
+    }
+
     fun offsetLatLng(location: LatLng): LatLng {
         return LatLng(location.latitude - 0.003, location.longitude)
     }
@@ -101,7 +118,6 @@ fun HomeRoute(
     LaunchedEffect(Unit) {
         if (locationPermissions.allPermissionsGranted) {
             viewModel.fetchCurrentLocation()
-            cameraOffsetLatLng = offsetLatLng(location)
         } else {
             locationPermissions.launchMultiplePermissionRequest()
         }
@@ -122,7 +138,7 @@ fun HomeRoute(
             viewModel.fetchCurrentLocation()
             cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f))
         },
-        navigateToPlaceType = navigateToPlaceType,
+        navigateToPlaceType = navigateToPlaceTypeWithData,
         selectedPOI = selectedPOI,
         placeTypes = placeTypes,
         selectPOI = viewModel::selectPOI,
@@ -221,7 +237,7 @@ private fun HomeScreen(
                 if (placeTypes.isNotEmpty()) {
                     PlaceTypeListRow(
                         placeTypes = placeTypes,
-                        onAddClick = navigateToPlaceType,
+                        onAddClick = navigateToPlaceType
                     )
                     MissionCard() // TODO: MissionCardData 로 전달
 
@@ -259,7 +275,7 @@ private fun PreviewHomeScreen() {
                 exp = 70
             ),
             cameraPositionState = rememberCameraPositionState(),
-            placeTypes = listOf("park", "restaurant", "restaurant", "restaurant", "restaurant", "restaurant"),
+            placeTypes = listOf("park", "restaurant", "restaurant", "restaurant", "restaurant", "restaurant")
         )
     }
 }

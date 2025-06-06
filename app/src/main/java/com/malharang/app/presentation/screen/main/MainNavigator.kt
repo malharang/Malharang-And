@@ -46,7 +46,6 @@ class MainNavigator(
         }
     }
 
-
     @Composable
     fun shouldShowBottomBar() = MainTab.contains {
         val currentRoute = currentDestination?.route

@@ -84,4 +84,8 @@ class HomeViewModel @Inject constructor(
         _selectedPOI.value = poi
         fetchPlaceTypes(poi.placeId)
     }
+
+    fun setSelectedPlaceType(types: List<String>) {
+        _placeTypes.value = types
+    }
 }

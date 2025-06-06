@@ -24,7 +24,6 @@ fun PlaceTypeListRow(
     placeTypes: List<String>,
     onAddClick: () -> Unit = {}
 ) {
-
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()

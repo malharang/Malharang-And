@@ -60,13 +60,11 @@ fun PlaceTypeEmptyView(
     }
 }
 
-
 @Preview
 @Composable
 private fun PlaceTypeEmptyViewPreview() {
-    MalHaRangTheme{
-        PlaceTypeEmptyView{
-
+    MalHaRangTheme {
+        PlaceTypeEmptyView {
         }
     }
 }

@@ -20,6 +20,8 @@ fun NavGraphBuilder.homeNavGraph(
     composable<MainTabRoute.Home> {
         HomeRoute(
             padding = padding,
-            navigateToPlaceType = { navController.navigateToPlaceType() })
+            navController = navController,
+            navigateToPlaceType = { navController.navigateToPlaceType() }
+        )
     }
 }
