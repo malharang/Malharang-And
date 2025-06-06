@@ -16,4 +16,7 @@ sealed interface MainTabRoute {
     data object Profile : MainTabRoute
 }
 
-sealed interface DummyRoute
+sealed interface HomeRoute {
+    @Serializable
+    data object PlaceType : HomeRoute
+}

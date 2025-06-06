@@ -9,7 +9,9 @@ val Black = Color(0xFF000000) // 100%
 
 // White
 val White = Color(0xFFFFFFFF)
-val White20 = Color(0x33FFFFFF)
+val White80 = White.copy(alpha = 0.8f)
+val White20 = White.copy(alpha = 0.2f)
+val White60 = White.copy(alpha = 0.6f)
 
 // Gray
 val Gray = Color(0xFFF5F0E5)
@@ -31,6 +33,9 @@ val GreenTint = Color(0xFF22C55E)
 data class MalHaRangColors(
     val black: Color,
     val white: Color,
+    val white80: Color,
+    val white60: Color,
+    val white20: Color,
     val gray: Color,
     val grayDark: Color,
     val greenLight: Color,
@@ -44,6 +49,9 @@ data class MalHaRangColors(
 val defaultMalHaRangColors = MalHaRangColors(
     black = Black,
     white = White,
+    white80 = White80,
+    white60 = White60,
+    white20 = White20,
     gray = Gray,
     grayDark = GrayDark,
     greenLight = GreenLight,

@@ -1,7 +1,9 @@
 package com.malharang.app.di
 
 import com.malharang.app.domain.repository.DummyRepository
+import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.usecase.DummyUseCase
+import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,4 +18,10 @@ object UseCaseModule {
     fun provideDummyUseCase(
         dummyRepository: DummyRepository
     ): DummyUseCase = DummyUseCase(dummyRepository)
+
+    @Provides
+    @Singleton
+    fun providePlaceTypeUseCase(
+        placeTypeRepository: PlaceTypeRepository
+    ): PlaceTypeUseCase = PlaceTypeUseCase(placeTypeRepository)
 }
