@@ -46,7 +46,6 @@ fun ChatRoute(
     onBackClick: () -> Unit,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
-
     val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
 
@@ -81,7 +80,7 @@ fun ChatRoute(
         state = state,
         listState = listState,
         onIntent = viewModel::onIntent,
-        onBackClick = onBackClick,
+        onBackClick = onBackClick
     )
 }
 
@@ -92,9 +91,8 @@ private fun ChatScreen(
     onIntent: (ChatIntent) -> Unit,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
-    missionDescription: String = "How to Order at a Coffe Shop",
+    missionDescription: String = "How to Order at a Coffe Shop"
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -121,21 +119,21 @@ private fun ChatScreen(
                 .weight(1f)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(space = 10.dp, alignment = Alignment.Top),
-            state = listState,
+            state = listState
         ) {
             item {
                 Text(
                     text = "Malssi",
                     style = typography.bodySmall,
                     modifier = Modifier
-                        .padding(top = 30.dp, bottom = 5.dp),
+                        .padding(top = 30.dp, bottom = 5.dp)
                 )
             }
 
             items(state.chatList) { chat ->
                 ChatBubble(
                     text = chat.text,
-                    sender = chat.sender,
+                    sender = chat.sender
                 )
             }
 
@@ -171,7 +169,7 @@ private fun PreviewChatScreen() {
             missionDescription = "How to Order at a Coffe Shop",
             state = ChatState(),
             onIntent = {},
-            listState = rememberLazyListState(),
+            listState = rememberLazyListState()
         )
     }
 }

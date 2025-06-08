@@ -41,7 +41,7 @@ fun ChatBubble(
     modifier: Modifier = Modifier,
     onTranslateClick: () -> Unit = {},
     onVoiceClick: () -> Unit = {},
-    onBookmarkClick: () -> Unit = {},
+    onBookmarkClick: () -> Unit = {}
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
@@ -63,8 +63,11 @@ fun ChatBubble(
                 .clip(shape)
                 .background(bubbleColor)
                 .then(
-                    if (!isFromBot) Modifier.border(width = 1.dp, color = colors.gray, shape = shape)
-                    else Modifier
+                    if (!isFromBot) {
+                        Modifier.border(width = 1.dp, color = colors.gray, shape = shape)
+                    } else {
+                        Modifier
+                    }
                 )
                 .padding(16.dp)
                 .widthIn(max = maxWidth)
@@ -76,7 +79,7 @@ fun ChatBubble(
                 textAlign = TextAlign.Start,
                 softWrap = true,
                 style = typography.bodyMedium,
-                color = if (isFromBot) colors.white else colors.black,
+                color = if (isFromBot) colors.white else colors.black
             )
 
             HorizontalDivider(
@@ -88,8 +91,8 @@ fun ChatBubble(
             Row(
                 modifier = Modifier.wrapContentWidth(),
                 horizontalArrangement = Arrangement.spacedBy(
-                    space = 8.dp,
-                ),
+                    space = 8.dp
+                )
             ) {
                 ChatIcon(
                     icon = if (isFromBot) R.drawable.ic_chat_translate_white_24 else R.drawable.ic_chat_translate_green_24,
@@ -133,11 +136,11 @@ private fun ChatBubblePreview() {
         ) {
             ChatBubble(
                 text = "안녕하세요! 어떤 커피를\n주문 하시겠어요?",
-                sender = SenderType.BOT,
+                sender = SenderType.BOT
             )
             ChatBubble(
                 text = "아메리카노 한잔 주세요",
-                sender = SenderType.USER,
+                sender = SenderType.USER
             )
         }
     }

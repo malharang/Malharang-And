@@ -1,6 +1,5 @@
 package com.malharang.app.presentation.screen.chat.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -18,6 +17,6 @@ fun NavGraphBuilder.chatNavGraph(
     composable<MainTabRoute.Chat> {
         ChatRoute(
             onBackClick = { navController.popBackStack() }
-            )
+        )
     }
 }

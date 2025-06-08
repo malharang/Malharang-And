@@ -20,14 +20,14 @@ import com.malharang.app.ui.theme.MalHaRangTheme.typography
 fun ChatTopBar(
     title: String,
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {},
-){
+    onBackClick: () -> Unit = {}
+) {
     Row(
         modifier = modifier
             .padding(top = 20.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.ic_chat_arrow_back_black_24),
@@ -37,13 +37,12 @@ fun ChatTopBar(
 
         Text(
             text = title,
-            style = typography.bodyMediumBold,
+            style = typography.bodyMediumBold
         )
 
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.ic_chat_leaf_black_24),
-            contentDescription = null,
+            contentDescription = null
         )
-
     }
 }

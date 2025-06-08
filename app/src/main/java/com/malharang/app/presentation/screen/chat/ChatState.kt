@@ -6,5 +6,5 @@ data class ChatState(
     val chatList: List<ChatMessage> = emptyList(),
     val input: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val error: String? = null
 )
