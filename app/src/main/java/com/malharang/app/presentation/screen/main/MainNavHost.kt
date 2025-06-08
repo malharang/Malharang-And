@@ -39,7 +39,10 @@ fun MainNavHost(
 
             profileNavGraph(padding)
 
-            placeTypeNavGraph(navigator.navController)
+            placeTypeNavGraph(
+                padding = padding,
+                navController = navigator.navController
+            )
         }
     }
 }

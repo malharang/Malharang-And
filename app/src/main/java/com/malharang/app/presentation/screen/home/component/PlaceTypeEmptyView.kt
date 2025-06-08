@@ -31,7 +31,7 @@ fun PlaceTypeEmptyView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "이 장소에 대한 유형 정보가 없어요.\n직접 추가해 볼까요?",
+            text = "No place type available.\nWould you like to add one?",
             modifier = Modifier.padding(bottom = 12.dp),
             textAlign = TextAlign.Center,
             color = colors.grayDark
@@ -47,12 +47,12 @@ fun PlaceTypeEmptyView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_home_add_24),
-                    contentDescription = "장소 유형 추가",
+                    contentDescription = "Add place type",
                     colorFilter = ColorFilter.tint(colors.white)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "장소 유형 직접 추가",
+                    text = "Add place type",
                     color = colors.white
                 )
             }

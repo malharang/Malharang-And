@@ -2,9 +2,21 @@ package com.malharang.app.presentation.screen.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +30,7 @@ import com.malharang.app.R
 import com.malharang.app.core.component.UserStatusBar
 import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.ui.theme.MalHaRangTheme
+import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun ProfileRoute(
@@ -31,6 +44,7 @@ fun ProfileScreen(padding: PaddingValues) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
+                .background(colors.greenProfileBackgroundTop)
                 .fillMaxSize()
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -44,17 +58,22 @@ fun ProfileScreen(padding: PaddingValues) {
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp)
+                    .background(colors.greenProfileBackgroundTop)
+                    .padding(top = 5.dp, bottom = 3.dp)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(
+                modifier = Modifier
+                    .background(colors.greenProfileBackgroundTop)
+                    .height(50.dp)
+            )
 
             ProfileCharacterImage()
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFEFF9E9))
+                    .background(colors.greenProfileBackgroundBottom)
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -75,7 +94,7 @@ fun ProfileScreen(padding: PaddingValues) {
 @Composable
 fun ProfileCharacterImage() {
     Image(
-        painter = painterResource(id = R.drawable.img_profile_massi),
+        painter = painterResource(id = R.drawable.img_profile_malssi),
         contentDescription = "Seed Character",
         modifier = Modifier
             .fillMaxWidth()

@@ -116,6 +116,7 @@ fun HomeRoute(
     }
 
     LaunchedEffect(Unit) {
+        Timber.tag("DEBUG_HOME").d("LaunchedEffect: HomeRoute")
         if (locationPermissions.allPermissionsGranted) {
             viewModel.fetchCurrentLocation()
         } else {
@@ -125,9 +126,11 @@ fun HomeRoute(
 
     LaunchedEffect(location) {
         location.let {
-            cameraPositionState.move(
-                CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f)
-            )
+            if (!cameraPositionState.isMoving) {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f)
+                )
+            }
         }
     }
 
@@ -227,10 +230,11 @@ private fun HomeScreen(
                         .padding(vertical = 10.dp)
                         .clip(RoundedCornerShape(10.dp))
                 )
+
                 Text(
-                    text = "\uD83D\uDCCD 현재 위치: ${selectedPOI?.name ?: "한신대학교 경삼관"}",
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    text = selectedPOI?.name?.let { "\uD83D\uDCCD Location: $it" }
+                        ?: "\uD83D\uDCCD Pick a spot to talk!",
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
 
