@@ -32,7 +32,7 @@ fun ChatTopBar(
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.ic_chat_arrow_back_black_24),
             contentDescription = null,
-            modifier = Modifier.noRippleClickable { onBackClick }
+            modifier = Modifier.noRippleClickable { onBackClick() }
         )
 
         Text(
