@@ -21,6 +21,8 @@ val GrayDark = Color(0xFF8E8E93)
 val GreenUltraLight = Color(0xFFF0FFF7)
 val GreenLight = Color(0xFFD3EEDD)
 val GreenDark = Color(0xFF006358)
+val GreenProfileBackgroundBottom = Color(0xFFEFF9E9)
+val GreenProfileBackgroundTop = Color(0xFFFCFEF8)
 val Green = Color(0xFF00AC6D)
 val GreenBasic = Color(0xFF00AC6D)
 val GreenBasic20 = GreenBasic.copy(alpha = 0.2f)
@@ -40,6 +42,8 @@ data class MalHaRangColors(
     val white60: Color,
     val white20: Color,
     val gray: Color,
+    val greenProfileBackgroundBottom: Color,
+    val greenProfileBackgroundTop: Color,
     val greenBasic20: Color,
     val greenBasic: Color,
     val grayDark: Color,
@@ -60,6 +64,8 @@ val defaultMalHaRangColors = MalHaRangColors(
     white20 = White20,
     gray = Gray,
     grayDark = GrayDark,
+    greenProfileBackgroundBottom = GreenProfileBackgroundBottom,
+    greenProfileBackgroundTop = GreenProfileBackgroundTop,
     greenBasic20 = GreenBasic20,
     greenBasic = GreenBasic,
     greenUltraLight = GreenUltraLight,
