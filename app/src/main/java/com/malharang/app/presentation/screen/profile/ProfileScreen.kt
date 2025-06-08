@@ -59,7 +59,7 @@ fun ProfileScreen(padding: PaddingValues) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(colors.greenProfileBackgroundTop)
-                    .padding(top = 5.dp, bottom = 3.dp),
+                    .padding(top = 5.dp, bottom = 3.dp)
             )
 
             Spacer(

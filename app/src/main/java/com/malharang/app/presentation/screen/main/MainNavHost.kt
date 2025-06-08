@@ -41,7 +41,8 @@ fun MainNavHost(
 
             placeTypeNavGraph(
                 padding = padding,
-                navController = navigator.navController)
+                navController = navigator.navController
+            )
         }
     }
 }

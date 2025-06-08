@@ -13,7 +13,7 @@ fun NavController.navigateToPlaceType() {
 
 fun NavGraphBuilder.placeTypeNavGraph(
     navController: NavController,
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     composable<HomeRoute.PlaceType> {
         PlaceTypeRoute(
