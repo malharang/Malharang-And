@@ -32,7 +32,6 @@ fun MainNavHost(
             homeNavGraph(padding, navigator.navController)
 
             chatNavGraph(
-                padding = padding,
                 navController = navigator.navController
             )
 
