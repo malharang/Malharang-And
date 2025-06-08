@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +48,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 @Composable
 fun PlaceTypeRoute(
     onBackClick: () -> Unit,
+    padding: PaddingValues,
     onTypeSelected: (List<String>) -> Unit,
     viewModel: PlaceTypeViewModel = hiltViewModel()
 ) {
@@ -61,6 +63,7 @@ fun PlaceTypeRoute(
     }
 
     PlaceTypeScreen(
+        padding = padding,
         query = query,
         onQueryChange = viewModel::updateQuery,
         searchResult = searchResult,
@@ -76,6 +79,7 @@ fun PlaceTypeRoute(
 
 @Composable
 fun PlaceTypeScreen(
+    padding: PaddingValues,
     query: String,
     onQueryChange: (String) -> Unit,
     searchResult: List<String>,
@@ -88,8 +92,8 @@ fun PlaceTypeScreen(
         Modifier
             .fillMaxSize()
             .background(colors.white)
+            .padding(padding)
     ) {
-        // 상단 바
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,7 +112,7 @@ fun PlaceTypeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "장소 유형 선택",
+                    text = "Select Place Type",
                     style = MaterialTheme.typography.titleMedium.copy(
                         color = colors.greenDark,
                         fontWeight = FontWeight.Bold
@@ -137,7 +141,7 @@ fun PlaceTypeScreen(
                 value = query,
                 onValueChange = { onQueryChange(it) },
                 singleLine = true,
-                placeholder = { Text("예: cafe, museum, park ...") },
+                placeholder = { Text("e.g. cafe, museum, park") },
                 shape = RoundedCornerShape(20.dp),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = colors.white,
@@ -175,7 +179,7 @@ fun PlaceTypeScreen(
             ) {
                 Column {
                     Text(
-                        text = "선택된 유형",
+                        text = "Select Place Type",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = colors.greenDark,
                             fontWeight = FontWeight.Bold
@@ -209,7 +213,7 @@ fun PlaceTypeScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = "최근 검색",
+                        text = "Recent Searches",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = colors.greenDark,
                             fontWeight = FontWeight.Bold
@@ -233,7 +237,7 @@ fun PlaceTypeScreen(
 
             if (query.isNotEmpty()) {
                 Text(
-                    text = "검색 결과",
+                    text = "Search Results",
                     style = MaterialTheme.typography.titleMedium.copy(
                         color = colors.greenDark,
                         fontWeight = FontWeight.Bold
@@ -248,7 +252,7 @@ fun PlaceTypeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "\uD83D\uDD0D 찾으시는 유형이 없어요!",
+                            text = "\uD83D\uDD0D No matching types found!",
                             style = MaterialTheme.typography.bodyLarge.copy(color = colors.grayDark)
                         )
                     }
@@ -272,7 +276,6 @@ fun PlaceTypeScreen(
             }
         }
 
-        // 하단 완료 버튼
         if (selectedTypes.isNotEmpty()) {
             Box(
                 modifier = Modifier
@@ -289,7 +292,7 @@ fun PlaceTypeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "완료",
+                        text = "Select",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = colors.white,
                             fontWeight = FontWeight.Bold
@@ -338,7 +341,8 @@ private fun PreviewPlaceTypeScreen() {
             recentTypes = listOf("museum", "gallery", "restaurant"),
             selectedTypes = listOf("park"),
             onTypeSelected = {},
-            onBackClick = {}
+            onBackClick = {},
+            padding = PaddingValues()
         )
     }
 }
