@@ -1,5 +1,6 @@
 package com.malharang.app.presentation.screen.mission
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,17 +11,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
+import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import androidx.compose.ui.Modifier
 
 @Composable
 fun MissionRoute(
@@ -71,6 +75,11 @@ fun MissionRoute(
         ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
         ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
         ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
+        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
+        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
+        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
+        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
+        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
         ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
     )
 
@@ -94,12 +103,13 @@ private fun MissionScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(horizontal = 20.dp)
     ) {
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -142,6 +152,7 @@ private fun MissionScreen(
                 )
                 DropdownMissions("Review Mission", reviewMissionList)
                 SentenceItem("Export Sentences", exportSentences)
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
@@ -164,7 +175,7 @@ fun DropdownMissions(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded }, // 아이콘 클릭 처리
+                .noRippleClickable { expanded = !expanded }, // 아이콘 클릭 처리
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -179,28 +190,21 @@ fun DropdownMissions(
                 contentDescription = null
             )
         }
-
         if (expanded) {
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyColumn(
+            val scrollState = rememberScrollState()
+            Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 280.dp)
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
-                }
-                items(completedMissionList) { mission ->
+                completedMissionList.forEach { mission ->
                     MissionCard(mission)
-                }
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
                 }
             }
         }
     }
 }
+
 data class ExportSentenceModel(
     val text: String,
     val translation: String
@@ -220,12 +224,13 @@ fun SentenceItem(
             .fillMaxWidth()
             .shadow(1.dp, RoundedCornerShape(12.dp))
             .background(colors.white, RoundedCornerShape(12.dp))
-            .clickable { expanded = !expanded }
             .padding(16.dp)
     ) {
         // Title Section
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .noRippleClickable { expanded = !expanded },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -244,8 +249,8 @@ fun SentenceItem(
         if (expanded) {
             Spacer(modifier = Modifier.height(12.dp))
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
                 exportSentences.forEach { sentence ->
                     Column {
@@ -256,39 +261,44 @@ fun SentenceItem(
                                     color = colors.gray.copy(alpha = 0.08f),
                                     shape = RoundedCornerShape(12.dp)
                                 )
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                                .padding(vertical = 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(
-                                verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_chat_sound_green_24),
-                                    contentDescription = "Play Sound",
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_sound_green_24),
+                                    contentDescription = null,
                                     modifier = Modifier
-                                        .size(18.dp)
-                                        .clickable { onSoundClick(sentence) } // ✅ 사운드 클릭
+                                        .clip(CircleShape)
+                                        .clickable { onSoundClick(sentence) }
+
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Column {
                                     Text(sentence.text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                     Text(sentence.translation, fontSize = 12.sp, color = colors.grayDark)
                                 }
                             }
 
-                            Icon(
+                            Image(
                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_bookmark_filled),
                                 contentDescription = "Bookmark",
+                                colorFilter = ColorFilter.tint(colors.greenBasic),
                                 modifier = Modifier
-                                    .size(18.dp)
-                                    .clickable { onBookmarkClick(sentence) } // ✅ 북마크 클릭
+                                    .noRippleClickable { onBookmarkClick(sentence) } // ✅ 북마크 클릭
                             )
                         }
 
                         // Divider
-                        androidx.compose.material3.Divider(color = colors.black.copy(alpha = 0.2f))
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = colors.black.copy(alpha = 0.2f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
                     }
                 }
             }
@@ -324,7 +334,13 @@ private fun PreviewMissionScreen() {
             ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
             ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
             ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
+            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
+            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
+            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
+            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
+            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
             ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
+
         )
 
         MissionScreen(
