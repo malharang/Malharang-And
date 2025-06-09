@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.core.util.noRippleClickable
+import com.malharang.app.presentation.model.ExportSentenceModel
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
@@ -205,10 +206,6 @@ fun DropdownMissions(
     }
 }
 
-data class ExportSentenceModel(
-    val text: String,
-    val translation: String
-)
 
 @Composable
 fun SentenceItem(
