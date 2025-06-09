@@ -206,7 +206,6 @@ fun DropdownMissions(
     }
 }
 
-
 @Composable
 fun SentenceItem(
     title: String,
