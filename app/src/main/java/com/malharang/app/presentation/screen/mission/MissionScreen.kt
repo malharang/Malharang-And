@@ -1,5 +1,6 @@
 package com.malharang.app.presentation.screen.mission
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,17 +11,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,12 +31,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
+import com.malharang.app.core.util.noRippleClickable
+import com.malharang.app.presentation.model.ExportSentenceModel
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
@@ -63,11 +72,16 @@ fun MissionRoute(
     )
 
     val exportSentences = listOf(
-        "Order food - 2025.05.01",
-        "Ask for directions - 2025.05.03",
-        "Introduce yourself - 2025.05.04",
-        "Buy a ticket - 2025.05.05",
-        "Make a reservation - 2025.05.06"
+        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
+        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
+        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
+        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
+        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
+        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
+        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
+        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
+        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
+        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
     )
 
     MissionScreen(
@@ -84,18 +98,19 @@ private fun MissionScreen(
     padding: PaddingValues,
     missionCardList: List<MissionCardModel>,
     reviewMissionList: List<MissionCardModel>,
-    exportSentences: List<String>
+    exportSentences: List<ExportSentenceModel>
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(horizontal = 20.dp)
     ) {
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -110,6 +125,7 @@ private fun MissionScreen(
                     tint = colors.black
                 )
             }
+            Spacer(modifier = Modifier.height(20.dp))
 
             // 섹션: Available Missions
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -137,6 +153,7 @@ private fun MissionScreen(
                 )
                 DropdownMissions("Review Mission", reviewMissionList)
                 SentenceItem("Export Sentences", exportSentences)
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
@@ -153,13 +170,13 @@ fun DropdownMissions(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(1.dp, RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
+            .background(colors.white, RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded }, // 아이콘 클릭 처리
+                .noRippleClickable { expanded = !expanded }, // 아이콘 클릭 처리
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -174,23 +191,15 @@ fun DropdownMissions(
                 contentDescription = null
             )
         }
-
         if (expanded) {
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyColumn(
+            val scrollState = rememberScrollState()
+            Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 280.dp)
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
-                }
-                items(completedMissionList) { mission ->
+                completedMissionList.forEach { mission ->
                     MissionCard(mission)
-                }
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
                 }
             }
         }
@@ -200,7 +209,9 @@ fun DropdownMissions(
 @Composable
 fun SentenceItem(
     title: String,
-    exportSentences: List<String>
+    exportSentences: List<ExportSentenceModel>,
+    onSoundClick: (ExportSentenceModel) -> Unit = {},
+    onBookmarkClick: (ExportSentenceModel) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -209,11 +220,13 @@ fun SentenceItem(
             .fillMaxWidth()
             .shadow(1.dp, RoundedCornerShape(12.dp))
             .background(colors.white, RoundedCornerShape(12.dp))
-            .clickable { expanded = !expanded }
             .padding(16.dp)
     ) {
+        // Title Section
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .noRippleClickable { expanded = !expanded },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -231,19 +244,58 @@ fun SentenceItem(
 
         if (expanded) {
             Spacer(modifier = Modifier.height(12.dp))
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 200.dp), // 스크롤 높이 제한
-                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(exportSentences) { mission ->
-                    Text(
-                        text = mission,
-                        fontSize = 12.sp,
-                        color = colors.black,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+                exportSentences.forEach { sentence ->
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = colors.gray.copy(alpha = 0.08f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_sound_green_24),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .clickable { onSoundClick(sentence) }
+
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(sentence.text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                    Text(sentence.translation, fontSize = 12.sp, color = colors.grayDark)
+                                }
+                            }
+
+                            Image(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_bookmark_filled),
+                                contentDescription = "Bookmark",
+                                colorFilter = ColorFilter.tint(colors.greenBasic),
+                                modifier = Modifier
+                                    .noRippleClickable { onBookmarkClick(sentence) } // ✅ 북마크 클릭
+                            )
+                        }
+
+                        // Divider
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = colors.black.copy(alpha = 0.2f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
@@ -274,11 +326,17 @@ private fun PreviewMissionScreen() {
         )
 
         val exportSentences = listOf(
-            "Order food - 2025.05.01",
-            "Ask for directions - 2025.05.03",
-            "Introduce yourself - 2025.05.04",
-            "Buy a ticket - 2025.05.05",
-            "Make a reservation - 2025.05.06"
+            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
+            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
+            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
+            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
+            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
+            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
+            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
+            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
+            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
+            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
+
         )
 
         MissionScreen(
