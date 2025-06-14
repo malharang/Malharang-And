@@ -15,6 +15,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.malharang.app.presentation.model.MissionCardModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +47,34 @@ class HomeViewModel @Inject constructor(
         "establishment",
         "point_of_interest"
     )
+
+    val exampleMissions = listOf(
+        MissionCardModel(
+            title = "Order at a Cafe",
+            description = "Visit a nearby café"
+        ),
+        MissionCardModel(
+            title = "Ask for Directions",
+            description = "Visit a nearby café"
+        ),
+        MissionCardModel(
+            title = "Talk at a Convenience Store",
+            description = "Visit a nearby café"
+        ),
+        MissionCardModel(
+            title = "Read Traffic Signs",
+            description = "Visit a nearby café"
+        ),
+        MissionCardModel(
+            title = "Role-play: Restaurant Order",
+            description = "Visit a nearby café"
+        ),
+        MissionCardModel(
+            title = "Introduce Yourself in Korean",
+            description = "Visit a nearby café"
+        )
+    )
+
 
     fun fetchPlaceTypes(placeId: String) {
         val placeFields = listOf(Place.Field.TYPES)
