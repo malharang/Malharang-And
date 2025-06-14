@@ -30,12 +30,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,6 +62,12 @@ fun PlaceTypeRoute(
     BackHandler {
         onTypeSelected(selectedTypes)
         onBackClick()
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.initPlaceTypes(context)
     }
 
     PlaceTypeScreen(
@@ -324,7 +332,7 @@ fun PlaceTypePill(
         Text(
             text = type.replace("_", " "),
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = if (isSelected) colors.white else colors.greenDark
+                color = if (isSelected) colors.white else colors.white
             )
         )
     }
