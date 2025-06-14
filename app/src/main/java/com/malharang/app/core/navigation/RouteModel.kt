@@ -19,4 +19,7 @@ sealed interface MainTabRoute {
 sealed interface HomeRoute {
     @Serializable
     data object PlaceType : HomeRoute
+
+    @Serializable
+    data object Search : HomeRoute
 }
