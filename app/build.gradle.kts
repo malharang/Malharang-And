@@ -1,3 +1,4 @@
+
 import java.util.Properties
 
 plugins {
@@ -28,7 +29,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", properties["base.url"].toString())
         buildConfigField("String", "MAPS_API_KEY", properties["maps.api.key"].toString())
-        manifestPlaceholders["MAPS_API_KEY"] = properties["maps.api.key"].toString()
+        manifestPlaceholders["MAPS_API_KEY"] = properties["MAPS_API_KEY"].toString()
     }
 
     buildTypes {

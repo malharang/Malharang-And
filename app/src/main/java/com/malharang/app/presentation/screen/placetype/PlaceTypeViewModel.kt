@@ -1,8 +1,12 @@
 package com.malharang.app.presentation.screen.placetype
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.malharang.app.R
 import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,28 +29,28 @@ class PlaceTypeViewModel @Inject constructor(
     private val _recentTypes = MutableStateFlow<List<String>>(emptyList())
     val recentTypes: StateFlow<List<String>> = _recentTypes
 
-    private val allPlaceTypes = listOf(
-        "restaurant", "cafe", "bar", "bakery",
-        "park", "museum", "art_gallery", "library",
-        "shopping_mall", "supermarket", "convenience_store",
-        "gym", "hospital", "pharmacy",
-        "bank", "atm", "post_office",
-        "school", "university",
-        "movie_theater", "tourist_attraction",
-        "hotel", "parking"
-    )
+    private var allPlaceTypes: List<String> = emptyList()
 
     private val _searchResult = MutableStateFlow<List<String>>(emptyList())
     val searchResult: StateFlow<List<String>> = _searchResult
 
-    init {
+    fun initPlaceTypes(context: Context) {
         savedStateHandle.get<List<String>>("existing_types")?.let { types ->
             _selectedTypes.value = types.toList()
         }
 
         viewModelScope.launch {
+            allPlaceTypes = loadPlaceTypesFromRaw(context)
             _recentTypes.value = useCase.getRecentPlaceTypes()
         }
+    }
+
+    fun loadPlaceTypesFromRaw(context: Context): List<String> {
+        val inputStream = context.resources.openRawResource(R.raw.place_types)
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+        val gson = Gson()
+        return gson.fromJson(jsonString, object : TypeToken<List<String>>() {}.type)
     }
 
     fun updateQuery(newQuery: String) {
