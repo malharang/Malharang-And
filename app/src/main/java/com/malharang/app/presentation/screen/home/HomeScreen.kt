@@ -75,7 +75,8 @@ fun HomeRoute(
     val cameraPositionState = rememberCameraPositionState {
         currentLocation?.let {
             position = CameraPosition.fromLatLngZoom(
-                LatLng(it.latitude, it.longitude), zoomLevel
+                LatLng(it.latitude, it.longitude),
+                zoomLevel
             )
         }
     }
@@ -146,7 +147,6 @@ fun moveCameraPosition(currentLocation: LatLng?, cameraPositionState: CameraPosi
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
@@ -157,7 +157,7 @@ private fun HomeScreen(
     onClickPOI: (PointOfInterest) -> Unit = {},
     missionCards: List<MissionCardModel>,
     navigateToPlaceType: () -> Unit = {},
-    onRequestCurrentLocation: () -> Unit = {},
+    onRequestCurrentLocation: () -> Unit = {}
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
@@ -172,7 +172,6 @@ private fun HomeScreen(
     ) {
         UserStatusBar(userStatusModel, modifier = Modifier.padding(top = 5.dp, bottom = 3.dp))
 
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -185,16 +184,15 @@ private fun HomeScreen(
                 cameraPositionState = cameraPositionState,
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = false,
-                    myLocationButtonEnabled = true,
+                    myLocationButtonEnabled = true
                 ),
                 googleMapOptionsFactory = {
                     GoogleMapOptions().mapId("f818388e77495a353ad721f7")
                 },
                 onPOIClick = { poi ->
                     onClickPOI(poi)
-                },
+                }
             ) {
-
                 markerState?.let {
                     Marker(
                         state = it,
@@ -221,7 +219,6 @@ private fun HomeScreen(
                     )
                 }
 
-
                 BottomSheetScaffold(
                     scaffoldState = scaffoldState,
                     sheetPeekHeight = 80.dp,
@@ -231,9 +228,9 @@ private fun HomeScreen(
                             selectedPOIName = placeInfo?.name,
                             placeTypes = placeInfo?.types ?: emptyList(),
                             missionCards = missionCards,
-                            onAddPlaceTypeClick = navigateToPlaceType,
+                            onAddPlaceTypeClick = navigateToPlaceType
                         )
-                    },
+                    }
                 ) {
                     placeInfo?.let {
                         LaunchedEffect(it.types) {
@@ -263,7 +260,7 @@ private fun PreviewHomeScreen() {
                 exp = 70
             ),
             cameraPositionState = rememberCameraPositionState(),
-            missionCards = listOf(),
+            missionCards = listOf()
         )
     }
 }

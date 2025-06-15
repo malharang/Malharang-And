@@ -29,7 +29,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 fun PlaceTypeListRow(
     placeTypes: List<String>,
     modifier: Modifier = Modifier,
-    onAddClick: () -> Unit = {},
+    onAddClick: () -> Unit = {}
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),

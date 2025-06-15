@@ -53,7 +53,6 @@ class PlaceTypeViewModel @Inject constructor(
         return gson.fromJson(jsonString, object : TypeToken<List<String>>() {}.type)
     }
 
-
     fun updateQuery(newQuery: String) {
         _query.value = newQuery
         if (newQuery.isEmpty()) {
@@ -79,11 +78,11 @@ class PlaceTypeViewModel @Inject constructor(
         _selectedTypes.value = currentTypes
 
         val updatedRecentTypes = (
-                _recentTypes.value.toMutableList().apply {
-                    remove(type)
-                    add(0, type)
-                }
-                ).take(5)
+            _recentTypes.value.toMutableList().apply {
+                remove(type)
+                add(0, type)
+            }
+            ).take(5)
 
         _recentTypes.value = updatedRecentTypes
     }

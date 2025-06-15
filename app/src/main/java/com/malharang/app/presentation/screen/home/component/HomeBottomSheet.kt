@@ -22,14 +22,13 @@ fun HomeBottomSheet(
     selectedPOIName: String?,
     placeTypes: List<String>,
     missionCards: List<MissionCardModel>,
-    onAddPlaceTypeClick: () -> Unit,
+    onAddPlaceTypeClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
             text = selectedPOIName?.let { "\uD83D\uDCCD Location: $it" }
                 ?: "\uD83D\uDCCD Pick a spot to talk!",
@@ -44,7 +43,7 @@ fun HomeBottomSheet(
         if (placeTypes.isNotEmpty()) {
             PlaceTypeListRow(
                 placeTypes = placeTypes,
-                onAddClick = onAddPlaceTypeClick,
+                onAddClick = onAddPlaceTypeClick
             )
             Spacer(modifier = Modifier.padding(5.dp))
 

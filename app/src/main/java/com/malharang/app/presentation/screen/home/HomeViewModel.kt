@@ -126,5 +126,4 @@ class HomeViewModel @Inject constructor(
             types = emptyList()
         )
     }
-
 }

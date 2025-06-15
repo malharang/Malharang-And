@@ -21,7 +21,7 @@ fun NavGraphBuilder.homeNavGraph(
         HomeRoute(
             padding = padding,
             navController = navController,
-            navigateToPlaceType = { navController.navigateToPlaceType() },
+            navigateToPlaceType = { navController.navigateToPlaceType() }
         )
     }
 }
