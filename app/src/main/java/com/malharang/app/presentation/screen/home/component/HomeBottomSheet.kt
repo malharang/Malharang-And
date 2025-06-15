@@ -51,7 +51,6 @@ fun HomeBottomSheet(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier
-                    .weight(1f)
                     .padding(horizontal = 20.dp)
             ) {
                 items(missionCards) { card ->

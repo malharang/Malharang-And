@@ -12,7 +12,6 @@ import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
 import com.malharang.app.presentation.screen.placetype.navigation.placeTypeNavGraph
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
-import com.malharang.app.presentation.screen.search.navigation.searchNavGraph
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
@@ -41,11 +40,6 @@ fun MainNavHost(
             profileNavGraph(padding)
 
             placeTypeNavGraph(
-                padding = padding,
-                navController = navigator.navController
-            )
-
-            searchNavGraph(
                 padding = padding,
                 navController = navigator.navController
             )

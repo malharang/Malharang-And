@@ -44,7 +44,7 @@ agp = "8.9.1"
 lifecycleRuntimeComposeAndroid = "2.8.7"
 
 # Google Maps
-maps-compose = "4.4.1"
+maps-compose = "6.6.0"
 play-services-location = "21.3.0"
 places = "3.5.0"
 

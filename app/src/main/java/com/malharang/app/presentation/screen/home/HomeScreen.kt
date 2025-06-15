@@ -3,16 +3,12 @@
 package com.malharang.app.presentation.screen.home
 
 import android.Manifest
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -40,6 +35,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -53,32 +49,21 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
 import com.malharang.app.core.component.UserStatusBar
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.presentation.screen.home.component.HomeBottomSheet
-import com.malharang.app.presentation.screen.home.component.HomeSearchBar
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun HomeRoute(
     padding: PaddingValues,
     navController: NavController,
     navigateToPlaceType: () -> Unit,
-    navigateToSearch: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    zoomLevel: Float = 19f
 ) {
-    // TODO: Dummy Data
-    val userStatusModel = UserStatusModel(
-        profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
-        name = "Malssi",
-        level = 5,
-        exp = 70
-    )
-
-    // Maps
     val locationPermissions = rememberMultiplePermissionsState(
         permissions = listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -86,71 +71,81 @@ fun HomeRoute(
         )
     )
 
-    val location by viewModel.location.collectAsState()
-    var cameraOffsetLatLng = LatLng(location.latitude - 0.003, location.longitude)
+    val currentLocation by viewModel.currentLocation.collectAsState()
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(cameraOffsetLatLng, 16f)
+        currentLocation?.let {
+            position = CameraPosition.fromLatLngZoom(
+                LatLng(it.latitude, it.longitude), zoomLevel
+            )
+        }
     }
 
-    val selectedPOI by viewModel.selectedPOI.collectAsState()
-    val placeTypes by viewModel.placeTypes.collectAsState()
+    val placeInfo by viewModel.placeInfo.collectAsState()
 
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
 
     LaunchedEffect(navBackStackEntry) {
         val type = navBackStackEntry?.savedStateHandle?.get<List<String>>("selected_place_types")
         if (type != null) {
-            val currentTypes = viewModel.placeTypes.value
+            val currentTypes = placeInfo?.types ?: emptyList()
             val updatedTypes = (currentTypes + type).distinct()
-            viewModel.setSelectedPlaceType(updatedTypes)
+            viewModel.setSelectedPlaceTypes(updatedTypes)
 
             navBackStackEntry.savedStateHandle.remove<List<String>>("selected_place_types")
         }
     }
-    LaunchedEffect(Unit) {
-        Timber.tag("DEBUG_HOME").d("LaunchedEffect: HomeRoute")
+
+    LaunchedEffect(locationPermissions.allPermissionsGranted) {
         if (locationPermissions.allPermissionsGranted) {
-            viewModel.fetchCurrentLocation()
-        } else {
+            viewModel.fetchCurrentLocation() // 권한 허용 시 내 위치 다시 요청
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (!locationPermissions.allPermissionsGranted) {
             locationPermissions.launchMultiplePermissionRequest()
         }
     }
 
-    fun offsetLatLng(location: LatLng): LatLng {
-        return LatLng(location.latitude - 0.003, location.longitude)
-    }
-
-    LaunchedEffect(location) {
-        location.let {
-            if (!cameraPositionState.isMoving) {
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f)
-                )
-            }
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let {
+            moveCameraPosition(it, cameraPositionState, zoomLevel)
         }
     }
 
     val navigateToPlaceTypeWithData = {
-        navController.currentBackStackEntry?.savedStateHandle?.set("existing_types", placeTypes)
+        navController.currentBackStackEntry?.savedStateHandle?.set("existing_types", placeInfo?.types ?: emptyList())
         navigateToPlaceType()
     }
 
     HomeScreen(
         padding = padding,
-        userStatusModel = userStatusModel,
+        userStatusModel = viewModel.userStatusModel,
         onRequestCurrentLocation = {
             viewModel.fetchCurrentLocation()
-            cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(offsetLatLng(location), 16f))
+            moveCameraPosition(currentLocation, cameraPositionState, zoomLevel)
+        },
+        placeInfo = placeInfo,
+        onClickPOI = {
+            viewModel.fetchPlaceTypes(it.placeId)
+            viewModel.setSelectedPlaceInfo(it.name, it.latLng)
         },
         navigateToPlaceType = navigateToPlaceTypeWithData,
-        navigateToSearch = navigateToSearch,
-        selectedPOI = selectedPOI,
-        placeTypes = placeTypes,
         missionCards = viewModel.exampleMissions,
-        selectPOI = viewModel::selectPOI,
         cameraPositionState = cameraPositionState
     )
 }
+
+fun moveCameraPosition(currentLocation: LatLng?, cameraPositionState: CameraPositionState, zoomLevel: Float) {
+    currentLocation?.let {
+        if (!cameraPositionState.isMoving) {
+            cameraPositionState.move(
+                CameraUpdateFactory.newLatLngZoom(it, zoomLevel)
+            )
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,17 +153,17 @@ private fun HomeScreen(
     padding: PaddingValues,
     userStatusModel: UserStatusModel,
     cameraPositionState: CameraPositionState,
-    selectedPOI: PointOfInterest? = null,
-    placeTypes: List<String>,
+    placeInfo: PlaceInfoModel? = null,
+    onClickPOI: (PointOfInterest) -> Unit = {},
     missionCards: List<MissionCardModel>,
     navigateToPlaceType: () -> Unit = {},
-    navigateToSearch: () -> Unit = {},
-    selectPOI: (PointOfInterest) -> Unit = {},
     onRequestCurrentLocation: () -> Unit = {},
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
-    val showSearchBar = remember { mutableStateOf(true) }
+    val markerState = remember(placeInfo?.latLng) {
+        placeInfo?.let { MarkerState(it.latLng) }
+    }
 
     Column(
         modifier = Modifier
@@ -192,44 +187,24 @@ private fun HomeScreen(
                     zoomControlsEnabled = false,
                     myLocationButtonEnabled = true,
                 ),
+                googleMapOptionsFactory = {
+                    GoogleMapOptions().mapId("f818388e77495a353ad721f7")
+                },
                 onPOIClick = { poi ->
-                    selectPOI(poi)
+                    onClickPOI(poi)
                 },
             ) {
-                selectedPOI?.let {
-                    Timber.tag("DEBUG_HOME").d("POI Id: %s", it.placeId)
 
+                markerState?.let {
                     Marker(
-                        state = MarkerState(position = it.latLng),
-                        title = it.name,
+                        state = it,
+                        title = placeInfo?.name,
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                     )
                 }
             }
 
             Column {
-                AnimatedVisibility(
-                    visible = showSearchBar.value,
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it + 50 },
-                        animationSpec = tween(durationMillis = 300)
-                    )
-                ) {
-                    HomeSearchBar(
-                        onClick = {
-                            showSearchBar.value = false
-                            scope.launch {
-                                delay(300)
-                                navigateToSearch()
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 20.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
                 Box(
                     modifier = Modifier
                         .align(alignment = Alignment.End)
@@ -246,30 +221,31 @@ private fun HomeScreen(
                     )
                 }
 
+
                 BottomSheetScaffold(
                     scaffoldState = scaffoldState,
                     sheetPeekHeight = 80.dp,
                     sheetContainerColor = colors.white,
                     sheetContent = {
                         HomeBottomSheet(
-                            selectedPOIName = selectedPOI?.name,
-                            placeTypes = placeTypes,
+                            selectedPOIName = placeInfo?.name,
+                            placeTypes = placeInfo?.types ?: emptyList(),
                             missionCards = missionCards,
                             onAddPlaceTypeClick = navigateToPlaceType,
                         )
-                    }
+                    },
                 ) {
-                    LaunchedEffect(placeTypes) {
-                        if (placeTypes.isNotEmpty()) {
-                            scope.launch {
-                                scaffoldState.bottomSheetState.expand()
+                    placeInfo?.let {
+                        LaunchedEffect(it.types) {
+                            if (it.types.isNotEmpty()) {
+                                scope.launch {
+                                    scaffoldState.bottomSheetState.expand()
+                                }
                             }
                         }
                     }
                 }
             }
-
-
         }
     }
 }
@@ -281,17 +257,13 @@ private fun PreviewHomeScreen() {
         HomeScreen(
             padding = PaddingValues(),
             userStatusModel = UserStatusModel(
-                profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
+                profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&siAze=64",
                 name = "Malssi",
                 level = 5,
                 exp = 70
             ),
             cameraPositionState = rememberCameraPositionState(),
-            placeTypes = listOf("park", "restaurant", "restaurant", "restaurant", "restaurant", "restaurant"),
             missionCards = listOf(),
-            selectedPOI = null,
-            selectPOI = {},
-            onRequestCurrentLocation = {},
         )
     }
 }

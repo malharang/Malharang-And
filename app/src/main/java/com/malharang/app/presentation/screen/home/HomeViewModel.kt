@@ -10,18 +10,18 @@ import androidx.lifecycle.ViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.model.PlaceInfoModel
+import com.malharang.app.presentation.model.UserStatusModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,22 +30,26 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _location = MutableStateFlow<LatLng>(LatLng(37.5665, 126.9780))
-    val location: StateFlow<LatLng> = _location.asStateFlow()
+    private val _currentLocation = MutableStateFlow<LatLng?>(null)
+    val currentLocation: StateFlow<LatLng?> = _currentLocation.asStateFlow()
 
-    private val _selectedPOI = MutableStateFlow<PointOfInterest?>(null)
-    val selectedPOI: StateFlow<PointOfInterest?> = _selectedPOI.asStateFlow()
+    private val _placeInfo = MutableStateFlow<PlaceInfoModel?>(null)
+    val placeInfo: StateFlow<PlaceInfoModel?> = _placeInfo.asStateFlow()
 
     private val placesClient: PlacesClient by lazy {
         Places.createClient(context)
     }
 
-    private val _placeTypes = MutableStateFlow<List<String>>(emptyList())
-    val placeTypes: StateFlow<List<String>> = _placeTypes.asStateFlow()
-
     private val excludedTypes = listOf(
         "establishment",
         "point_of_interest"
+    )
+
+    val userStatusModel = UserStatusModel(
+        profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
+        name = "Malssi",
+        level = 5,
+        exp = 70
     )
 
     val exampleMissions = listOf(
@@ -75,6 +79,19 @@ class HomeViewModel @Inject constructor(
         )
     )
 
+    fun fetchCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationClient.lastLocation.addOnSuccessListener { loc ->
+                loc?.let {
+                    _currentLocation.value = LatLng(it.latitude, it.longitude)
+                }
+            }
+        }
+    }
 
     fun fetchPlaceTypes(placeId: String) {
         val placeFields = listOf(Place.Field.TYPES)
@@ -86,35 +103,28 @@ class HomeViewModel @Inject constructor(
 
                 val filteredTypes = types.filterNot { it in excludedTypes }
 
-                _placeTypes.value = filteredTypes
-                Timber.tag("DEBUG_HOME").d("Place Types: %s", _placeTypes.value)
+                setSelectedPlaceTypes(filteredTypes)
             }
             .addOnFailureListener { exception ->
-                _placeTypes.value = emptyList()
-                Timber.tag("DEBUG_HOME").e(exception, "Place Types: 장소 유형을 가져오는데 실패했습니다.")
+                setSelectedPlaceTypes(emptyList())
             }
     }
 
-    fun fetchCurrentLocation() {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            locationClient.lastLocation.addOnSuccessListener { loc ->
-                loc?.let {
-                    _location.value = LatLng(it.latitude, it.longitude)
-                }
-            }
-        }
+    fun setSelectedPlaceTypes(placeTypes: List<String>) {
+        _placeInfo.value = _placeInfo.value?.copy(
+            types = placeTypes
+        )
     }
 
-    fun selectPOI(poi: PointOfInterest) {
-        _selectedPOI.value = poi
-        fetchPlaceTypes(poi.placeId)
+    fun setSelectedPlaceInfo(name: String, latLng: LatLng) {
+        _placeInfo.value = _placeInfo.value?.copy(
+            name = name,
+            latLng = latLng
+        ) ?: PlaceInfoModel(
+            name = name,
+            latLng = latLng,
+            types = emptyList()
+        )
     }
 
-    fun setSelectedPlaceType(types: List<String>) {
-        _placeTypes.value = types
-    }
 }

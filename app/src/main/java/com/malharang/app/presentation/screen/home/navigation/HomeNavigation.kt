@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.home.HomeRoute
 import com.malharang.app.presentation.screen.placetype.navigation.navigateToPlaceType
-import com.malharang.app.presentation.screen.search.navigation.navigateToSearch
 
 fun NavController.navigateToHome(navOptions: NavOptions) {
     navigate(MainTabRoute.Home, navOptions)
@@ -23,7 +22,6 @@ fun NavGraphBuilder.homeNavGraph(
             padding = padding,
             navController = navController,
             navigateToPlaceType = { navController.navigateToPlaceType() },
-            navigateToSearch = { navController.navigateToSearch() }
         )
     }
 }
