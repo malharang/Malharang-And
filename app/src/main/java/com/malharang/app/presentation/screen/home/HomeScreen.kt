@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,14 +37,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
@@ -51,6 +50,7 @@ import com.malharang.app.core.component.UserStatusBar
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.UserStatusModel
+import com.malharang.app.presentation.screen.home.component.CustomMarker
 import com.malharang.app.presentation.screen.home.component.HomeBottomSheet
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
@@ -126,6 +126,7 @@ fun HomeRoute(
             viewModel.fetchCurrentLocation()
             moveCameraPosition(currentLocation, cameraPositionState, zoomLevel)
         },
+        currentLocation = currentLocation,
         placeInfo = placeInfo,
         onClickPOI = {
             viewModel.fetchPlaceTypes(it.placeId)
@@ -153,6 +154,7 @@ private fun HomeScreen(
     padding: PaddingValues,
     userStatusModel: UserStatusModel,
     cameraPositionState: CameraPositionState,
+    currentLocation: LatLng? = null,
     placeInfo: PlaceInfoModel? = null,
     onClickPOI: (PointOfInterest) -> Unit = {},
     missionCards: List<MissionCardModel>,
@@ -161,9 +163,14 @@ private fun HomeScreen(
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
-    val markerState = remember(placeInfo?.latLng) {
+    val selectedMarkerState = remember(placeInfo?.latLng) {
         placeInfo?.let { MarkerState(it.latLng) }
     }
+
+    val currentMarkerState = remember(currentLocation) {
+        currentLocation?.let { MarkerState(currentLocation) }
+    }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -193,11 +200,18 @@ private fun HomeScreen(
                     onClickPOI(poi)
                 }
             ) {
-                markerState?.let {
-                    Marker(
-                        state = it,
-                        title = placeInfo?.name,
-                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+                selectedMarkerState?.let {
+                    CustomMarker(
+                        position = it.position,
+                        context = context,
+                        resId = R.drawable.img_home_map_malssi_marker
+                    )
+                }
+                currentMarkerState?.let {
+                    CustomMarker(
+                        position = it.position,
+                        context = context,
+                        resId = R.drawable.img_home_map_profile_marker
                     )
                 }
             }

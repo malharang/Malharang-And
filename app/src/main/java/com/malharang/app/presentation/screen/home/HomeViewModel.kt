@@ -60,22 +60,6 @@ class HomeViewModel @Inject constructor(
         MissionCardModel(
             title = "Ask for Directions",
             description = "Visit a nearby café"
-        ),
-        MissionCardModel(
-            title = "Talk at a Convenience Store",
-            description = "Visit a nearby café"
-        ),
-        MissionCardModel(
-            title = "Read Traffic Signs",
-            description = "Visit a nearby café"
-        ),
-        MissionCardModel(
-            title = "Role-play: Restaurant Order",
-            description = "Visit a nearby café"
-        ),
-        MissionCardModel(
-            title = "Introduce Yourself in Korean",
-            description = "Visit a nearby café"
         )
     )
 
