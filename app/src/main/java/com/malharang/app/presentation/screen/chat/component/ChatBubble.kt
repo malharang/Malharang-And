@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,9 +41,11 @@ fun ChatBubble(
     text: String,
     sender: SenderType,
     modifier: Modifier = Modifier,
-    onTranslateClick: () -> Unit = {},
+    translatedText: String? = null,
+    onTranslateClick: (String) -> Unit = {},
     onVoiceClick: () -> Unit = {},
-    onBookmarkClick: () -> Unit = {}
+    onBookmarkClick: () -> Unit = {},
+    isTranslating: Boolean = false
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
@@ -52,6 +56,7 @@ fun ChatBubble(
         bottomStart = 16.dp,
         bottomEnd = 16.dp
     )
+    val isLoading = remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier
@@ -82,6 +87,17 @@ fun ChatBubble(
                 color = if (isFromBot) colors.white else colors.black
             )
 
+            translatedText?.let { text ->
+                Text(
+                    text = if (isTranslating) "..." else text,
+                    textAlign = TextAlign.Start,
+                    softWrap = true,
+                    modifier = Modifier.padding(top = 5.dp),
+                    style = typography.bodySmallPlus,
+                    color = if (isFromBot) colors.white else colors.black
+                )
+            }
+
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 10.dp),
                 thickness = 0.5.dp,
@@ -97,7 +113,12 @@ fun ChatBubble(
                 ChatIcon(
                     icon = if (isFromBot) R.drawable.ic_chat_translate_white_24 else R.drawable.ic_chat_translate_green_24,
                     description = "Translate",
-                    onClick = onTranslateClick
+                    onClick = {
+                        onTranslateClick(text)
+                        if (translatedText == null) {
+                            isLoading.value = true
+                        }
+                    }
                 )
                 ChatIcon(
                     icon = if (isFromBot) R.drawable.ic_chat_sound_white_24 else R.drawable.ic_chat_sound_green_24,
@@ -136,7 +157,8 @@ private fun ChatBubblePreview() {
         ) {
             ChatBubble(
                 text = "안녕하세요! 어떤 커피를\n주문 하시겠어요?",
-                sender = SenderType.BOT
+                sender = SenderType.BOT,
+                translatedText = "hi What coffee do you want?"
             )
             ChatBubble(
                 text = "아메리카노 한잔 주세요",

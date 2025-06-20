@@ -68,4 +68,20 @@ object NetworkModule {
                 json.asConverterFactory(requireNotNull("application/json".toMediaTypeOrNull()))
             )
             .build()
+
+    @ExperimentalSerializationApi
+    @Provides
+    @Singleton
+    @javax.inject.Named("Translate")
+    fun providesTranslateRetrofit(
+        okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BuildConfig.TRANSLATE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(
+                json.asConverterFactory(requireNotNull("application/json".toMediaTypeOrNull()))
+            )
+            .build()
 }

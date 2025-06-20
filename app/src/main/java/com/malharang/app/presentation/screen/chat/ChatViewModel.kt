@@ -2,7 +2,7 @@ package com.malharang.app.presentation.screen.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.malharang.app.domain.usecase.DummyUseCase
+import com.malharang.app.domain.usecase.TranslateUseCase
 import com.malharang.app.presentation.model.ChatMessage
 import com.malharang.app.presentation.model.SenderType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val dummyUseCase: DummyUseCase
+    private val translateUseCase: TranslateUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -26,6 +26,9 @@ class ChatViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<ChatSideEffect>()
     val sideEffect: SharedFlow<ChatSideEffect> = _sideEffect
+
+    private val _translateErrorMessage = MutableStateFlow<String?>(null)
+    val translateErrorMessage: StateFlow<String?> = _translateErrorMessage.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -40,9 +43,11 @@ class ChatViewModel @Inject constructor(
             is ChatIntent.OnInputChanged -> {
                 _state.update { it.copy(input = intent.input) }
             }
+
             is ChatIntent.SendMessage -> {
                 sendMessage(intent.message)
             }
+
             is ChatIntent.ReceiveBotResponse -> {
                 // TODO: Receive bot response
             }
@@ -60,5 +65,57 @@ class ChatViewModel @Inject constructor(
             val updatedChat = _state.value.chatList + botReply
             _state.update { it.copy(chatList = updatedChat, isLoading = false) }
         }
+    }
+
+    fun getTranslate(index: Int, text: String, language: String = "en") {
+        viewModelScope.launch {
+            _state.update { currentState ->
+                val updatedList = currentState.chatList.toMutableList()
+                val original = updatedList.getOrNull(index)
+                if (original != null) {
+                    updatedList[index] = original.copy(
+                        isTranslating = true,
+                        translatedText = null
+                    )
+                }
+                currentState.copy(chatList = updatedList)
+            }
+
+            translateUseCase(
+                text = text,
+                language = language
+            )
+                .onSuccess { translateData ->
+
+                    _state.update { currentState ->
+                        val updatedList = currentState.chatList.toMutableList()
+                        val original = updatedList.getOrNull(index)
+
+                        if (original != null) {
+                            updatedList[index] = original.copy(
+                                translatedText = translateData.translatedText,
+                                isTranslating = false
+                            )
+                        }
+
+                        currentState.copy(chatList = updatedList)
+                    }
+                }
+                .onFailure {
+                    _translateErrorMessage.value = translateErrorMessage.toString()
+                    _state.update { currentState ->
+                        val updatedList = currentState.chatList.toMutableList()
+                        val original = updatedList.getOrNull(index)
+                        if (original != null) {
+                            updatedList[index] = original.copy(isTranslating = false)
+                        }
+                        currentState.copy(chatList = updatedList)
+                    }
+                }
+        }
+    }
+
+    fun clearToastTranslateErrorMessage() {
+        _translateErrorMessage.value = null
     }
 }
