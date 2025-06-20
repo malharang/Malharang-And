@@ -16,23 +16,25 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.malharang.app.core.util.toast
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.component.ChatBubble
 import com.malharang.app.presentation.screen.chat.component.ChatTextField
@@ -46,8 +48,18 @@ fun ChatRoute(
     onBackClick: () -> Unit,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+
+    val translateErrorMessage by viewModel.translateErrorMessage.collectAsStateWithLifecycle()
+
+    LaunchedEffect(translateErrorMessage) {
+        translateErrorMessage?.let {
+            context.toast(it)
+            viewModel.clearToastTranslateErrorMessage()
+        }
+    }
 
     LaunchedEffect(state.isLoading) {
         if (state.isLoading) {
@@ -58,7 +70,7 @@ fun ChatRoute(
         }
     }
 
-    var imeHeight = remember { mutableIntStateOf(0) }
+    val imeHeight = remember { mutableIntStateOf(0) }
     val ime = WindowInsets.ime
     val localDensity = LocalDensity.current
     LaunchedEffect(Unit) {
@@ -72,15 +84,15 @@ fun ChatRoute(
                     listState.scrollBy((keyboardHeight - imeHeight.intValue).toFloat())
                 }
                 imeHeight.intValue = keyboardHeight
-            } else if (keyboardHeight == 0) imeHeight
+            }
         }
     }
-
     ChatScreen(
         state = state,
         listState = listState,
         onIntent = viewModel::onIntent,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }
     )
 }
 
@@ -89,6 +101,7 @@ private fun ChatScreen(
     state: ChatState,
     listState: LazyListState,
     onIntent: (ChatIntent) -> Unit,
+    onTranslateClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
     missionDescription: String = "How to Order at a Coffe Shop"
@@ -130,10 +143,15 @@ private fun ChatScreen(
                 )
             }
 
-            items(state.chatList) { chat ->
+            itemsIndexed(state.chatList) { index, chat ->
                 ChatBubble(
                     text = chat.text,
-                    sender = chat.sender
+                    sender = chat.sender,
+                    translatedText = chat.translatedText,
+                    isTranslating = chat.isTranslating,
+                    onTranslateClick = {
+                        onTranslateClick(index, chat.text)
+                    }
                 )
             }
 
@@ -169,7 +187,8 @@ private fun PreviewChatScreen() {
             missionDescription = "How to Order at a Coffe Shop",
             state = ChatState(),
             onIntent = {},
-            listState = rememberLazyListState()
+            listState = rememberLazyListState(),
+            onTranslateClick = { _, _ -> }
         )
     }
 }

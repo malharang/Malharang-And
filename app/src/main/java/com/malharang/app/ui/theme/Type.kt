@@ -12,6 +12,7 @@ import com.malharang.app.R
 @Immutable
 data class MalHaRangTypography(
     val bodySmall: TextStyle,
+    val bodySmallPlus: TextStyle,
     val bodyMedium: TextStyle,
     val bodyMediumBold: TextStyle,
     val titleLarge: TextStyle
@@ -21,6 +22,12 @@ val defaultMalHaRangTypography = MalHaRangTypography(
 
     bodySmall = TextStyle(
         fontSize = 12.sp,
+        lineHeight = 18.sp,
+        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans_medium)),
+        fontWeight = FontWeight.Medium
+    ),
+    bodySmallPlus = TextStyle(
+        fontSize = 16.sp,
         lineHeight = 18.sp,
         fontFamily = FontFamily(Font(R.font.plus_jakarta_sans_medium)),
         fontWeight = FontWeight.Medium

@@ -30,6 +30,8 @@ android {
         buildConfigField("String", "BASE_URL", properties["base.url"].toString())
         buildConfigField("String", "MAPS_API_KEY", properties["maps.api.key"].toString())
         manifestPlaceholders["MAPS_API_KEY"] = properties["MAPS_API_KEY"].toString()
+        buildConfigField("String", "TRANSLATE_URL", properties["translate.url"].toString())
+        buildConfigField("String", "TRANSLATE_API_KEY", properties["translate.api.key"].toString())
     }
 
     buildTypes {
@@ -110,6 +112,8 @@ dependencies {
     // Map permissions
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
+
+    // Cloud Translation
 }
 
 ktlint {

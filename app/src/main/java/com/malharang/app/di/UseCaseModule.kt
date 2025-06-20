@@ -4,6 +4,8 @@ import com.malharang.app.domain.repository.DummyRepository
 import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.usecase.DummyUseCase
 import com.malharang.app.domain.usecase.PlaceTypeUseCase
+import com.malharang.app.domain.repository.TranslateRepository
+import com.malharang.app.domain.usecase.TranslateUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +26,10 @@ object UseCaseModule {
     fun providePlaceTypeUseCase(
         placeTypeRepository: PlaceTypeRepository
     ): PlaceTypeUseCase = PlaceTypeUseCase(placeTypeRepository)
+
+    @Provides
+    @Singleton
+    fun provideTranslateUseCase(
+        translateRepository: TranslateRepository
+    ): TranslateUseCase = TranslateUseCase(translateRepository)
 }
