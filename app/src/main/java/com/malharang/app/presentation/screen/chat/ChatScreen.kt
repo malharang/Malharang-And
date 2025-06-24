@@ -35,13 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.core.util.toast
+import com.malharang.app.presentation.model.MicState
 import com.malharang.app.presentation.model.SenderType
+import com.malharang.app.presentation.screen.chat.component.ChatBottomContents
 import com.malharang.app.presentation.screen.chat.component.ChatBubble
-import com.malharang.app.presentation.screen.chat.component.ChatTextField
 import com.malharang.app.presentation.screen.chat.component.ChatTopBar
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
+import timber.log.Timber
 
 @Composable
 fun ChatRoute(
@@ -51,6 +53,7 @@ fun ChatRoute(
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val micState by viewModel.micState.collectAsStateWithLifecycle()
 
     val translateErrorMessage by viewModel.translateErrorMessage.collectAsStateWithLifecycle()
 
@@ -90,6 +93,10 @@ fun ChatRoute(
     ChatScreen(
         state = state,
         listState = listState,
+        micState = micState,
+        micClick = {
+            Timber.tag("RIVE").d("🖱 Mic button clicked - Current: $micState")
+            viewModel.updateMicState(MicState.StartRecording) },
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
         onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }
@@ -100,6 +107,8 @@ fun ChatRoute(
 private fun ChatScreen(
     state: ChatState,
     listState: LazyListState,
+    micState: MicState,
+    micClick: () -> Unit,
     onIntent: (ChatIntent) -> Unit,
     onTranslateClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
@@ -109,7 +118,7 @@ private fun ChatScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(colors.greenUltraLight)
+            .background(colors.greenLight30)
             .windowInsetsPadding(WindowInsets.systemBars)
             .imePadding()
     ) {
@@ -118,12 +127,11 @@ private fun ChatScreen(
             onBackClick = onBackClick,
             modifier = Modifier
                 .padding(bottom = 20.dp)
-                .padding(horizontal = 16.dp)
         )
 
         HorizontalDivider(
             thickness = 1.dp,
-            color = colors.white
+            color = colors.greenBasic20
         )
 
         LazyColumn(
@@ -163,18 +171,21 @@ private fun ChatScreen(
                     )
                 }
             }
+
             item {
                 Spacer(modifier = Modifier.height(5.dp))
             }
         }
 
-        ChatTextField(
+        ChatBottomContents(
             chat = state.input,
             onTextChanged = { onIntent(ChatIntent.OnInputChanged(it)) },
             onSendClick = { onIntent(ChatIntent.SendMessage(state.input)) },
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .padding(bottom = 10.dp)
+            modifier = Modifier,
+            onVoiceClick = { onIntent(ChatIntent.OnVoiceClick) },
+            isVoiced = state.isVoiced,
+            micState = micState,
+            onMicClick = micClick,
         )
     }
 }
@@ -188,7 +199,9 @@ private fun PreviewChatScreen() {
             state = ChatState(),
             onIntent = {},
             listState = rememberLazyListState(),
-            onTranslateClick = { _, _ -> }
+            onTranslateClick = { _, _ -> },
+            micState = MicState.Idle,
+            micClick = {}
         )
     }
 }

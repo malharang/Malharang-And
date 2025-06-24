@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malharang.app.domain.usecase.TranslateUseCase
 import com.malharang.app.presentation.model.ChatMessage
+import com.malharang.app.presentation.model.MicState
 import com.malharang.app.presentation.model.SenderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -30,6 +31,9 @@ class ChatViewModel @Inject constructor(
     private val _translateErrorMessage = MutableStateFlow<String?>(null)
     val translateErrorMessage: StateFlow<String?> = _translateErrorMessage.asStateFlow()
 
+    private val _micState = MutableStateFlow(MicState.Idle)
+    val micState: StateFlow<MicState> = _micState
+
     init {
         viewModelScope.launch {
             val botReply = ChatMessage("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
@@ -50,6 +54,10 @@ class ChatViewModel @Inject constructor(
 
             is ChatIntent.ReceiveBotResponse -> {
                 // TODO: Receive bot response
+            }
+
+            is ChatIntent.OnVoiceClick -> {
+                _state.update { it.copy(isVoiced = !it.isVoiced) }
             }
         }
     }
@@ -117,5 +125,9 @@ class ChatViewModel @Inject constructor(
 
     fun clearToastTranslateErrorMessage() {
         _translateErrorMessage.value = null
+    }
+
+    fun updateMicState(state: MicState) {
+        _micState.value = state
     }
 }

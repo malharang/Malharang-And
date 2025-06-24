@@ -1,8 +1,8 @@
 package com.malharang.app.di
 
 import com.malharang.app.data.remote.datasource.DummyRemoteDataSource
-import com.malharang.app.data.remote.datasource.TranslateRemoteDataSource
 import com.malharang.app.data.remote.datasourceimpl.DummyRemoteDataSourceImpl
+import com.malharang.app.data.remote.datasource.TranslateRemoteDataSource
 import com.malharang.app.data.remote.datasourceimpl.TranslateRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module

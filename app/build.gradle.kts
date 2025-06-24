@@ -1,4 +1,3 @@
-
 import java.util.Properties
 
 plugins {
@@ -113,7 +112,9 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
 
-    // Cloud Translation
+    // Rive
+    implementation(libs.rive)
+    implementation(libs.startup)
 }
 
 ktlint {

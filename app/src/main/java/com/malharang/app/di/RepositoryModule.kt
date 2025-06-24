@@ -25,5 +25,5 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindTranslateRepository(TranslateRepositoryImpl: TranslateRepositoryImpl): TranslateRepository
+    abstract fun bindTranslateRepository(translateRepositoryImpl: TranslateRepositoryImpl): TranslateRepository
 }
