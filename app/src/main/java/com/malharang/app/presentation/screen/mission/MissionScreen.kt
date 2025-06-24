@@ -40,11 +40,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.ExportSentenceModel
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.screen.chat.component.MissionComplete
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
@@ -300,6 +302,11 @@ fun SentenceItem(
             }
         }
     }
+}
+
+@Composable
+fun MissionScreen(navController: NavController) {
+    MissionComplete(navController = navController)
 }
 
 @Preview(showBackground = true)

@@ -50,6 +50,7 @@ import com.malharang.app.core.component.UserStatusBar
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.UserStatusModel
+import com.malharang.app.presentation.screen.chat.component.MissionComplete
 import com.malharang.app.presentation.screen.home.component.CustomMarker
 import com.malharang.app.presentation.screen.home.component.HomeBottomSheet
 import com.malharang.app.ui.theme.MalHaRangTheme
@@ -259,6 +260,11 @@ private fun HomeScreen(
             }
         }
     }
+}
+
+@Composable
+fun HomeScreen(navController: NavController) {
+    MissionComplete(navController = navController)
 }
 
 @Preview(showBackground = true)

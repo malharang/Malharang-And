@@ -23,3 +23,11 @@ sealed interface HomeRoute {
     @Serializable
     data object Search : HomeRoute
 }
+
+sealed interface ChatRoute {
+    @Serializable
+    data object Quiz : ChatRoute
+
+    @Serializable
+    data object Home : ChatRoute
+}
