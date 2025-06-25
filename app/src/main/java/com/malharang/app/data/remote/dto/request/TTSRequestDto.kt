@@ -20,5 +20,3 @@ data class VoiceSettings(
     @SerialName("speed")
     val speed: Float = 0.8f
 )
-
-

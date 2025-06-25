@@ -46,7 +46,7 @@ fun ChatBubble(
     onVoiceClick: (String) -> Unit = {},
     onBookmarkClick: () -> Unit = {},
     isTranslating: Boolean = false,
-    isSoundPlaying: Boolean = false,
+    isSoundPlaying: Boolean = false
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT

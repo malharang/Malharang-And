@@ -19,7 +19,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun ChatRoundIconButton(
     @DrawableRes iconRes: Int,
@@ -28,16 +27,20 @@ fun ChatRoundIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isShadow: Boolean = false,
-    padding: Int = 8,
+    padding: Int = 8
 ) {
     Box(
         modifier = modifier
             .then(
-                if (isShadow == true) Modifier.shadow(
-                    elevation = 3.dp,
-                    shape = CircleShape,
-                    clip = true
-                ) else Modifier
+                if (isShadow == true) {
+                    Modifier.shadow(
+                        elevation = 3.dp,
+                        shape = CircleShape,
+                        clip = true
+                    )
+                } else {
+                    Modifier
+                }
             )
             .clip(CircleShape)
             .background(backgroundColor)
@@ -54,5 +57,3 @@ fun ChatRoundIconButton(
         )
     }
 }
-
-

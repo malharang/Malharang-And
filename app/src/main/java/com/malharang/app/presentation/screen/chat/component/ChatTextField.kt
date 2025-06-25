@@ -54,7 +54,6 @@ fun ChatTextField(
         backgroundColor = colors.greenUltraLight
     )
 
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -102,7 +101,7 @@ fun ChatTextField(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
                             )
                         )
                     }

@@ -30,7 +30,7 @@ fun ChatBottomContents(
     onSendClick: () -> Unit,
     onVoiceClick: () -> Unit,
     onMicClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val surfaceColor = colors.greenLight30
     val blurModifier = modifier.drawBehind {
@@ -38,16 +38,15 @@ fun ChatBottomContents(
         val gradientBrush = Brush.verticalGradient(
             colors = listOf(Color.Transparent, surfaceColor),
             startY = -gradientHeight,
-            endY = 0f,
+            endY = 0f
         )
 
         drawRect(
             brush = gradientBrush,
             topLeft = Offset(x = 0f, y = -gradientHeight),
-            size = Size(width = size.width, height = gradientHeight),
+            size = Size(width = size.width, height = gradientHeight)
         )
     }
-
 
     Row(
         modifier = blurModifier
@@ -56,7 +55,6 @@ fun ChatBottomContents(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
         if (!isVoiced) {
             ChatRoundIconButton(
                 iconRes = R.drawable.ic_chat_voice_24,
@@ -70,7 +68,7 @@ fun ChatBottomContents(
             ChatTextField(
                 chat = chat,
                 onTextChanged = { onTextChanged(it) },
-                onSendClick = { onSendClick() },
+                onSendClick = { onSendClick() }
             )
         } else {
             Row(
@@ -78,9 +76,8 @@ fun ChatBottomContents(
                     .fillMaxWidth()
                     .padding(bottom = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.Center
             ) {
-
                 Spacer(modifier = Modifier.width(90.dp))
 
                 MicAnimationButton(
@@ -104,7 +101,6 @@ fun ChatBottomContents(
         }
     }
 }
-
 
 @Preview
 @Composable

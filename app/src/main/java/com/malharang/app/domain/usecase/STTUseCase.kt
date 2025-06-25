@@ -8,6 +8,6 @@ import javax.inject.Inject
 class STTUseCase @Inject constructor(
     private val speechRepository: SpeechRepository
 ) {
-    suspend operator fun invoke(file: File)
-    : Result<STTData> = speechRepository.postSpeechToText(file = file)
+    suspend operator fun invoke(file: File): Result<STTData> =
+        speechRepository.postSpeechToText(file = file)
 }

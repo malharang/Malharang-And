@@ -201,7 +201,7 @@ private fun ChatScreen(
             onVoiceClick = { onIntent(ChatIntent.OnVoiceClick) },
             isVoiced = state.isVoiced,
             micState = micState,
-            onMicClick = micClick,
+            onMicClick = micClick
         )
     }
 }
@@ -218,7 +218,7 @@ private fun PreviewChatScreen() {
             onTranslateClick = { _, _ -> },
             micState = MicState.Idle,
             micClick = {},
-            onVoiceClick = { _, _ -> },
+            onVoiceClick = { _, _ -> }
         )
     }
 }

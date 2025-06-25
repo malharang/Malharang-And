@@ -63,7 +63,6 @@ class SpeechRecorderManager @Inject constructor(
                     tempFile.delete()
                 }
             }
-
         } catch (e: Exception) {
             Timber.tag("TTS_TEST").e(e, "TTS 스트림 재생 실패")
         }

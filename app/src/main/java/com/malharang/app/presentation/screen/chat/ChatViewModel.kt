@@ -31,7 +31,7 @@ class ChatViewModel @Inject constructor(
     private val translateUseCase: TranslateUseCase,
     private val recorder: SpeechRecorderManager,
     private val sttUseCase: STTUseCase,
-    private val ttsUseCase: TTSUseCase,
+    private val ttsUseCase: TTSUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -178,9 +178,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun postTextToSpeech(index: Int, text: String) {
-
         viewModelScope.launch {
-
             val isPlaying = _state.value.chatList.getOrNull(index)?.isSoundPlaying == true
 
             if (isPlaying) {
@@ -196,7 +194,6 @@ class ChatViewModel @Inject constructor(
             ttsUseCase(text = text)
                 .onSuccess { ttsData ->
                     Timber.tag("TTS_TEST").d("TTS API 호출 성공")
-
 
                     recorder.playTTSStream(
                         responseBody = ttsData.audioStream,
@@ -254,5 +251,4 @@ class ChatViewModel @Inject constructor(
     fun clearToastErrorMessage() {
         _errorMessage.value = null
     }
-
 }

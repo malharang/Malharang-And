@@ -20,7 +20,7 @@ fun MicAnimationButton(
     modifier: Modifier = Modifier,
     @RawRes animation: Int = R.raw.mic_record_button,
     stateMachineName: String = "MicStateMachine",
-    onClick: () -> Unit = {},
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier.size(100.dp)

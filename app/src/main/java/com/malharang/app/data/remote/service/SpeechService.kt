@@ -1,6 +1,5 @@
 package com.malharang.app.data.remote.service
 
-import android.os.Build
 import com.malharang.app.BuildConfig
 import com.malharang.app.data.remote.dto.request.TTSRequestDto
 import com.malharang.app.data.remote.dto.response.STTResponseDto
@@ -36,4 +35,3 @@ interface SpeechService {
         @Query("output_format") format: String = "mp3_44100_128"
     ): Response<ResponseBody>
 }
-
