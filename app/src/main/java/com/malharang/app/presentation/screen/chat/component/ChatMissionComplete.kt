@@ -3,6 +3,7 @@ package com.malharang.app.presentation.screen.chat.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,11 +11,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -24,11 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
-import androidx.compose.foundation.layout.Spacer as Spacer1
-import androidx.compose.material3.Icon as Icon1
-import androidx.navigation.NavController
 
 @Composable
 fun MissionComplete(
@@ -72,12 +73,12 @@ fun MissionComplete(
                     .height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C471))
             ) {
-                Icon1(
+                Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Complete",
                     tint = colors.white
                 )
-                Spacer1(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text("Go to Quiz Tab", color = colors.white)
             }
 
@@ -90,11 +91,11 @@ fun MissionComplete(
                     .height(48.dp),
                 border = BorderStroke(1.dp, Color.LightGray)
             ) {
-                Icon1(
+                Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search"
                 )
-                Spacer1(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text("Find Another Mission")
             }
         }

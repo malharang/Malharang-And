@@ -46,6 +46,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.typography
 @Composable
 fun ChatRoute(
     onBackClick: () -> Unit,
+    navigateToQuizStart: () -> Unit,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -92,6 +93,7 @@ fun ChatRoute(
         listState = listState,
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
+        navigateToQuizStart = navigateToQuizStart,
         onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }
     )
 }
@@ -104,6 +106,7 @@ private fun ChatScreen(
     onTranslateClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
+    navigateToQuizStart: () -> Unit = {},
     missionDescription: String = "How to Order at a Coffe Shop"
 ) {
     Column(

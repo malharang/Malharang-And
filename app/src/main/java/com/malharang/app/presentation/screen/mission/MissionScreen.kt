@@ -40,19 +40,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.malharang.app.R
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.ExportSentenceModel
 import com.malharang.app.presentation.model.MissionCardModel
-import com.malharang.app.presentation.screen.chat.component.MissionComplete
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionRoute(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navigateToQuizStart: () -> Unit,
 ) {
     val missionCardList = listOf(
         MissionCardModel(
@@ -90,8 +89,8 @@ fun MissionRoute(
         padding = padding,
         missionCardList = missionCardList,
         reviewMissionList = reviewMissions,
-        exportSentences = exportSentences
-
+        exportSentences = exportSentences,
+        navigateToQuizStart = navigateToQuizStart,
     )
 }
 
@@ -100,7 +99,8 @@ private fun MissionScreen(
     padding: PaddingValues,
     missionCardList: List<MissionCardModel>,
     reviewMissionList: List<MissionCardModel>,
-    exportSentences: List<ExportSentenceModel>
+    exportSentences: List<ExportSentenceModel>,
+    navigateToQuizStart: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -108,6 +108,7 @@ private fun MissionScreen(
             .padding(padding)
             .padding(horizontal = 20.dp)
     ) {
+
         item {
             Row(
                 modifier = Modifier
@@ -129,6 +130,10 @@ private fun MissionScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
 
+            Text(
+                text = "go to quiz",
+                modifier = Modifier.clickable { navigateToQuizStart() },
+            )
             // 섹션: Available Missions
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
@@ -304,11 +309,6 @@ fun SentenceItem(
     }
 }
 
-@Composable
-fun MissionScreen(navController: NavController) {
-    MissionComplete(navController = navController)
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewMissionScreen() {
@@ -350,8 +350,8 @@ private fun PreviewMissionScreen() {
             padding = PaddingValues(),
             missionCardList = missionCardList,
             reviewMissionList = reviewMissions,
-            exportSentences = exportSentences
-
+            exportSentences = exportSentences,
+            navigateToQuizStart = {}
         )
     }
 }

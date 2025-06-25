@@ -20,14 +20,25 @@ sealed interface HomeRoute {
     @Serializable
     data object PlaceType : HomeRoute
 
-    @Serializable
-    data object Search : HomeRoute
 }
 
-sealed interface ChatRoute {
+sealed interface QuizRoute {
     @Serializable
-    data object Quiz : ChatRoute
+    data object QuizStart : QuizRoute
 
     @Serializable
-    data object Home : ChatRoute
+    data class QuizType(
+        val scenarioId: Int,
+    ): QuizRoute
+
+    @Serializable
+    data class QuizPlay(
+        val scenarioId: Int,
+        val type: String,
+    ): QuizRoute
+
+    @Serializable
+    data class QuizResult(
+        val countResult: String,
+    ): QuizRoute
 }

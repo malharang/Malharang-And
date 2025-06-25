@@ -7,15 +7,20 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.mission.MissionRoute
+import com.malharang.app.presentation.screen.quiz.navigation.navigateToQuizStart
 
 fun NavController.navigateToMission(navOptions: NavOptions) {
     navigate(MainTabRoute.Mission, navOptions)
 }
 
 fun NavGraphBuilder.missionNavGraph(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavController
 ) {
     composable<MainTabRoute.Mission> {
-        MissionRoute(padding = padding)
+        MissionRoute(
+            padding = padding,
+            navigateToQuizStart = { navController.navigateToQuizStart() }
+        )
     }
 }
