@@ -1,4 +1,3 @@
-
 import java.util.Properties
 
 plugins {
@@ -32,6 +31,8 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = properties["MAPS_API_KEY"].toString()
         buildConfigField("String", "TRANSLATE_URL", properties["translate.url"].toString())
         buildConfigField("String", "TRANSLATE_API_KEY", properties["translate.api.key"].toString())
+        buildConfigField("String", "SPEECH_URL", properties["speech.url"].toString())
+        buildConfigField("String", "SPEECH_API_KEY", properties["speech.api.key"].toString())
     }
 
     buildTypes {
@@ -113,7 +114,9 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
 
-    // Cloud Translation
+    // Rive
+    implementation(libs.rive)
+    implementation(libs.startup)
 }
 
 ktlint {

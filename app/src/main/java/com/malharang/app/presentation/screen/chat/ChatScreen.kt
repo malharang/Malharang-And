@@ -34,15 +34,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.malharang.app.core.util.toast
+import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import com.malharang.app.presentation.model.SenderType
+import com.malharang.app.presentation.screen.chat.component.ChatBottomContents
 import com.malharang.app.presentation.screen.chat.component.ChatBubble
-import com.malharang.app.presentation.screen.chat.component.ChatTextField
 import com.malharang.app.presentation.screen.chat.component.ChatTopBar
+import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
+import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatRoute(
     onBackClick: () -> Unit,
@@ -51,13 +58,14 @@ fun ChatRoute(
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val micState by viewModel.micState.collectAsStateWithLifecycle()
 
-    val translateErrorMessage by viewModel.translateErrorMessage.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-    LaunchedEffect(translateErrorMessage) {
-        translateErrorMessage?.let {
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
             context.toast(it)
-            viewModel.clearToastTranslateErrorMessage()
+            viewModel.clearToastErrorMessage()
         }
     }
 
@@ -87,12 +95,24 @@ fun ChatRoute(
             }
         }
     }
+
+    val permissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+
+    LaunchedEffect(Unit) {
+        if (!permissionState.status.isGranted) {
+            permissionState.launchPermissionRequest()
+        }
+    }
+
     ChatScreen(
         state = state,
         listState = listState,
+        micState = micState,
+        micClick = { viewModel.onMicClicked() },
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
-        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }
+        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) },
+        onVoiceClick = viewModel::postTextToSpeech
     )
 }
 
@@ -100,6 +120,9 @@ fun ChatRoute(
 private fun ChatScreen(
     state: ChatState,
     listState: LazyListState,
+    micState: MicState,
+    micClick: () -> Unit,
+    onVoiceClick: (Int, String) -> Unit,
     onIntent: (ChatIntent) -> Unit,
     onTranslateClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
@@ -109,7 +132,7 @@ private fun ChatScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(colors.greenUltraLight)
+            .background(colors.greenLight30)
             .windowInsetsPadding(WindowInsets.systemBars)
             .imePadding()
     ) {
@@ -118,12 +141,11 @@ private fun ChatScreen(
             onBackClick = onBackClick,
             modifier = Modifier
                 .padding(bottom = 20.dp)
-                .padding(horizontal = 16.dp)
         )
 
         HorizontalDivider(
             thickness = 1.dp,
-            color = colors.white
+            color = colors.greenBasic20
         )
 
         LazyColumn(
@@ -151,7 +173,9 @@ private fun ChatScreen(
                     isTranslating = chat.isTranslating,
                     onTranslateClick = {
                         onTranslateClick(index, chat.text)
-                    }
+                    },
+                    onVoiceClick = { onVoiceClick(index, chat.text) },
+                    isSoundPlaying = chat.isSoundPlaying
                 )
             }
 
@@ -163,18 +187,21 @@ private fun ChatScreen(
                     )
                 }
             }
+
             item {
                 Spacer(modifier = Modifier.height(5.dp))
             }
         }
 
-        ChatTextField(
+        ChatBottomContents(
             chat = state.input,
             onTextChanged = { onIntent(ChatIntent.OnInputChanged(it)) },
             onSendClick = { onIntent(ChatIntent.SendMessage(state.input)) },
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .padding(bottom = 10.dp)
+            modifier = Modifier,
+            onVoiceClick = { onIntent(ChatIntent.OnVoiceClick) },
+            isVoiced = state.isVoiced,
+            micState = micState,
+            onMicClick = micClick
         )
     }
 }
@@ -188,7 +215,10 @@ private fun PreviewChatScreen() {
             state = ChatState(),
             onIntent = {},
             listState = rememberLazyListState(),
-            onTranslateClick = { _, _ -> }
+            onTranslateClick = { _, _ -> },
+            micState = MicState.Idle,
+            micClick = {},
+            onVoiceClick = { _, _ -> }
         )
     }
 }
