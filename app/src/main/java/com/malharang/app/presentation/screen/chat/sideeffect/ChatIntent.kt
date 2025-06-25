@@ -1,4 +1,4 @@
-package com.malharang.app.presentation.screen.chat
+package com.malharang.app.presentation.screen.chat.sideeffect
 
 sealed interface ChatIntent {
     data class SendMessage(val message: String) : ChatIntent

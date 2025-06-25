@@ -11,7 +11,7 @@ import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.Alignment
 import com.malharang.app.R
 import com.malharang.app.core.util.noRippleClickable
-import com.malharang.app.presentation.model.MicState
+import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import timber.log.Timber
 
 @Composable

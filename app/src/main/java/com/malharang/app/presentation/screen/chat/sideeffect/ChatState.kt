@@ -1,4 +1,4 @@
-package com.malharang.app.presentation.screen.chat
+package com.malharang.app.presentation.screen.chat.sideeffect
 
 import com.malharang.app.presentation.model.ChatMessage
 

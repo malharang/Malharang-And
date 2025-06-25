@@ -34,17 +34,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.malharang.app.core.util.toast
-import com.malharang.app.presentation.model.MicState
+import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.component.ChatBottomContents
 import com.malharang.app.presentation.screen.chat.component.ChatBubble
 import com.malharang.app.presentation.screen.chat.component.ChatTopBar
+import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
+import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 import com.malharang.app.ui.theme.MalHaRangTheme.typography
-import timber.log.Timber
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatRoute(
     onBackClick: () -> Unit,
@@ -56,11 +61,19 @@ fun ChatRoute(
     val micState by viewModel.micState.collectAsStateWithLifecycle()
 
     val translateErrorMessage by viewModel.translateErrorMessage.collectAsStateWithLifecycle()
+    val sttErrorMessage by viewModel.sttErrorMessage.collectAsStateWithLifecycle()
 
     LaunchedEffect(translateErrorMessage) {
         translateErrorMessage?.let {
             context.toast(it)
             viewModel.clearToastTranslateErrorMessage()
+        }
+    }
+
+    LaunchedEffect(sttErrorMessage) {
+        sttErrorMessage?.let {
+            context.toast(it)
+            viewModel.clearToastSTTErrorMessage()
         }
     }
 
@@ -90,13 +103,20 @@ fun ChatRoute(
             }
         }
     }
+
+    val permissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+
+    LaunchedEffect(Unit) {
+        if (!permissionState.status.isGranted) {
+            permissionState.launchPermissionRequest()
+        }
+    }
+
     ChatScreen(
         state = state,
         listState = listState,
         micState = micState,
-        micClick = {
-            Timber.tag("RIVE").d("🖱 Mic button clicked - Current: $micState")
-            viewModel.updateMicState(MicState.StartRecording) },
+        micClick = { viewModel.onMicClicked() },
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
         onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }

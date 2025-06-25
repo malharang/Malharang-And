@@ -1,39 +1,25 @@
 package com.malharang.app.presentation.screen.chat.component
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.malharang.app.R
-import com.malharang.app.core.util.noRippleClickable
-import com.malharang.app.presentation.model.MicState
+import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import timber.log.Timber
 
 @Composable
 fun ChatBottomContents(
@@ -72,22 +58,12 @@ fun ChatBottomContents(
     ) {
 
         if (!isVoiced) {
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(colors.greenLight)
-                    .clickable { onVoiceClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_chat_voice_24),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(colors.green),
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .padding(8.dp)
-                )
-            }
+            ChatRoundIconButton(
+                iconRes = R.drawable.ic_chat_voice_24,
+                tint = colors.green,
+                backgroundColor = colors.greenLight,
+                onClick = onVoiceClick
+            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
@@ -100,16 +76,29 @@ fun ChatBottomContents(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 20.dp),
+                    .padding(bottom = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround,
+                horizontalArrangement = Arrangement.Center,
             ) {
+
+                Spacer(modifier = Modifier.width(90.dp))
 
                 MicAnimationButton(
                     micState = micState,
                     onClick = {
                         onMicClick()
                     }
+                )
+
+                ChatRoundIconButton(
+                    iconRes = R.drawable.ic_chat_keyboard_24,
+                    tint = colors.grayDark,
+                    backgroundColor = colors.white,
+                    onClick = onVoiceClick,
+                    isShadow = true,
+                    modifier = Modifier
+                        .padding(start = 50.dp),
+                    padding = 12
                 )
             }
         }

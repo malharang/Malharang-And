@@ -1,4 +1,4 @@
-package com.malharang.app.presentation.model
+package com.malharang.app.presentation.screen.chat.sideeffect
 
 enum class MicState(val trigger: String?) {
     Idle(null),
