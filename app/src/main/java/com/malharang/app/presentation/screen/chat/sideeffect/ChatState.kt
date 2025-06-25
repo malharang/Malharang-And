@@ -7,5 +7,5 @@ data class ChatState(
     val input: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isVoiced: Boolean = false
+    val isVoiced: Boolean = false,
 )

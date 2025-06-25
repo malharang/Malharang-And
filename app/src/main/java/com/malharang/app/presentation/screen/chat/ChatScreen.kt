@@ -60,20 +60,12 @@ fun ChatRoute(
     val listState = rememberLazyListState()
     val micState by viewModel.micState.collectAsStateWithLifecycle()
 
-    val translateErrorMessage by viewModel.translateErrorMessage.collectAsStateWithLifecycle()
-    val sttErrorMessage by viewModel.sttErrorMessage.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-    LaunchedEffect(translateErrorMessage) {
-        translateErrorMessage?.let {
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
             context.toast(it)
-            viewModel.clearToastTranslateErrorMessage()
-        }
-    }
-
-    LaunchedEffect(sttErrorMessage) {
-        sttErrorMessage?.let {
-            context.toast(it)
-            viewModel.clearToastSTTErrorMessage()
+            viewModel.clearToastErrorMessage()
         }
     }
 
@@ -119,7 +111,8 @@ fun ChatRoute(
         micClick = { viewModel.onMicClicked() },
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
-        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }
+        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) },
+        onVoiceClick = viewModel::postTextToSpeech
     )
 }
 
@@ -129,6 +122,7 @@ private fun ChatScreen(
     listState: LazyListState,
     micState: MicState,
     micClick: () -> Unit,
+    onVoiceClick: (Int, String) -> Unit,
     onIntent: (ChatIntent) -> Unit,
     onTranslateClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
@@ -179,7 +173,9 @@ private fun ChatScreen(
                     isTranslating = chat.isTranslating,
                     onTranslateClick = {
                         onTranslateClick(index, chat.text)
-                    }
+                    },
+                    onVoiceClick = { onVoiceClick(index, chat.text) },
+                    isSoundPlaying = chat.isSoundPlaying
                 )
             }
 
@@ -221,7 +217,8 @@ private fun PreviewChatScreen() {
             listState = rememberLazyListState(),
             onTranslateClick = { _, _ -> },
             micState = MicState.Idle,
-            micClick = {}
+            micClick = {},
+            onVoiceClick = { _, _ -> },
         )
     }
 }
