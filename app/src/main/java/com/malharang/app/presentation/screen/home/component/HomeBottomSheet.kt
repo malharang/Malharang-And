@@ -16,13 +16,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.model.PlaceTypeItem
 
 @Composable
 fun HomeBottomSheet(
     selectedPOIName: String?,
-    placeTypes: List<String>,
+    locationType: PlaceTypeItem.Location? = null,
+    goalTypes: List<PlaceTypeItem.Goal>,
     missionCards: List<MissionCardModel>,
-    onAddPlaceTypeClick: () -> Unit
+    onLocationTypeClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -40,10 +42,11 @@ fun HomeBottomSheet(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (placeTypes.isNotEmpty()) {
+        if (locationType != null) {
             PlaceTypeListRow(
-                placeTypes = placeTypes,
-                onAddClick = onAddPlaceTypeClick
+                goalTypes = goalTypes,
+                onLocationTypeClick = onLocationTypeClick,
+                locationType = locationType
             )
             Spacer(modifier = Modifier.padding(5.dp))
 
@@ -61,7 +64,7 @@ fun HomeBottomSheet(
             }
         } else {
             PlaceTypeEmptyView(
-                onAddPlaceTypeClick = onAddPlaceTypeClick
+                onAddPlaceTypeClick = onLocationTypeClick
             )
         }
     }

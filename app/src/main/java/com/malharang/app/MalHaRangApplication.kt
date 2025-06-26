@@ -9,6 +9,7 @@ import timber.log.Timber
 class MalHaRangApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+
         Timber.plant(Timber.DebugTree())
 
         // Places API 초기화

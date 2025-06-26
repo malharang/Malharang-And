@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
 import com.malharang.app.presentation.screen.chat.navigation.chatNavGraph
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
+import com.malharang.app.presentation.screen.home.navigation.navigateToHome
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
 import com.malharang.app.presentation.screen.placetype.navigation.placeTypeNavGraph
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
@@ -18,7 +20,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 fun MainNavHost(
     navigator: MainNavigator,
     padding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
@@ -41,7 +43,17 @@ fun MainNavHost(
 
             placeTypeNavGraph(
                 padding = padding,
-                navController = navigator.navController
+                navigateToUp = navigator::navigateUp,
+                navigateToHome = { placeType ->
+                    val navOptions = navOptions {
+                        navigator.navController.currentDestination?.route?.let {
+                            popUpTo(it) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                    navigator.navController.navigateToHome(placeType, navOptions)
+                }
             )
         }
     }

@@ -5,5 +5,7 @@ import com.google.android.gms.maps.model.LatLng
 data class PlaceInfoModel(
     val name: String,
     val latLng: LatLng,
-    val types: List<String>
+    val locationType: PlaceTypeItem.Location? = null,
+    val goalTypes: List<PlaceTypeItem.Goal> = emptyList()
 )
+

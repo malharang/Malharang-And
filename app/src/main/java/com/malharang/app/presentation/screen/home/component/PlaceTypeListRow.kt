@@ -23,13 +23,15 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.malharang.app.R
 import com.malharang.app.core.util.noRippleClickable
+import com.malharang.app.presentation.model.PlaceTypeItem
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun PlaceTypeListRow(
-    placeTypes: List<String>,
+    goalTypes: List<PlaceTypeItem.Goal>,
     modifier: Modifier = Modifier,
-    onAddClick: () -> Unit = {}
+    locationType: PlaceTypeItem.Location,
+    onLocationTypeClick: () -> Unit = {}
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),
@@ -38,19 +40,36 @@ fun PlaceTypeListRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items(placeTypes) { placeType ->
+        item{
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
-                    .background(colors.black)
+                    .background(colors.green)
+                    .noRippleClickable(onClick = { onLocationTypeClick() })
                     .padding(horizontal = 10.dp, vertical = 2.dp)
             ) {
                 Text(
-                    text = placeType.replace("_", " "),
+                    text = locationType.name.replace("_", " "),
                     color = colors.white
                 )
             }
         }
+
+        items(goalTypes) { goalType ->
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(colors.black)
+                    .noRippleClickable(onClick = {})
+                    .padding(horizontal = 10.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = goalType.name.replace("_", " "),
+                    color = colors.white
+                )
+            }
+        }
+
         item {
             Spacer(modifier = Modifier.width(5.dp))
             Box(
@@ -58,7 +77,7 @@ fun PlaceTypeListRow(
                     .clip(RoundedCornerShape(8.dp))
                     .background(colors.greenTint)
                     .padding(4.dp)
-                    .noRippleClickable { onAddClick() },
+                    .noRippleClickable {},
                 contentAlignment = Alignment.Center
             ) {
                 Image(

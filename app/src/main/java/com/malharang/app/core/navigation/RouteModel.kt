@@ -4,7 +4,9 @@ import kotlinx.serialization.Serializable
 
 sealed interface MainTabRoute {
     @Serializable
-    data object Home : MainTabRoute
+    data class Home(
+        val placeType: String? = null
+    ): MainTabRoute
 
     @Serializable
     data object Chat : MainTabRoute
@@ -19,7 +21,4 @@ sealed interface MainTabRoute {
 sealed interface HomeRoute {
     @Serializable
     data object PlaceType : HomeRoute
-
-    @Serializable
-    data object Search : HomeRoute
 }

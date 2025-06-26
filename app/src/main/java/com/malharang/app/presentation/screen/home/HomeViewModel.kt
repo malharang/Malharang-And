@@ -16,12 +16,14 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
+import com.malharang.app.presentation.model.PlaceTypeItem
 import com.malharang.app.presentation.model.UserStatusModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,11 +41,6 @@ class HomeViewModel @Inject constructor(
     private val placesClient: PlacesClient by lazy {
         Places.createClient(context)
     }
-
-    private val excludedTypes = listOf(
-        "establishment",
-        "point_of_interest"
-    )
 
     val userStatusModel = UserStatusModel(
         profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
@@ -77,28 +74,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun fetchPlaceTypes(placeId: String) {
-        val placeFields = listOf(Place.Field.TYPES)
+    fun fetchPlaceType(placeId: String) {
+        val placeFields = listOf(Place.Field.PRIMARY_TYPE)
         val request = FetchPlaceRequest.newInstance(placeId, placeFields)
 
         placesClient.fetchPlace(request)
             .addOnSuccessListener { response ->
-                val types = response.place.placeTypes ?: emptyList()
+                val primaryType = response.place.primaryType
 
-                val filteredTypes = types.filterNot { it in excludedTypes }
-
-                setSelectedPlaceTypes(filteredTypes)
+                setSelectedPlaceType(primaryType)
             }
             .addOnFailureListener { exception ->
-                setSelectedPlaceTypes(emptyList())
+                setSelectedPlaceType(null)
             }
     }
 
-    fun setSelectedPlaceTypes(placeTypes: List<String>) {
+    fun setSelectedPlaceType(placeType: String?) {
+        if (placeType == null) {
+            return
+        }
+        Timber.tag("PlaceTypeFetcher").d("Setting place type: $placeType")
+
         _placeInfo.value = _placeInfo.value?.copy(
-            types = placeTypes
+            locationType = PlaceTypeItem.Location(name = placeType)
         )
     }
+
 
     fun setSelectedPlaceInfo(name: String, latLng: LatLng) {
         _placeInfo.value = _placeInfo.value?.copy(
@@ -107,7 +108,8 @@ class HomeViewModel @Inject constructor(
         ) ?: PlaceInfoModel(
             name = name,
             latLng = latLng,
-            types = emptyList()
+            locationType = placeInfo.value?.locationType,
+            goalTypes = placeInfo.value?.goalTypes ?: emptyList()
         )
     }
 }

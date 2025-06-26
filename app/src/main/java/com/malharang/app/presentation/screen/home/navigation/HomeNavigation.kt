@@ -5,12 +5,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.home.HomeRoute
 import com.malharang.app.presentation.screen.placetype.navigation.navigateToPlaceType
 
-fun NavController.navigateToHome(navOptions: NavOptions) {
-    navigate(MainTabRoute.Home, navOptions)
+fun NavController.navigateToHome(
+    placeType: String? = null,
+    navOptions: NavOptions) {
+    navigate(route = MainTabRoute.Home(placeType),
+        navOptions = navOptions)
 }
 
 fun NavGraphBuilder.homeNavGraph(
@@ -20,8 +24,7 @@ fun NavGraphBuilder.homeNavGraph(
     composable<MainTabRoute.Home> {
         HomeRoute(
             padding = padding,
-            navController = navController,
-            navigateToPlaceType = { navController.navigateToPlaceType() }
+            navigateToPlaceType = navController::navigateToPlaceType
         )
     }
 }

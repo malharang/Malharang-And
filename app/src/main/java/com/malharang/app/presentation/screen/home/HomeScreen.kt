@@ -31,8 +31,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -59,7 +57,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeRoute(
     padding: PaddingValues,
-    navController: NavController,
     navigateToPlaceType: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
     zoomLevel: Float = 19f
@@ -83,19 +80,6 @@ fun HomeRoute(
 
     val placeInfo by viewModel.placeInfo.collectAsState()
 
-    val navBackStackEntry = navController.currentBackStackEntryAsState().value
-
-    LaunchedEffect(navBackStackEntry) {
-        val type = navBackStackEntry?.savedStateHandle?.get<List<String>>("selected_place_types")
-        if (type != null) {
-            val currentTypes = placeInfo?.types ?: emptyList()
-            val updatedTypes = (currentTypes + type).distinct()
-            viewModel.setSelectedPlaceTypes(updatedTypes)
-
-            navBackStackEntry.savedStateHandle.remove<List<String>>("selected_place_types")
-        }
-    }
-
     LaunchedEffect(locationPermissions.allPermissionsGranted) {
         if (locationPermissions.allPermissionsGranted) {
             viewModel.fetchCurrentLocation() // 권한 허용 시 내 위치 다시 요청
@@ -114,11 +98,6 @@ fun HomeRoute(
         }
     }
 
-    val navigateToPlaceTypeWithData = {
-        navController.currentBackStackEntry?.savedStateHandle?.set("existing_types", placeInfo?.types ?: emptyList())
-        navigateToPlaceType()
-    }
-
     HomeScreen(
         padding = padding,
         userStatusModel = viewModel.userStatusModel,
@@ -129,10 +108,10 @@ fun HomeRoute(
         currentLocation = currentLocation,
         placeInfo = placeInfo,
         onClickPOI = {
-            viewModel.fetchPlaceTypes(it.placeId)
+            viewModel.fetchPlaceType(it.placeId)
             viewModel.setSelectedPlaceInfo(it.name, it.latLng)
         },
-        navigateToPlaceType = navigateToPlaceTypeWithData,
+        navigateToPlaceType = navigateToPlaceType,
         missionCards = viewModel.exampleMissions,
         cameraPositionState = cameraPositionState
     )
@@ -240,15 +219,16 @@ private fun HomeScreen(
                     sheetContent = {
                         HomeBottomSheet(
                             selectedPOIName = placeInfo?.name,
-                            placeTypes = placeInfo?.types ?: emptyList(),
+                            locationType = placeInfo?.locationType,
+                            goalTypes = placeInfo?.goalTypes ?: listOf(),
                             missionCards = missionCards,
-                            onAddPlaceTypeClick = navigateToPlaceType
+                            onLocationTypeClick = navigateToPlaceType
                         )
                     }
                 ) {
                     placeInfo?.let {
-                        LaunchedEffect(it.types) {
-                            if (it.types.isNotEmpty()) {
+                        LaunchedEffect(it.locationType) {
+                            if (it.locationType != null) {
                                 scope.launch {
                                     scaffoldState.bottomSheetState.expand()
                                 }

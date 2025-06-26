@@ -1,10 +1,12 @@
 package com.malharang.app.presentation.screen.placetype.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.malharang.app.core.navigation.HomeRoute
+import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.placetype.PlaceTypeRoute
 
 fun NavController.navigateToPlaceType() {
@@ -12,25 +14,18 @@ fun NavController.navigateToPlaceType() {
 }
 
 fun NavGraphBuilder.placeTypeNavGraph(
-    navController: NavController,
-    padding: PaddingValues
+    navigateToUp: () -> Unit,
+    navigateToHome: (String) -> Unit,
+    padding: PaddingValues,
 ) {
     composable<HomeRoute.PlaceType> {
+        BackHandler {
+            navigateToUp()
+        }
         PlaceTypeRoute(
             padding = padding,
-            onBackClick = {
-                navController.previousBackStackEntry?.savedStateHandle?.set(
-                    "selected_place_types",
-                    navController.currentBackStackEntry?.savedStateHandle?.get<List<String>>("selected_types") ?: emptyList()
-                )
-                navController.popBackStack()
-            },
-            onTypeSelected = { selectedTypes ->
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "selected_types",
-                    selectedTypes
-                )
-            }
+            onHomeNavigate = navigateToHome,
+            onBackButtonClick = navigateToUp,
         )
     }
 }

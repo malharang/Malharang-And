@@ -1,6 +1,5 @@
 package com.malharang.app.presentation.screen.placetype
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -49,20 +48,15 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun PlaceTypeRoute(
-    onBackClick: () -> Unit,
     padding: PaddingValues,
-    onTypeSelected: (List<String>) -> Unit,
-    viewModel: PlaceTypeViewModel = hiltViewModel()
+    onHomeNavigate: (String) -> Unit,
+    onBackButtonClick: () -> Unit,
+    viewModel: PlaceTypeViewModel = hiltViewModel(),
 ) {
     val query by viewModel.query.collectAsState()
     val searchResult by viewModel.searchResult.collectAsState()
     val recentTypes by viewModel.recentTypes.collectAsState()
-    val selectedTypes by viewModel.selectedTypes.collectAsState()
-
-    BackHandler {
-        onTypeSelected(selectedTypes)
-        onBackClick()
-    }
+    val selectedType by viewModel.selectedType.collectAsState()
 
     val context = LocalContext.current
 
@@ -76,12 +70,10 @@ fun PlaceTypeRoute(
         onQueryChange = viewModel::updateQuery,
         searchResult = searchResult,
         recentTypes = recentTypes,
-        selectedTypes = selectedTypes,
-        onTypeSelected = { viewModel.selectPlaceType(it) },
-        onBackClick = {
-            onTypeSelected(selectedTypes)
-            onBackClick()
-        }
+        selectedType = selectedType,
+        onTypeSelected = viewModel::selectPlaceType,
+        onHomeButtonClick = onHomeNavigate,
+        onBackButtonClick = onBackButtonClick,
     )
 }
 
@@ -92,9 +84,10 @@ fun PlaceTypeScreen(
     onQueryChange: (String) -> Unit,
     searchResult: List<String>,
     recentTypes: List<String>,
-    selectedTypes: List<String>,
+    selectedType: String?,
     onTypeSelected: (String) -> Unit,
-    onBackClick: () -> Unit
+    onHomeButtonClick: (String) -> Unit,
+    onBackButtonClick: () -> Unit
 ) {
     Column(
         Modifier
@@ -108,7 +101,7 @@ fun PlaceTypeScreen(
                 .padding(start = 8.dp, end = 20.dp, top = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackClick) {
+            IconButton(onClick = onBackButtonClick) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_place_type_arrow_back_24),
                     contentDescription = "뒤로가기",
@@ -126,9 +119,9 @@ fun PlaceTypeScreen(
                         fontWeight = FontWeight.Bold
                     )
                 )
-                if (selectedTypes.isNotEmpty()) {
+                selectedType?.let {
                     Text(
-                        text = " (${selectedTypes.size})",
+                        text = " (1)",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = colors.greenDark
                         )
@@ -147,7 +140,7 @@ fun PlaceTypeScreen(
 
             OutlinedTextField(
                 value = query,
-                onValueChange = { onQueryChange(it) },
+                onValueChange = onQueryChange,
                 singleLine = true,
                 placeholder = { Text("e.g. cafe, museum, park") },
                 shape = RoundedCornerShape(20.dp),
@@ -181,29 +174,31 @@ fun PlaceTypeScreen(
             )
 
             AnimatedVisibility(
-                visible = selectedTypes.isNotEmpty(),
+                visible = selectedType != null,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
                 Column {
                     Text(
-                        text = "Select Place Type",
+                        text = "Selected Place Type",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = colors.greenDark,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(bottom = 18.dp)
-                    ) {
-                        items(selectedTypes) { type ->
-                            PlaceTypePill(
-                                type = type,
-                                onClick = { onTypeSelected(type) },
-                                isSelected = true
-                            )
+                    selectedType?.let {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(bottom = 18.dp)
+                        ) {
+                            item {
+                                PlaceTypePill(
+                                    type = it,
+                                    onClick = { onTypeSelected(it) },
+                                    isSelected = true
+                                )
+                            }
                         }
                     }
                 }
@@ -237,7 +232,7 @@ fun PlaceTypeScreen(
                         PlaceTypePill(
                             type = type,
                             onClick = { onTypeSelected(type) },
-                            isSelected = selectedTypes.contains(type)
+                            isSelected = selectedType == type
                         )
                     }
                 }
@@ -275,7 +270,7 @@ fun PlaceTypeScreen(
                             PlaceTypePill(
                                 type = type,
                                 onClick = { onTypeSelected(type) },
-                                isSelected = selectedTypes.contains(type),
+                                isSelected = selectedType == type,
                                 modifier = Modifier.padding(horizontal = 2.dp)
                             )
                         }
@@ -284,7 +279,7 @@ fun PlaceTypeScreen(
             }
         }
 
-        if (selectedTypes.isNotEmpty()) {
+        if (selectedType != null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -296,7 +291,7 @@ fun PlaceTypeScreen(
                         .height(48.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(colors.greenDark)
-                        .clickable { onBackClick() },
+                        .clickable { onHomeButtonClick(selectedType) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -332,25 +327,27 @@ fun PlaceTypePill(
         Text(
             text = type.replace("_", " "),
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = if (isSelected) colors.white else colors.white
+                color = colors.white
             )
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
 private fun PreviewPlaceTypeScreen() {
     MalHaRangTheme {
         PlaceTypeScreen(
-            query = "",
-            onQueryChange = {},
-            searchResult = listOf("park", "cafe"),
-            recentTypes = listOf("museum", "gallery", "restaurant"),
-            selectedTypes = listOf("park"),
-            onTypeSelected = {},
-            onBackClick = {},
-            padding = PaddingValues()
+            padding = TODO(),
+            query = TODO(),
+            onQueryChange = TODO(),
+            searchResult = TODO(),
+            recentTypes = TODO(),
+            selectedType = TODO(),
+            onTypeSelected = TODO(),
+            onHomeButtonClick = TODO(),
+            onBackButtonClick = TODO(),
         )
     }
 }
