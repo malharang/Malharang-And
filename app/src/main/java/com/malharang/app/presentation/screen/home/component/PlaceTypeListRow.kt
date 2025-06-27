@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +31,9 @@ fun PlaceTypeListRow(
     goalTypes: List<PlaceTypeItem.Goal>,
     modifier: Modifier = Modifier,
     locationType: PlaceTypeItem.Location,
-    onLocationTypeClick: () -> Unit = {}
+    onLocationTypeClick: () -> Unit = {},
+    onGoalClick: () -> Unit = {},
+    onPillClick: (Int) -> Unit = {},
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),
@@ -40,7 +42,7 @@ fun PlaceTypeListRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        item{
+        item {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
@@ -55,12 +57,12 @@ fun PlaceTypeListRow(
             }
         }
 
-        items(goalTypes) { goalType ->
+        itemsIndexed(goalTypes) { index, goalType ->
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .background(colors.black)
-                    .noRippleClickable(onClick = {})
+                    .noRippleClickable(onClick = { onPillClick(index) })
                     .padding(horizontal = 10.dp, vertical = 2.dp)
             ) {
                 Text(
@@ -77,12 +79,12 @@ fun PlaceTypeListRow(
                     .clip(RoundedCornerShape(8.dp))
                     .background(colors.greenTint)
                     .padding(4.dp)
-                    .noRippleClickable {},
+                    .noRippleClickable { onGoalClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_home_add_24),
-                    contentDescription = "장소 유형 추가",
+                    contentDescription = "사용자 목적 추가",
                     colorFilter = ColorFilter.tint(colors.white)
                 )
             }

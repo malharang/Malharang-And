@@ -90,14 +90,45 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setSelectedPlaceType(placeType: String?) {
-        if (placeType == null) {
-            return
-        }
-        Timber.tag("PlaceTypeFetcher").d("Setting place type: $placeType")
 
-        _placeInfo.value = _placeInfo.value?.copy(
-            locationType = PlaceTypeItem.Location(name = placeType)
-        )
+        if (placeType != null){
+            _placeInfo.value = _placeInfo.value?.copy(
+                locationType = PlaceTypeItem.Location(name = placeType)
+            ) ?: PlaceInfoModel(
+                name = placeType.replace("_", " "),
+                latLng = LatLng(0.0, 0.0),
+                locationType = PlaceTypeItem.Location(name = placeType),
+                goalTypes = emptyList()
+            )
+        } else {
+            _placeInfo.value = _placeInfo.value?.copy(
+                locationType = null
+            )
+        }
+    }
+
+    fun addGoal(goal: String) {
+        val newGoal = PlaceTypeItem.Goal(goal)
+
+        val currentInfo = _placeInfo.value
+
+        val updatedGoals = currentInfo?.goalTypes.orEmpty().filterNot { it.name == goal } + newGoal
+
+        _placeInfo.value = currentInfo?.copy(
+            goalTypes = updatedGoals
+        ) ?: return
+    }
+
+    fun removeGoalAt(index: Int) {
+        val currentInfo = _placeInfo.value ?: return
+
+        if (index < 0 || index >= currentInfo.goalTypes.size) return
+
+        val updatedGoals = currentInfo.goalTypes.toMutableList().also {
+            it.removeAt(index)
+        }
+
+        _placeInfo.value = currentInfo.copy(goalTypes = updatedGoals)
     }
 
 

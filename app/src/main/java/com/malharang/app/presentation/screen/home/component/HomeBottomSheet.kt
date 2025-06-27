@@ -24,7 +24,9 @@ fun HomeBottomSheet(
     locationType: PlaceTypeItem.Location? = null,
     goalTypes: List<PlaceTypeItem.Goal>,
     missionCards: List<MissionCardModel>,
-    onLocationTypeClick: () -> Unit
+    onLocationTypeClick: () -> Unit,
+    onGoalClick: () -> Unit,
+    onGoalRemoveClick: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -46,6 +48,8 @@ fun HomeBottomSheet(
             PlaceTypeListRow(
                 goalTypes = goalTypes,
                 onLocationTypeClick = onLocationTypeClick,
+                onGoalClick = onGoalClick,
+                onPillClick = onGoalRemoveClick,
                 locationType = locationType
             )
             Spacer(modifier = Modifier.padding(5.dp))

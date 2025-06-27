@@ -58,6 +58,9 @@ import kotlinx.coroutines.launch
 fun HomeRoute(
     padding: PaddingValues,
     navigateToPlaceType: () -> Unit,
+    navigateToGoal: () -> Unit,
+    placeTypeArg: String?,
+    goalArg: String?,
     viewModel: HomeViewModel = hiltViewModel(),
     zoomLevel: Float = 19f
 ) {
@@ -80,9 +83,21 @@ fun HomeRoute(
 
     val placeInfo by viewModel.placeInfo.collectAsState()
 
+    LaunchedEffect(placeTypeArg) {
+        placeTypeArg?.let {
+            viewModel.setSelectedPlaceType(it)
+        }
+    }
+
+    LaunchedEffect(goalArg) {
+        goalArg?.let {
+            viewModel.addGoal(it)
+        }
+    }
+
     LaunchedEffect(locationPermissions.allPermissionsGranted) {
         if (locationPermissions.allPermissionsGranted) {
-            viewModel.fetchCurrentLocation() // 권한 허용 시 내 위치 다시 요청
+            viewModel.fetchCurrentLocation()
         }
     }
 
@@ -112,6 +127,8 @@ fun HomeRoute(
             viewModel.setSelectedPlaceInfo(it.name, it.latLng)
         },
         navigateToPlaceType = navigateToPlaceType,
+        navigateToGoal = navigateToGoal,
+        onGoalRemoveClick = viewModel::removeGoalAt,
         missionCards = viewModel.exampleMissions,
         cameraPositionState = cameraPositionState
     )
@@ -138,6 +155,8 @@ private fun HomeScreen(
     onClickPOI: (PointOfInterest) -> Unit = {},
     missionCards: List<MissionCardModel>,
     navigateToPlaceType: () -> Unit = {},
+    navigateToGoal: () -> Unit = {},
+    onGoalRemoveClick: (Int) -> Unit = {},
     onRequestCurrentLocation: () -> Unit = {}
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -222,16 +241,16 @@ private fun HomeScreen(
                             locationType = placeInfo?.locationType,
                             goalTypes = placeInfo?.goalTypes ?: listOf(),
                             missionCards = missionCards,
-                            onLocationTypeClick = navigateToPlaceType
+                            onLocationTypeClick = navigateToPlaceType,
+                            onGoalClick = navigateToGoal,
+                            onGoalRemoveClick = onGoalRemoveClick
                         )
                     }
                 ) {
                     placeInfo?.let {
                         LaunchedEffect(it.locationType) {
-                            if (it.locationType != null) {
-                                scope.launch {
-                                    scaffoldState.bottomSheetState.expand()
-                                }
+                            scope.launch {
+                                scaffoldState.bottomSheetState.expand()
                             }
                         }
                     }
@@ -254,7 +273,9 @@ private fun PreviewHomeScreen() {
                 exp = 70
             ),
             cameraPositionState = rememberCameraPositionState(),
-            missionCards = listOf()
+            missionCards = listOf(),
+            navigateToPlaceType = {},
+            navigateToGoal = {}
         )
     }
 }

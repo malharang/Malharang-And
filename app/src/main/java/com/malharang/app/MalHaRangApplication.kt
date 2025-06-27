@@ -11,7 +11,6 @@ class MalHaRangApplication : Application() {
         super.onCreate()
 
         Timber.plant(Timber.DebugTree())
-
         // Places API 초기화
         if (!Places.isInitialized()) {
             Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)

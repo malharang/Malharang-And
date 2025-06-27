@@ -119,14 +119,6 @@ fun PlaceTypeScreen(
                         fontWeight = FontWeight.Bold
                     )
                 )
-                selectedType?.let {
-                    Text(
-                        text = " (1)",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = colors.greenDark
-                        )
-                    )
-                }
             }
         }
 

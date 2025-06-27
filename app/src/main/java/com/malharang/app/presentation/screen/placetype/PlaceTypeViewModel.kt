@@ -11,6 +11,7 @@ import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -68,17 +69,21 @@ class PlaceTypeViewModel @Inject constructor(
     }
 
     fun selectPlaceType(type: String) {
-        _selectedType.value = type
+        _selectedType.update { current ->
+            if (current == type) null else type
+        }
 
-        val updatedRecentTypes = _recentTypes.value
-            .toMutableList()
-            .apply {
-                remove(type)
-                add(0, type)
-            }
-            .take(5)
+        if (_selectedType.value != null) {
+            val updatedRecentTypes = _recentTypes.value
+                .toMutableList()
+                .apply {
+                    remove(type)
+                    add(0, type)
+                }
+                .take(5)
 
-        _recentTypes.value = updatedRecentTypes
+            _recentTypes.value = updatedRecentTypes
+        }
     }
 
     fun getSelectedType(): String? {

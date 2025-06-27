@@ -15,7 +15,8 @@ fun NavController.navigateToPlaceType() {
 
 fun NavGraphBuilder.placeTypeNavGraph(
     navigateToUp: () -> Unit,
-    navigateToHome: (String) -> Unit,
+    navigateToHome: () -> Unit,
+    navController: NavController,
     padding: PaddingValues,
 ) {
     composable<HomeRoute.PlaceType> {
@@ -24,8 +25,11 @@ fun NavGraphBuilder.placeTypeNavGraph(
         }
         PlaceTypeRoute(
             padding = padding,
-            onHomeNavigate = navigateToHome,
-            onBackButtonClick = navigateToUp,
+            onHomeNavigate = { selected ->
+                navController.previousBackStackEntry?.savedStateHandle?.set("selected_place_type", selected)
+                navigateToHome()
+            },
+            onBackButtonClick = navigateToUp
         )
     }
 }

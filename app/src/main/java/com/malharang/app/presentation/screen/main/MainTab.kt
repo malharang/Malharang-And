@@ -16,7 +16,7 @@ enum class MainTab(
         inactiveIconResId = R.drawable.ic_navi_home_inactive_24,
         activeIconResId = R.drawable.ic_navi_home_active_24,
         title = R.string.navi_home_title,
-        route = MainTabRoute.Home()
+        route = MainTabRoute.Home
     ),
     CHAT(
         inactiveIconResId = R.drawable.ic_navi_chat_inactive_24,
