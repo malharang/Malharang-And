@@ -33,7 +33,7 @@ fun PlaceTypeListRow(
     locationType: PlaceTypeItem.Location,
     onLocationTypeClick: () -> Unit = {},
     onGoalClick: () -> Unit = {},
-    onPillClick: (Int) -> Unit = {},
+    onPillClick: (Int) -> Unit = {}
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),

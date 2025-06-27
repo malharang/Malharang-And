@@ -12,4 +12,3 @@ class ScenarioRemoteDataSourceImpl @Inject constructor(
     override suspend fun postGenerateScenario(request: ScenarioRequestDto): ScenarioResponseDto =
         scenarioService.postGenerateScenario(request = request)
 }
-

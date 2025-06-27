@@ -1,7 +1,6 @@
 package com.malharang.app.presentation.screen.placetype
 
 import android.content.Context
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -62,7 +61,7 @@ class PlaceTypeViewModel @Inject constructor(
         }
         val containsResults = allPlaceTypes.filter {
             it.replace("_", " ").contains(newQuery.lowercase()) &&
-                    !it.replace("_", " ").startsWith(newQuery.lowercase())
+                !it.replace("_", " ").startsWith(newQuery.lowercase())
         }
 
         _searchResult.value = startsWithResults + containsResults

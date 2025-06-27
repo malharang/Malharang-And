@@ -27,14 +27,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
     @ApplicationContext private val context: Context,
-    private val scenarioUseCase: ScenarioUseCase,
+    private val scenarioUseCase: ScenarioUseCase
 ) : ViewModel() {
 
     private val _currentLocation = MutableStateFlow<LatLng?>(null)
@@ -65,7 +64,7 @@ class HomeViewModel @Inject constructor(
 
     fun fetchScenario(placeType: String, goal: String?) {
         viewModelScope.launch {
-            if(goal == null) {
+            if (goal == null) {
                 _isLoading.value = true
             }
             scenarioUseCase(location = placeType, goal = goal)
@@ -164,7 +163,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
 
     fun setSelectedPlaceInfo(name: String, latLng: LatLng) {
         _placeInfo.value = _placeInfo.value?.copy(

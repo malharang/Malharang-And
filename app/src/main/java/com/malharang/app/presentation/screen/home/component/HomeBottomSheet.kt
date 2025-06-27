@@ -29,7 +29,7 @@ fun HomeBottomSheet(
     onGoalClick: () -> Unit,
     onGoalRemoveClick: (Int) -> Unit,
     locationType: PlaceTypeItem.Location? = null,
-    isMissionLoading: Boolean = false,
+    isMissionLoading: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -76,7 +76,6 @@ fun HomeBottomSheet(
                     }
                 }
             }
-
         } else {
             PlaceTypeEmptyView(
                 onAddPlaceTypeClick = onLocationTypeClick

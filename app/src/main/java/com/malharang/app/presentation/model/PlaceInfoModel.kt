@@ -8,4 +8,3 @@ data class PlaceInfoModel(
     val locationType: PlaceTypeItem.Location? = null,
     val goalTypes: List<PlaceTypeItem.Goal> = emptyList()
 )
-

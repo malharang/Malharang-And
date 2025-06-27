@@ -11,4 +11,3 @@ data class ScenarioRequestDto(
     @SerialName("goal")
     val goal: String? = null
 )
-

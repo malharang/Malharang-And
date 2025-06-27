@@ -11,4 +11,3 @@ data class ScenarioResponseDto(
     @SerialName("scenarios")
     val scenarios: List<String>
 )
-

@@ -79,7 +79,6 @@ fun MissionCard(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewMissionCard() {

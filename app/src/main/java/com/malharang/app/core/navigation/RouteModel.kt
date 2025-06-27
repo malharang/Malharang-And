@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 sealed interface MainTabRoute {
     @Serializable
-    data object Home: MainTabRoute
+    data object Home : MainTabRoute
 
     @Serializable
     data object Chat : MainTabRoute

@@ -16,7 +16,7 @@ fun NavGraphBuilder.goalNavGraph(
     navigateToUp: () -> Unit,
     navigateToHome: () -> Unit,
     navController: NavController,
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     composable<HomeRoute.Goal> {
         BackHandler {

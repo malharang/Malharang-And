@@ -21,7 +21,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 fun MainNavHost(
     navigator: MainNavigator,
     padding: PaddingValues,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
@@ -71,7 +71,6 @@ fun MainNavHost(
                 },
                 padding = padding
             )
-
         }
     }
 }

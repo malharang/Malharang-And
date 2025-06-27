@@ -36,7 +36,7 @@ fun NavGraphBuilder.homeNavGraph(
             placeTypeArg = selectedPlaceType,
             goalArg = selectedGoal,
             navigateToPlaceType = navController::navigateToPlaceType,
-            navigateToGoal = navController::navigateToGoal,
+            navigateToGoal = navController::navigateToGoal
         )
 
         LaunchedEffect(Unit) {

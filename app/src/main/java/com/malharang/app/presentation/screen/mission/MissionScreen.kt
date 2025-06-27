@@ -53,10 +53,10 @@ fun MissionRoute(
 ) {
     val missionCardList = listOf(
         MissionCardModel(
-            title = "Order food",
+            title = "Order food"
         ),
         MissionCardModel(
-            title = "Ask for directions",
+            title = "Ask for directions"
         )
     )
 
@@ -304,10 +304,10 @@ private fun PreviewMissionScreen() {
     MalHaRangTheme {
         val missionCardList = listOf(
             MissionCardModel(
-                title = "Order food",
+                title = "Order food"
             ),
             MissionCardModel(
-                title = "Ask for directions",
+                title = "Ask for directions"
             )
         )
 

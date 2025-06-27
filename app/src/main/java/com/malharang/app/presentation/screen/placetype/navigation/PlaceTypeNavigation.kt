@@ -6,7 +6,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.malharang.app.core.navigation.HomeRoute
-import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.placetype.PlaceTypeRoute
 
 fun NavController.navigateToPlaceType() {
@@ -17,7 +16,7 @@ fun NavGraphBuilder.placeTypeNavGraph(
     navigateToUp: () -> Unit,
     navigateToHome: () -> Unit,
     navController: NavController,
-    padding: PaddingValues,
+    padding: PaddingValues
 ) {
     composable<HomeRoute.PlaceType> {
         BackHandler {

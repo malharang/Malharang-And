@@ -26,7 +26,7 @@ class MainNavigator(
     val currentTab: MainTab?
         @Composable get() =
             when {
-                else -> MainTab.find { tab -> currentDestination?.hasRoute(tab::class) == true}
+                else -> MainTab.find { tab -> currentDestination?.hasRoute(tab::class) == true }
             }
 
     fun navigateUp() {

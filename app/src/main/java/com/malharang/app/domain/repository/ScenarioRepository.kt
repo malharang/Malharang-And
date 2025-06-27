@@ -6,5 +6,5 @@ interface ScenarioRepository {
     suspend fun postGenerateScenario(
         location: String,
         goal: String?
-    ) : Result<List<ScenarioData>>
+    ): Result<List<ScenarioData>>
 }

@@ -74,7 +74,6 @@ fun HomeRoute(
         )
     )
 
-
     val context = LocalContext.current
     val placeInfo by viewModel.placeInfo.collectAsState()
     val missionCardList by viewModel.missionCardList.collectAsStateWithLifecycle()
@@ -109,7 +108,6 @@ fun HomeRoute(
             viewModel.addGoal(goalArg)
         }
     }
-
 
     LaunchedEffect(locationPermissions.allPermissionsGranted) {
         if (locationPermissions.allPermissionsGranted) {
@@ -299,7 +297,7 @@ private fun PreviewHomeScreen() {
             navigateToGoal = {},
             onGoalRemoveClick = {},
             onRequestCurrentLocation = {},
-            context = TODO(),
+            context = TODO()
         )
     }
 }

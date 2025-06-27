@@ -41,7 +41,7 @@ fun GoalRoute(
     padding: PaddingValues,
     onBackClick: () -> Unit,
     onConfirmClick: (String) -> Unit,
-    viewModel: GoalViewModel = hiltViewModel(),
+    viewModel: GoalViewModel = hiltViewModel()
 ) {
     val query by viewModel.query.collectAsState()
 
@@ -56,7 +56,6 @@ fun GoalRoute(
         }
     )
 }
-
 
 @Composable
 fun GoalScreen(

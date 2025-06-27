@@ -37,5 +37,4 @@ object ServiceModule {
     @Singleton
     fun providesScenarioService(retrofit: Retrofit): ScenarioService =
         retrofit.create(ScenarioService::class.java)
-
 }

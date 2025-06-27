@@ -51,7 +51,7 @@ fun PlaceTypeRoute(
     padding: PaddingValues,
     onHomeNavigate: (String) -> Unit,
     onBackButtonClick: () -> Unit,
-    viewModel: PlaceTypeViewModel = hiltViewModel(),
+    viewModel: PlaceTypeViewModel = hiltViewModel()
 ) {
     val query by viewModel.query.collectAsState()
     val searchResult by viewModel.searchResult.collectAsState()
@@ -73,7 +73,7 @@ fun PlaceTypeRoute(
         selectedType = selectedType,
         onTypeSelected = viewModel::selectPlaceType,
         onHomeButtonClick = onHomeNavigate,
-        onBackButtonClick = onBackButtonClick,
+        onBackButtonClick = onBackButtonClick
     )
 }
 
@@ -325,7 +325,6 @@ fun PlaceTypePill(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewPlaceTypeScreen() {
@@ -339,7 +338,7 @@ private fun PreviewPlaceTypeScreen() {
             selectedType = TODO(),
             onTypeSelected = TODO(),
             onHomeButtonClick = TODO(),
-            onBackButtonClick = TODO(),
+            onBackButtonClick = TODO()
         )
     }
 }
