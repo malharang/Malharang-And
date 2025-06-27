@@ -3,6 +3,7 @@
 package com.malharang.app.presentation.screen.home
 
 import android.Manifest
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -45,6 +47,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
 import com.malharang.app.core.component.UserStatusBar
+import com.malharang.app.core.util.toast
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.UserStatusModel
@@ -71,6 +74,13 @@ fun HomeRoute(
         )
     )
 
+
+    val context = LocalContext.current
+    val placeInfo by viewModel.placeInfo.collectAsState()
+    val missionCardList by viewModel.missionCardList.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
     val currentLocation by viewModel.currentLocation.collectAsState()
     val cameraPositionState = rememberCameraPositionState {
         currentLocation?.let {
@@ -81,7 +91,12 @@ fun HomeRoute(
         }
     }
 
-    val placeInfo by viewModel.placeInfo.collectAsState()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            context.toast(it)
+            viewModel.clearToastMessage()
+        }
+    }
 
     LaunchedEffect(placeTypeArg) {
         placeTypeArg?.let {
@@ -90,10 +105,11 @@ fun HomeRoute(
     }
 
     LaunchedEffect(goalArg) {
-        goalArg?.let {
-            viewModel.addGoal(it)
+        if (goalArg != null) {
+            viewModel.addGoal(goalArg)
         }
     }
+
 
     LaunchedEffect(locationPermissions.allPermissionsGranted) {
         if (locationPermissions.allPermissionsGranted) {
@@ -115,6 +131,7 @@ fun HomeRoute(
 
     HomeScreen(
         padding = padding,
+        context = context,
         userStatusModel = viewModel.userStatusModel,
         onRequestCurrentLocation = {
             viewModel.fetchCurrentLocation()
@@ -123,13 +140,15 @@ fun HomeRoute(
         currentLocation = currentLocation,
         placeInfo = placeInfo,
         onClickPOI = {
+            viewModel.clearPlaceInfo()
             viewModel.fetchPlaceType(it.placeId)
             viewModel.setSelectedPlaceInfo(it.name, it.latLng)
         },
+        isMissionLoading = isLoading,
         navigateToPlaceType = navigateToPlaceType,
         navigateToGoal = navigateToGoal,
         onGoalRemoveClick = viewModel::removeGoalAt,
-        missionCards = viewModel.exampleMissions,
+        missionCards = missionCardList,
         cameraPositionState = cameraPositionState
     )
 }
@@ -148,12 +167,14 @@ fun moveCameraPosition(currentLocation: LatLng?, cameraPositionState: CameraPosi
 @Composable
 private fun HomeScreen(
     padding: PaddingValues,
+    context: Context,
     userStatusModel: UserStatusModel,
     cameraPositionState: CameraPositionState,
     currentLocation: LatLng? = null,
     placeInfo: PlaceInfoModel? = null,
     onClickPOI: (PointOfInterest) -> Unit = {},
     missionCards: List<MissionCardModel>,
+    isMissionLoading: Boolean = false,
     navigateToPlaceType: () -> Unit = {},
     navigateToGoal: () -> Unit = {},
     onGoalRemoveClick: (Int) -> Unit = {},
@@ -168,7 +189,6 @@ private fun HomeScreen(
     val currentMarkerState = remember(currentLocation) {
         currentLocation?.let { MarkerState(currentLocation) }
     }
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -241,6 +261,7 @@ private fun HomeScreen(
                             locationType = placeInfo?.locationType,
                             goalTypes = placeInfo?.goalTypes ?: listOf(),
                             missionCards = missionCards,
+                            isMissionLoading = isMissionLoading,
                             onLocationTypeClick = navigateToPlaceType,
                             onGoalClick = navigateToGoal,
                             onGoalRemoveClick = onGoalRemoveClick
@@ -275,7 +296,10 @@ private fun PreviewHomeScreen() {
             cameraPositionState = rememberCameraPositionState(),
             missionCards = listOf(),
             navigateToPlaceType = {},
-            navigateToGoal = {}
+            navigateToGoal = {},
+            onGoalRemoveClick = {},
+            onRequestCurrentLocation = {},
+            context = TODO(),
         )
     }
 }

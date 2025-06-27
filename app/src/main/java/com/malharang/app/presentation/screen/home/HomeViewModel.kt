@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
@@ -14,6 +15,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.PlaceTypeItem
@@ -23,13 +25,16 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val scenarioUseCase: ScenarioUseCase,
 ) : ViewModel() {
 
     private val _currentLocation = MutableStateFlow<LatLng?>(null)
@@ -37,6 +42,15 @@ class HomeViewModel @Inject constructor(
 
     private val _placeInfo = MutableStateFlow<PlaceInfoModel?>(null)
     val placeInfo: StateFlow<PlaceInfoModel?> = _placeInfo.asStateFlow()
+
+    private val _missionCardList = MutableStateFlow<List<MissionCardModel>>(emptyList())
+    val missionCardList: StateFlow<List<MissionCardModel>> = _missionCardList.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val placesClient: PlacesClient by lazy {
         Places.createClient(context)
@@ -49,28 +63,31 @@ class HomeViewModel @Inject constructor(
         exp = 70
     )
 
-    val exampleMissions = listOf(
-        MissionCardModel(
-            title = "Order at a Cafe",
-            description = "Visit a nearby café"
-        ),
-        MissionCardModel(
-            title = "Ask for Directions",
-            description = "Visit a nearby café"
-        )
-    )
-
-    fun fetchCurrentLocation() {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            locationClient.lastLocation.addOnSuccessListener { loc ->
-                loc?.let {
-                    _currentLocation.value = LatLng(it.latitude, it.longitude)
-                }
+    fun fetchScenario(placeType: String, goal: String?) {
+        viewModelScope.launch {
+            if(goal == null) {
+                _isLoading.value = true
             }
+            scenarioUseCase(location = placeType, goal = goal)
+                .onSuccess { scenarioList ->
+                    val itemType = if (goal != null) PlaceTypeItem.Goal(goal) else PlaceTypeItem.Location(placeType)
+                    val newCards = scenarioList.map {
+                        MissionCardModel(
+                            title = it.title,
+                            type = itemType
+                        )
+                    }
+
+                    if (goal != null) {
+                        _missionCardList.update { it + newCards }
+                    } else {
+                        _missionCardList.value = newCards
+                    }
+                }
+                .onFailure { error ->
+                    _errorMessage.value = error.message
+                }
+            _isLoading.value = false
         }
     }
 
@@ -90,16 +107,17 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setSelectedPlaceType(placeType: String?) {
-
-        if (placeType != null){
+        if (placeType != null) {
             _placeInfo.value = _placeInfo.value?.copy(
-                locationType = PlaceTypeItem.Location(name = placeType)
+                locationType = PlaceTypeItem.Location(name = placeType),
+                goalTypes = emptyList()
             ) ?: PlaceInfoModel(
                 name = placeType.replace("_", " "),
                 latLng = LatLng(0.0, 0.0),
                 locationType = PlaceTypeItem.Location(name = placeType),
                 goalTypes = emptyList()
             )
+            fetchScenario(placeType, null)
         } else {
             _placeInfo.value = _placeInfo.value?.copy(
                 locationType = null
@@ -109,14 +127,16 @@ class HomeViewModel @Inject constructor(
 
     fun addGoal(goal: String) {
         val newGoal = PlaceTypeItem.Goal(goal)
-
         val currentInfo = _placeInfo.value
-
         val updatedGoals = currentInfo?.goalTypes.orEmpty().filterNot { it.name == goal } + newGoal
 
         _placeInfo.value = currentInfo?.copy(
             goalTypes = updatedGoals
         ) ?: return
+
+        currentInfo?.locationType?.name?.let { placeType ->
+            fetchScenario(placeType, goal)
+        }
     }
 
     fun removeGoalAt(index: Int) {
@@ -131,6 +151,20 @@ class HomeViewModel @Inject constructor(
         _placeInfo.value = currentInfo.copy(goalTypes = updatedGoals)
     }
 
+    fun fetchCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationClient.lastLocation.addOnSuccessListener { loc ->
+                loc?.let {
+                    _currentLocation.value = LatLng(it.latitude, it.longitude)
+                }
+            }
+        }
+    }
+
 
     fun setSelectedPlaceInfo(name: String, latLng: LatLng) {
         _placeInfo.value = _placeInfo.value?.copy(
@@ -142,5 +176,14 @@ class HomeViewModel @Inject constructor(
             locationType = placeInfo.value?.locationType,
             goalTypes = placeInfo.value?.goalTypes ?: emptyList()
         )
+    }
+
+    fun clearPlaceInfo() {
+        _placeInfo.value = null
+        _missionCardList.value = emptyList()
+    }
+
+    fun clearToastMessage() {
+        _errorMessage.value = null
     }
 }

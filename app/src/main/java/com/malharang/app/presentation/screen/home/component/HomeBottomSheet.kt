@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,16 +18,18 @@ import androidx.compose.ui.unit.dp
 import com.malharang.app.core.component.MissionCard
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceTypeItem
+import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun HomeBottomSheet(
     selectedPOIName: String?,
-    locationType: PlaceTypeItem.Location? = null,
     goalTypes: List<PlaceTypeItem.Goal>,
     missionCards: List<MissionCardModel>,
     onLocationTypeClick: () -> Unit,
     onGoalClick: () -> Unit,
     onGoalRemoveClick: (Int) -> Unit,
+    locationType: PlaceTypeItem.Location? = null,
+    isMissionLoading: Boolean = false,
 ) {
     Column(
         modifier = Modifier
@@ -54,18 +57,26 @@ fun HomeBottomSheet(
             )
             Spacer(modifier = Modifier.padding(5.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-            ) {
-                items(missionCards) { card ->
-                    MissionCard(data = card)
-                }
-                item {
-                    Spacer(modifier = Modifier.padding(5.dp))
+            if (isMissionLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(vertical = 50.dp),
+                    color = colors.greenTint
+                )
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                ) {
+                    items(missionCards) { card ->
+                        MissionCard(data = card)
+                    }
+                    item {
+                        Spacer(modifier = Modifier.padding(5.dp))
+                    }
                 }
             }
+
         } else {
             PlaceTypeEmptyView(
                 onAddPlaceTypeClick = onLocationTypeClick

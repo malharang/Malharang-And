@@ -46,7 +46,7 @@ fun PlaceTypeListRow(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
-                    .background(colors.green)
+                    .background(colors.black)
                     .noRippleClickable(onClick = { onLocationTypeClick() })
                     .padding(horizontal = 10.dp, vertical = 2.dp)
             ) {
@@ -61,7 +61,7 @@ fun PlaceTypeListRow(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
-                    .background(colors.black)
+                    .background(colors.greenTint)
                     .noRippleClickable(onClick = { onPillClick(index) })
                     .padding(horizontal = 10.dp, vertical = 2.dp)
             ) {

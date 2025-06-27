@@ -1,20 +1,28 @@
 package com.malharang.app.presentation.screen.goal
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,17 +44,16 @@ fun GoalRoute(
     viewModel: GoalViewModel = hiltViewModel(),
 ) {
     val query by viewModel.query.collectAsState()
-    val selectedGoal by viewModel.selectedGoal.collectAsState()
 
     GoalScreen(
         padding = padding,
         query = query,
         onQueryChange = viewModel::updateQuery,
-        onAddGoal = viewModel::addGoalFromQuery,
-        selectedGoal = selectedGoal,
-        onGoalSelected = viewModel::selectGoal,
         onBackClick = onBackClick,
-        onConfirmClick = onConfirmClick
+        onConfirmClick = {
+            onConfirmClick(it)
+            viewModel.updateQuery("")
+        }
     )
 }
 
@@ -56,9 +63,6 @@ fun GoalScreen(
     padding: PaddingValues,
     query: String,
     onQueryChange: (String) -> Unit,
-    onAddGoal: () -> Unit,
-    selectedGoal: String?,
-    onGoalSelected: (String) -> Unit,
     onConfirmClick: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -66,9 +70,9 @@ fun GoalScreen(
         Modifier
             .fillMaxSize()
             .background(colors.white)
+            .imePadding()
             .padding(padding)
     ) {
-        // 헤더
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,7 +103,6 @@ fun GoalScreen(
         ) {
             Spacer(Modifier.height(16.dp))
 
-            // 입력창
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChange,
@@ -114,51 +117,24 @@ fun GoalScreen(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        onAddGoal()
+                        if (query.trim().isNotEmpty()) {
+                            onConfirmClick(query.trim())
+                        }
                     }
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.weight(1f))
 
-            // 선택된 목표
-            AnimatedVisibility(visible = selectedGoal != null, enter = fadeIn(), exit = fadeOut()) {
-                Column {
-                    Text(
-                        text = "Selected Goal",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = colors.greenDark,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    selectedGoal?.let {
-                        GoalPill(
-                            type = it,
-                            onClick = { onGoalSelected(it) },
-                            isSelected = true
-                        )
-                    }
-                }
-            }
-        }
-
-        // Select 버튼
-        if (selectedGoal != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-            ) {
+            if (query.isNotBlank()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(colors.greenDark)
-                        .clickable { onConfirmClick(selectedGoal) },
+                        .clickable { onConfirmClick(query.trim()) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -174,32 +150,6 @@ fun GoalScreen(
     }
 }
 
-
-@Composable
-fun GoalPill(
-    type: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isSelected: Boolean = false
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(22.dp))
-            .background(
-                color = if (isSelected) colors.greenDark else colors.greenTint,
-                shape = RoundedCornerShape(22.dp)
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 11.dp)
-    ) {
-        Text(
-            text = type,
-            style = MaterialTheme.typography.bodyMedium.copy(color = colors.white)
-        )
-    }
-}
-
-
 @Preview
 @Composable
 private fun GoalScreenPreview() {
@@ -208,9 +158,6 @@ private fun GoalScreenPreview() {
             padding = PaddingValues(0.dp),
             query = "",
             onQueryChange = {},
-            onAddGoal = {},
-            selectedGoal = null,
-            onGoalSelected = {},
             onConfirmClick = {},
             onBackClick = {}
         )

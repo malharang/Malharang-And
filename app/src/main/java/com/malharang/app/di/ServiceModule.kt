@@ -1,6 +1,7 @@
 package com.malharang.app.di
 
 import com.malharang.app.data.remote.service.DummyService
+import com.malharang.app.data.remote.service.ScenarioService
 import com.malharang.app.data.remote.service.SpeechService
 import com.malharang.app.data.remote.service.TranslateService
 import dagger.Module
@@ -31,4 +32,10 @@ object ServiceModule {
         @javax.inject.Named("Speech") retrofit: Retrofit
     ): SpeechService =
         retrofit.create(SpeechService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesScenarioService(retrofit: Retrofit): ScenarioService =
+        retrofit.create(ScenarioService::class.java)
+
 }

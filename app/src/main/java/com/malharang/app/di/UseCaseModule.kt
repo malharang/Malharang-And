@@ -2,11 +2,13 @@ package com.malharang.app.di
 
 import com.malharang.app.domain.repository.DummyRepository
 import com.malharang.app.domain.repository.PlaceTypeRepository
+import com.malharang.app.domain.repository.ScenarioRepository
 import com.malharang.app.domain.repository.SpeechRepository
 import com.malharang.app.domain.usecase.DummyUseCase
 import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import com.malharang.app.domain.repository.TranslateRepository
 import com.malharang.app.domain.usecase.STTUseCase
+import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
 import com.malharang.app.domain.usecase.TranslateUseCase
 import dagger.Module
@@ -47,4 +49,10 @@ object UseCaseModule {
     fun provideTTSUseCase(
         speechRepository: SpeechRepository
     ): TTSUseCase = TTSUseCase(speechRepository)
+
+    @Provides
+    @Singleton
+    fun provideScenarioUseCase(
+        scenarioRepository: ScenarioRepository
+    ): ScenarioUseCase = ScenarioUseCase(scenarioRepository)
 }

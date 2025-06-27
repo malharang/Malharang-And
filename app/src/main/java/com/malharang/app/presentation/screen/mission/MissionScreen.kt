@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -55,20 +54,18 @@ fun MissionRoute(
     val missionCardList = listOf(
         MissionCardModel(
             title = "Order food",
-            description = "Learn to order food in Korean"
         ),
         MissionCardModel(
             title = "Ask for directions",
-            description = "Practice asking for directions"
         )
     )
 
     val reviewMissions = listOf(
-        MissionCardModel("Order food", "Learn to order food in Korean"),
-        MissionCardModel("Ask for directions", "Practice asking for directions"),
-        MissionCardModel("Buy a ticket", "Handle ticket buying situation"),
-        MissionCardModel("Introduce yourself", "Practice self introduction"),
-        MissionCardModel("Make a reservation", "Phone call reservation practice")
+        MissionCardModel("Order food"),
+        MissionCardModel("Ask for directions"),
+        MissionCardModel("Buy a ticket"),
+        MissionCardModel("Introduce yourself"),
+        MissionCardModel("Make a reservation")
     )
 
     val exportSentences = listOf(
@@ -192,7 +189,6 @@ fun DropdownMissions(
             )
         }
         if (expanded) {
-            val scrollState = rememberScrollState()
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
@@ -309,20 +305,18 @@ private fun PreviewMissionScreen() {
         val missionCardList = listOf(
             MissionCardModel(
                 title = "Order food",
-                description = "Learn to order food in Korean"
             ),
             MissionCardModel(
                 title = "Ask for directions",
-                description = "Practice asking for directions"
             )
         )
 
         val reviewMissions = listOf(
-            MissionCardModel("Order food", "Learn to order food in Korean"),
-            MissionCardModel("Ask for directions", "Practice asking for directions"),
-            MissionCardModel("Buy a ticket", "Handle ticket buying situation"),
-            MissionCardModel("Introduce yourself", "Practice self introduction"),
-            MissionCardModel("Make a reservation", "Phone call reservation practice")
+            MissionCardModel("Order food"),
+            MissionCardModel("Ask for directions"),
+            MissionCardModel("Buy a ticket"),
+            MissionCardModel("Introduce yourself"),
+            MissionCardModel("Make a reservation")
         )
 
         val exportSentences = listOf(
