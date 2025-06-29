@@ -21,5 +21,5 @@ sealed interface HomeRoute {
     data object PlaceType : HomeRoute
 
     @Serializable
-    data object Search : HomeRoute
+    data object Goal : HomeRoute
 }

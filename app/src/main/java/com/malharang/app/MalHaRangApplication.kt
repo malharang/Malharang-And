@@ -9,8 +9,8 @@ import timber.log.Timber
 class MalHaRangApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        Timber.plant(Timber.DebugTree())
 
+        Timber.plant(Timber.DebugTree())
         // Places API 초기화
         if (!Places.isInitialized()) {
             Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)

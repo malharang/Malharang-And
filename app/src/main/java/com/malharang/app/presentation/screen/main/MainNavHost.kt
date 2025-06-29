@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
 import com.malharang.app.presentation.screen.chat.navigation.chatNavGraph
+import com.malharang.app.presentation.screen.goal.navigation.goalNavGraph
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
+import com.malharang.app.presentation.screen.home.navigation.navigateToHome
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
 import com.malharang.app.presentation.screen.placetype.navigation.placeTypeNavGraph
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
@@ -41,7 +44,32 @@ fun MainNavHost(
 
             placeTypeNavGraph(
                 padding = padding,
+                navigateToUp = navigator::navigateUp,
+                navigateToHome = {
+                    val navOptions = navOptions {
+                        popUpTo(MainTab.HOME.route) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                    navigator.navController.navigateToHome(navOptions)
+                },
                 navController = navigator.navController
+            )
+
+            goalNavGraph(
+                navController = navigator.navController,
+                navigateToUp = navigator::navigateUp,
+                navigateToHome = {
+                    val navOptions = navOptions {
+                        popUpTo(MainTab.HOME.route) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                    navigator.navController.navigateToHome(navOptions)
+                },
+                padding = padding
             )
         }
     }
