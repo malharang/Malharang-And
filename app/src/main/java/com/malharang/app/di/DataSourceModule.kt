@@ -1,8 +1,10 @@
 package com.malharang.app.di
 
+import com.malharang.app.data.remote.datasource.ChatRemoteDataSource
 import com.malharang.app.data.remote.datasource.ScenarioRemoteDataSource
 import com.malharang.app.data.remote.datasource.SpeechRemoteDataSource
 import com.malharang.app.data.remote.datasource.TranslateRemoteDataSource
+import com.malharang.app.data.remote.datasourceimpl.ChatRemoteDataSourceImpl
 import com.malharang.app.data.remote.datasourceimpl.ScenarioRemoteDataSourceImpl
 import com.malharang.app.data.remote.datasourceimpl.TranslateRemoteDataSourceImpl
 import com.malharang.app.data.remote.datasourceimpl.SpeechRemoteDataSourceImpl
@@ -26,4 +28,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindsScenarioDataSource(scenarioRemoteDataSourceImpl: ScenarioRemoteDataSourceImpl): ScenarioRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindsChatDataSource(chatRemoteDataSourceImpl: ChatRemoteDataSourceImpl): ChatRemoteDataSource
 }

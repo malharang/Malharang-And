@@ -1,10 +1,12 @@
 package com.malharang.app.di
 
+import com.malharang.app.data.repositoryimpl.ChatRepositoryImpl
 import com.malharang.app.data.repositoryimpl.PlaceTypeRepositoryImpl
 import com.malharang.app.data.repositoryimpl.ScenarioRepositoryImpl
 import com.malharang.app.data.repositoryimpl.SpeechRepositoryImpl
-import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.data.repositoryimpl.TranslateRepositoryImpl
+import com.malharang.app.domain.repository.ChatRepository
+import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.repository.ScenarioRepository
 import com.malharang.app.domain.repository.SpeechRepository
 import com.malharang.app.domain.repository.TranslateRepository
@@ -32,4 +34,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindScenarioRepository(scenarioRepositoryImpl: ScenarioRepositoryImpl): ScenarioRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(chatRepositoryImpl: ChatRepositoryImpl): ChatRepository
 }

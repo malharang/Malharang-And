@@ -1,10 +1,12 @@
 package com.malharang.app.di
 
+import com.malharang.app.domain.repository.ChatRepository
 import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.repository.ScenarioRepository
 import com.malharang.app.domain.repository.SpeechRepository
-import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import com.malharang.app.domain.repository.TranslateRepository
+import com.malharang.app.domain.usecase.ChatUseCase
+import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import com.malharang.app.domain.usecase.STTUseCase
 import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
@@ -47,4 +49,10 @@ object UseCaseModule {
     fun provideScenarioUseCase(
         scenarioRepository: ScenarioRepository
     ): ScenarioUseCase = ScenarioUseCase(scenarioRepository)
+
+    @Provides
+    @Singleton
+    fun provideChatUseCase(
+        chatRepository: ChatRepository
+    ): ChatUseCase = ChatUseCase(chatRepository)
 }
