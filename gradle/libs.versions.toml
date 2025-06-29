@@ -52,6 +52,9 @@ places = "3.5.0"
 rive = "5.0.1"
 startup = "1.1.1"
 
+# Room
+room = "2.7.2"
+
 [libraries]
 # Core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -110,6 +113,11 @@ google-places = { group = "com.google.android.libraries.places", name = "places"
 # Rive
 rive = { group = "app.rive", name = "rive-android", version.ref = "rive" }
 startup = { group = "androidx.startup", name = "startup-runtime", version.ref = "startup" }
+
+# Room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

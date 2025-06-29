@@ -1,11 +1,15 @@
 package com.malharang.app.di
 
 import com.malharang.app.data.repositoryimpl.ChatRepositoryImpl
+import com.malharang.app.data.repositoryimpl.ConversationRepositoryImpl
+import com.malharang.app.data.repositoryimpl.MessageRepositoryImpl
 import com.malharang.app.data.repositoryimpl.PlaceTypeRepositoryImpl
 import com.malharang.app.data.repositoryimpl.ScenarioRepositoryImpl
 import com.malharang.app.data.repositoryimpl.SpeechRepositoryImpl
 import com.malharang.app.data.repositoryimpl.TranslateRepositoryImpl
 import com.malharang.app.domain.repository.ChatRepository
+import com.malharang.app.domain.repository.ConversationRepository
+import com.malharang.app.domain.repository.MessageRepository
 import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.repository.ScenarioRepository
 import com.malharang.app.domain.repository.SpeechRepository
@@ -38,4 +42,16 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindChatRepository(chatRepositoryImpl: ChatRepositoryImpl): ChatRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindConversationRepository(
+        conversationRepositoryImpl: ConversationRepositoryImpl
+    ): ConversationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMessageRepository(
+        messageRepositoryImpl: MessageRepositoryImpl
+    ): MessageRepository
 }

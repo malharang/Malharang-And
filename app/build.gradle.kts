@@ -117,6 +117,11 @@ dependencies {
     // Rive
     implementation(libs.rive)
     implementation(libs.startup)
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 }
 
 ktlint {
