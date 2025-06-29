@@ -1,6 +1,5 @@
 package com.malharang.app.di
 
-import com.malharang.app.data.remote.service.DummyService
 import com.malharang.app.data.remote.service.ScenarioService
 import com.malharang.app.data.remote.service.SpeechService
 import com.malharang.app.data.remote.service.TranslateService
@@ -14,11 +13,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
-    @Provides
-    @Singleton
-    fun providesDummyService(retrofit: Retrofit): DummyService =
-        retrofit.create(DummyService::class.java)
-
     @Provides
     @Singleton
     fun providesTranslateService(
