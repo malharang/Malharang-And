@@ -2,10 +2,11 @@ package com.malharang.app.presentation.screen.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.malharang.app.domain.usecase.ChatUseCase
 import com.malharang.app.domain.usecase.STTUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
 import com.malharang.app.domain.usecase.TranslateUseCase
-import com.malharang.app.presentation.model.ChatMessage
+import com.malharang.app.presentation.model.ChatMessageModel
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.component.SpeechRecorderManager
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
@@ -31,7 +32,8 @@ class ChatViewModel @Inject constructor(
     private val translateUseCase: TranslateUseCase,
     private val recorder: SpeechRecorderManager,
     private val sttUseCase: STTUseCase,
-    private val ttsUseCase: TTSUseCase
+    private val ttsUseCase: TTSUseCase,
+    private val chatUseCase: ChatUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -48,20 +50,20 @@ class ChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val botReply = ChatMessage("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
+            val botReply = ChatMessageModel("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
             val updatedChat = _state.value.chatList + botReply
             _state.update { it.copy(chatList = updatedChat, isLoading = false) }
         }
     }
 
     private fun sendMessage(message: String) {
-        val currentChat = _state.value.chatList + ChatMessage(message, SenderType.USER)
+        val currentChat = _state.value.chatList + ChatMessageModel(message, SenderType.USER)
         _state.update { it.copy(chatList = currentChat, input = "", isLoading = true) }
 
         viewModelScope.launch {
             delay(1000)
 
-            val botReply = ChatMessage("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
+            val botReply = ChatMessageModel("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
             val updatedChat = _state.value.chatList + botReply
             _state.update { it.copy(chatList = updatedChat, isLoading = false) }
         }
@@ -88,6 +90,19 @@ class ChatViewModel @Inject constructor(
                     _state.update { it.copy(isVoiced = true) }
                 }
             }
+        }
+    }
+
+    private fun updateChatMessageAt(index: Int, update: (ChatMessageModel) -> ChatMessageModel) {
+        _state.update { currentState ->
+            val updatedList = currentState.chatList.toMutableList()
+            val original = updatedList.getOrNull(index)
+
+            if (original != null) {
+                updatedList[index] = update(original)
+            }
+
+            currentState.copy(chatList = updatedList)
         }
     }
 
@@ -232,19 +247,6 @@ class ChatViewModel @Inject constructor(
                     _errorMessage.value = _errorMessage.toString()
                     updateChatMessageAt(index) { it.copy(isTranslating = false) }
                 }
-        }
-    }
-
-    private fun updateChatMessageAt(index: Int, update: (ChatMessage) -> ChatMessage) {
-        _state.update { currentState ->
-            val updatedList = currentState.chatList.toMutableList()
-            val original = updatedList.getOrNull(index)
-
-            if (original != null) {
-                updatedList[index] = update(original)
-            }
-
-            currentState.copy(chatList = updatedList)
         }
     }
 

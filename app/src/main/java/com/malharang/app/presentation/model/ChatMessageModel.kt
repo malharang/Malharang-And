@@ -1,6 +1,6 @@
 package com.malharang.app.presentation.model
 
-data class ChatMessage(
+data class ChatMessageModel(
     val text: String,
     val sender: SenderType,
     val translatedText: String? = null,
