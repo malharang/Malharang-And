@@ -6,9 +6,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import com.malharang.app.core.navigation.MainTabRoute
+import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
 import com.malharang.app.presentation.screen.goal.navigation.navigateToGoal
 import com.malharang.app.presentation.screen.home.HomeRoute
+import com.malharang.app.presentation.screen.main.MainTab
 import com.malharang.app.presentation.screen.placetype.navigation.navigateToPlaceType
 
 fun NavController.navigateToHome(
@@ -36,7 +39,18 @@ fun NavGraphBuilder.homeNavGraph(
             placeTypeArg = selectedPlaceType,
             goalArg = selectedGoal,
             navigateToPlaceType = navController::navigateToPlaceType,
-            navigateToGoal = navController::navigateToGoal
+            navigateToGoal = navController::navigateToGoal,
+            navigateToChat = {
+                navController.navigateToChat(
+                    navOptions = navOptions {
+                        popUpTo(MainTab.CHAT.route) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                )
+            }
         )
 
         LaunchedEffect(Unit) {

@@ -29,4 +29,3 @@ class DeleteMessageUseCase @Inject constructor(
         repository.deleteMessagesByConversationId(conversationId)
     }
 }
-

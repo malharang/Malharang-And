@@ -8,7 +8,6 @@ fun ConversationEntity.toDomain(): ConversationData {
         id = this.id,
         selectedLocation = this.selectedLocation,
         selectedScenario = this.selectedScenario,
-        mode = this.mode,
-        messages = emptyList()
+        mode = this.mode
     )
 }

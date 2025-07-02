@@ -1,11 +1,10 @@
 package com.malharang.app.domain.model
 
-data class  ConversationData(
+data class ConversationData(
     val id: Long = 0,
     val mode: String,
     val selectedLocation: String,
-    val selectedScenario: String,
-    val messages: List<MessageData>
+    val selectedScenario: String
 )
 
 data class MessageData(

@@ -37,3 +37,11 @@ class DeleteConversationUseCase @Inject constructor(
         repository.deleteConversation(conversation.toEntity())
     }
 }
+
+class UpdateConversationModeUseCase @Inject constructor(
+    private val repository: ConversationRepository
+) {
+    suspend operator fun invoke(id: Long, mode: String) {
+        repository.updateConversationMode(id, mode)
+    }
+}

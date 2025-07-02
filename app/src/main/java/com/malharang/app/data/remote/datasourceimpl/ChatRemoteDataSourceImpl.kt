@@ -9,16 +9,16 @@ import com.malharang.app.domain.model.ChatStateData
 import javax.inject.Inject
 
 class ChatRemoteDataSourceImpl @Inject constructor(
-    private val chatService: ChatService,
+    private val chatService: ChatService
 ) : ChatRemoteDataSource {
     override suspend fun postChat(
         userInput: String,
-        state: ChatStateData,
+        state: ChatStateData
     ): ChatResponseDto =
         chatService.postChat(
             request = ChatRequestDto(
                 userInput = userInput,
-                state = state.toData(),
+                state = state.toData()
             )
         )
 }

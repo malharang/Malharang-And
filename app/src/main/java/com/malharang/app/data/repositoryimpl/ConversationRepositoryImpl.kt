@@ -24,4 +24,8 @@ class ConversationRepositoryImpl @Inject constructor(
     override suspend fun deleteConversation(entity: ConversationEntity) {
         conversationDao.deleteConversation(entity)
     }
+
+    override suspend fun updateConversationMode(id: Long, mode: String) {
+        conversationDao.updateMode(id = id, mode = mode)
+    }
 }

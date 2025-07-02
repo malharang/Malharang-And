@@ -1,6 +1,5 @@
 package com.malharang.app.domain.model
 
-
 data class ChatData(
     val reply: String,
     val state: ChatStateData

@@ -19,5 +19,4 @@ class ChatRepositoryImpl @Inject constructor(
             state = state
         ).toDomain()
     }
-
 }

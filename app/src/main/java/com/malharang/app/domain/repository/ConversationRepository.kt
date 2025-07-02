@@ -7,4 +7,5 @@ interface ConversationRepository {
     suspend fun getConversationById(id: Long): ConversationEntity?
     suspend fun getAllConversations(): List<ConversationEntity>
     suspend fun deleteConversation(entity: ConversationEntity)
+    suspend fun updateConversationMode(id: Long, mode: String)
 }

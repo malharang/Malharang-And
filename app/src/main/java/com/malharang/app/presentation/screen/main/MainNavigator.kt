@@ -29,6 +29,8 @@ class MainNavigator(
                 else -> MainTab.find { tab -> currentDestination?.hasRoute(tab::class) == true }
             }
 
+    var selectedConversationId: Long? = null
+
     fun navigateUp() {
         navController.navigateUp()
     }
@@ -44,7 +46,7 @@ class MainNavigator(
 
         when (tab) {
             MainTab.HOME -> navController.navigateToHome(navOptions = navOptions)
-            MainTab.CHAT -> navController.navigateToChat(navOptions)
+            MainTab.CHAT -> navController.navigateToChat(navOptions = navOptions)
             MainTab.MISSION -> navController.navigateToMission(navOptions)
             MainTab.PROFILE -> navController.navigateToProfile(navOptions)
         }
@@ -58,7 +60,7 @@ class MainNavigator(
 
         val currentRoute = currentDestination?.route
 
-        return isMainTabRoute && currentRoute != MainTabRoute.Chat::class.qualifiedName
+        return isMainTabRoute && currentDestination?.hasRoute(MainTab.CHAT.route::class) != true
     }
 }
 
