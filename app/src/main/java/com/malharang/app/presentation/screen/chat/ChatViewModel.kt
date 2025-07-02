@@ -12,6 +12,7 @@ import com.malharang.app.domain.usecase.GetConversationByIdUseCase
 import com.malharang.app.domain.usecase.GetMessagesByConversationIdUseCase
 import com.malharang.app.domain.usecase.InsertMessageUseCase
 import com.malharang.app.domain.usecase.STTUseCase
+import com.malharang.app.domain.usecase.SaveExportSentenceUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
 import com.malharang.app.domain.usecase.TranslateUseCase
 import com.malharang.app.domain.usecase.UpdateConversationModeUseCase
@@ -47,7 +48,8 @@ class ChatViewModel @Inject constructor(
     private val getConversationByIdUseCase: GetConversationByIdUseCase,
     private val insertMessageUseCase: InsertMessageUseCase,
     private val getMessageByConversationByIdUseCase: GetMessagesByConversationIdUseCase,
-    private val updateConversationModeUseCase: UpdateConversationModeUseCase
+    private val updateConversationModeUseCase: UpdateConversationModeUseCase,
+    private val saveExportSentenceUseCase: SaveExportSentenceUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -191,17 +193,6 @@ class ChatViewModel @Inject constructor(
         conversationId: Long
     ) {
         viewModelScope.launch {
-            Timber.tag("POST_CHAT_STATE").d(
-                """
-            🚀 postChat 호출:
-            🗨️ userInput: $userInput
-            🧠 mode: ${state.mode}
-            📍 location: ${state.selectedLocation}
-            🎯 scenario: ${state.selectedScenario}
-            💬 messages:
-            ${state.messages.joinToString("\n") { "- ${it.role}: ${it.content}" }}
-                """.trimIndent()
-            )
             chatUseCase(
                 userInput = userInput,
                 state = state
@@ -357,27 +348,62 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun getTranslate(index: Int, text: String, language: String = "en") {
-        viewModelScope.launch {
-            updateChatMessageAt(index) { it.copy(isTranslating = true, translatedText = null) }
+    fun getTranslate(
+        index: Int,
+        text: String,
+        language: String = "en",
+        isArchive: Boolean = false
+    ) {
+        val currentMessage = _state.value.chatList.getOrNull(index)
 
-            translateUseCase(
-                text = text,
-                language = language
-            )
+        if (currentMessage?.translatedText != null) {
+            if (isArchive) {
+                saveSentence(text, currentMessage.translatedText)
+            } else {
+                toggleTranslationVisibility(index)
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            updateChatMessageAt(index) {
+                it.copy(
+                    isTranslating = true,
+                    translatedText = null,
+                    isTranslationVisible = !isArchive
+                )
+            }
+
+            translateUseCase(text = text, language = language)
                 .onSuccess { translateData ->
                     updateChatMessageAt(index) {
                         it.copy(
                             translatedText = translateData.translatedText,
-                            isTranslating = false
+                            isTranslating = false,
+                            isTranslationVisible = !isArchive
                         )
+                    }
+
+                    if (isArchive) {
+                        saveSentence(text, translateData.translatedText)
                     }
                 }
                 .onFailure {
-                    _errorMessage.value = _errorMessage.toString()
+                    _errorMessage.value = it.message
                     updateChatMessageAt(index) { it.copy(isTranslating = false) }
                 }
         }
+    }
+
+    fun saveSentence(sentence: String, translation: String) {
+        viewModelScope.launch {
+            saveExportSentenceUseCase(sentence, translation)
+            _sideEffect.emit(ChatSideEffect.ShowToast(""))
+        }
+    }
+
+    fun toggleTranslationVisibility(index: Int) {
+        updateChatMessageAt(index) { it.copy(isTranslationVisible = !it.isTranslationVisible) }
     }
 
     fun clearToastErrorMessage() {

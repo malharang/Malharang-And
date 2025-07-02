@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.core.component.MissionCard
-import com.malharang.app.presentation.model.ExportSentenceModel
+import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.screen.mission.component.MissionReviews
 import com.malharang.app.presentation.screen.mission.component.MissionSentenceItem
@@ -40,31 +41,26 @@ fun MissionRoute(
 ) {
     val availableMissions by viewModel.availableMissions.collectAsStateWithLifecycle()
     val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
+    val exportList by viewModel.exportList.collectAsStateWithLifecycle()
 
-    val exportSentences = listOf(
-        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
-        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
-    )
+    val ttsPlayingId by viewModel.ttsPlayingId.collectAsState()
 
     MissionScreen(
         padding = padding,
         availableMissions = availableMissions,
         reviewMissions = reviewMissions,
-        exportSentences = exportSentences,
+        exportSentences = exportList,
         navigateToChat = { id ->
             if (id != null) {
                 viewModel.saveRecentConversationId(id)
                 navigateToChat()
             }
-        }
+        },
+        onExportBookmarkClick = { },
+        onExportSoundClick = { id, text ->
+            viewModel.playOrStopTTS(id = id, text = text)
+        },
+        ttsPlayingId = ttsPlayingId
     )
 }
 
@@ -73,8 +69,11 @@ private fun MissionScreen(
     padding: PaddingValues,
     availableMissions: List<MissionCardModel>,
     reviewMissions: List<MissionCardModel>,
-    exportSentences: List<ExportSentenceModel>,
+    exportSentences: List<ExportSentenceData>,
     navigateToChat: (Long?) -> Unit,
+    onExportBookmarkClick: (Long) -> Unit = {},
+    onExportSoundClick: (Long, String) -> Unit = { _, _ -> },
+    ttsPlayingId: Long? = null
 ) {
     LazyColumn(
         modifier = Modifier
@@ -113,7 +112,8 @@ private fun MissionScreen(
                 availableMissions.forEach { missionCardData ->
                     MissionCard(
                         data = missionCardData,
-                        onClick = {navigateToChat(missionCardData.conversationId)})
+                        onClick = { navigateToChat(missionCardData.conversationId) }
+                    )
                 }
             }
 
@@ -130,9 +130,14 @@ private fun MissionScreen(
                 )
                 MissionReviews(
                     reviewMissions = reviewMissions,
-                    navigateToChat = navigateToChat,
+                    navigateToChat = navigateToChat
                 )
-                MissionSentenceItem(exportSentences)
+                MissionSentenceItem(
+                    exportSentences = exportSentences,
+                    onBookmarkClick = onExportBookmarkClick,
+                    onSoundClick = onExportSoundClick,
+                    ttsPlayingId = ttsPlayingId
+                )
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
@@ -160,26 +165,12 @@ private fun PreviewMissionScreen() {
             MissionCardModel("Make a reservation")
         )
 
-        val exportSentences = listOf(
-            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
-            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
-
-        )
-
         MissionScreen(
             padding = PaddingValues(),
-            exportSentences = exportSentences,
+            exportSentences = emptyList(),
             availableMissions = missionCardList,
             reviewMissions = reviewMissions,
-            navigateToChat = {},
+            navigateToChat = {}
         )
     }
 }

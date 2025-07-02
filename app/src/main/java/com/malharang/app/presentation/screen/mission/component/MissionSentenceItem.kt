@@ -36,16 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 import com.malharang.app.core.util.noRippleClickable
-import com.malharang.app.presentation.model.ExportSentenceModel
+import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import kotlin.collections.forEach
 
 @Composable
 fun MissionSentenceItem(
-    exportSentences: List<ExportSentenceModel>,
+    exportSentences: List<ExportSentenceData>,
     title: String = "Export Sentences",
-    onSoundClick: (ExportSentenceModel) -> Unit = {},
-    onBookmarkClick: (ExportSentenceModel) -> Unit = {}
+    onSoundClick: (Long, String) -> Unit = { _, _ -> },
+    onBookmarkClick: (Long) -> Unit = {},
+    ttsPlayingId: Long? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -83,6 +83,8 @@ fun MissionSentenceItem(
                     .fillMaxWidth()
             ) {
                 exportSentences.forEach { sentence ->
+                    val isSoundPlaying = sentence.id == ttsPlayingId
+
                     Column {
                         Row(
                             modifier = Modifier
@@ -99,16 +101,25 @@ fun MissionSentenceItem(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_sound_green_24),
+                                    imageVector = if (isSoundPlaying) {
+                                        ImageVector.vectorResource(id = R.drawable.ic_chat_stop_green_24)
+                                    } else {
+                                        ImageVector.vectorResource(id = R.drawable.ic_mission_sound_green_24)
+                                    },
                                     contentDescription = null,
                                     modifier = Modifier
                                         .clip(CircleShape)
-                                        .clickable { onSoundClick(sentence) }
+                                        .clickable {
+                                            onSoundClick(
+                                                sentence.id,
+                                                sentence.sentence
+                                            )
+                                        }
 
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Column {
-                                    Text(sentence.text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                    Text(sentence.sentence, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                     Text(sentence.translation, fontSize = 12.sp, color = colors.grayDark)
                                 }
                             }
@@ -118,11 +129,10 @@ fun MissionSentenceItem(
                                 contentDescription = "Bookmark",
                                 colorFilter = ColorFilter.tint(colors.greenBasic),
                                 modifier = Modifier
-                                    .noRippleClickable { onBookmarkClick(sentence) } // ✅ 북마크 클릭
+                                    .clickable { onBookmarkClick(sentence.id) }
                             )
                         }
 
-                        // Divider
                         HorizontalDivider(
                             thickness = 1.dp,
                             color = colors.black.copy(alpha = 0.2f),

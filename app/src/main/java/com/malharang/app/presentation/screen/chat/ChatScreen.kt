@@ -46,6 +46,7 @@ import com.malharang.app.presentation.screen.chat.component.ChatBottomContents
 import com.malharang.app.presentation.screen.chat.component.ChatBubble
 import com.malharang.app.presentation.screen.chat.component.ChatTopBar
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
+import com.malharang.app.presentation.screen.chat.sideeffect.ChatSideEffect
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatUiState
 import com.malharang.app.presentation.screen.chat.sideeffect.MicState
@@ -77,6 +78,16 @@ fun ChatRoute(
     LaunchedEffect(state.chatList.size) {
         if (state.chatList.isNotEmpty()) {
             listState.animateScrollToItem(state.chatList.lastIndex + 1)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is ChatSideEffect.ShowToast -> {
+                    context.toast("\uD83D\uDCBE Saved!")
+                }
+            }
         }
     }
 
@@ -113,7 +124,9 @@ fun ChatRoute(
         micClick = { viewModel.onMicClicked() },
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
-        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) },
+        onTranslateClick = { index, text, isBookmark ->
+            viewModel.getTranslate(index = index, text = text, isArchive = isBookmark)
+        },
         onVoiceClick = viewModel::postTextToSpeech
     )
 }
@@ -126,7 +139,7 @@ private fun ChatScreen(
     micClick: () -> Unit,
     onVoiceClick: (Int, String) -> Unit,
     onIntent: (ChatIntent) -> Unit,
-    onTranslateClick: (Int, String) -> Unit,
+    onTranslateClick: (Int, String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {}
 ) {
@@ -206,10 +219,14 @@ private fun ChatScreen(
                             translatedText = chat.translatedText,
                             isTranslating = chat.isTranslating,
                             onTranslateClick = {
-                                onTranslateClick(index, chat.text)
+                                onTranslateClick(index, chat.text, false)
+                            },
+                            onBookmarkClick = {
+                                onTranslateClick(index, chat.text, true)
                             },
                             onVoiceClick = { onVoiceClick(index, chat.text) },
-                            isSoundPlaying = chat.isSoundPlaying
+                            isSoundPlaying = chat.isSoundPlaying,
+                            isTranslationVisible = chat.isTranslationVisible
                         )
                     }
 
@@ -250,7 +267,7 @@ private fun PreviewChatScreen() {
             state = ChatState(),
             onIntent = {},
             listState = rememberLazyListState(),
-            onTranslateClick = { _, _ -> },
+            onTranslateClick = { _, _, _ -> },
             micState = MicState.Idle,
             micClick = {},
             onVoiceClick = { _, _ -> }

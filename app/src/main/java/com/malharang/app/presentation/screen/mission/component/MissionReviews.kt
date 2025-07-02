@@ -115,7 +115,7 @@ private fun MissionSummaryCard(
             lineHeight = 20.sp,
             modifier = Modifier
                 .padding(end = 20.dp)
-                .weight(1f),
+                .weight(1f)
         )
 
         Text(
@@ -127,7 +127,6 @@ private fun MissionSummaryCard(
     }
 }
 
-
 @Preview
 @Composable
 private fun MissionReviewsPreview() {
@@ -138,7 +137,7 @@ private fun MissionReviewsPreview() {
                 MissionCardModel("Order food"),
                 MissionCardModel("Ask for directions"),
                 MissionCardModel("Buy a ticket"),
-                MissionCardModel("Introduce yourself"),
+                MissionCardModel("Introduce yourself")
             )
         )
     }

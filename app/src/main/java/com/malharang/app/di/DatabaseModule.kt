@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.malharang.app.data.local.AppDatabase
 import com.malharang.app.data.local.dao.ConversationDao
+import com.malharang.app.data.local.dao.ExportSentenceDao
 import com.malharang.app.data.local.dao.MessageDao
 import dagger.Module
 import dagger.Provides
@@ -37,4 +38,7 @@ object DatabaseModule {
     fun provideMessageDao(db: AppDatabase): MessageDao {
         return db.messageDao()
     }
+
+    @Provides
+    fun provideExportSentenceDao(db: AppDatabase): ExportSentenceDao = db.ExportSentenceDao()
 }
