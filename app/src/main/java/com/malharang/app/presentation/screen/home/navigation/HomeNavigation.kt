@@ -25,6 +25,7 @@ fun NavController.navigateToHome(
 
 fun NavGraphBuilder.homeNavGraph(
     padding: PaddingValues,
+    navigateToChat: () -> Unit,
     navController: NavController
 ) {
     composable<MainTabRoute.Home> {
@@ -40,17 +41,7 @@ fun NavGraphBuilder.homeNavGraph(
             goalArg = selectedGoal,
             navigateToPlaceType = navController::navigateToPlaceType,
             navigateToGoal = navController::navigateToGoal,
-            navigateToChat = {
-                navController.navigateToChat(
-                    navOptions = navOptions {
-                        popUpTo(MainTab.CHAT.route) {
-                            inclusive = false
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                )
-            }
+            navigateToChat = navigateToChat,
         )
 
         LaunchedEffect(Unit) {

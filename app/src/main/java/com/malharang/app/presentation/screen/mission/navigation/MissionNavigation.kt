@@ -13,9 +13,13 @@ fun NavController.navigateToMission(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.missionNavGraph(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navigateToChat: () -> Unit,
 ) {
     composable<MainTabRoute.Mission> {
-        MissionRoute(padding = padding)
+        MissionRoute(
+            padding = padding,
+            navigateToChat = navigateToChat,
+        )
     }
 }

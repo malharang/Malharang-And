@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.malharang.app.presentation.screen.chat.navigation.chatNavGraph
+import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
 import com.malharang.app.presentation.screen.goal.navigation.goalNavGraph
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
 import com.malharang.app.presentation.screen.home.navigation.navigateToHome
@@ -32,13 +33,38 @@ fun MainNavHost(
             navController = navigator.navController,
             startDestination = navigator.startDestination
         ) {
-            homeNavGraph(padding, navigator.navController)
+            homeNavGraph(
+                padding = padding,
+                navController = navigator.navController,
+                navigateToChat = {
+                    val navOptions = navOptions {
+                        popUpTo(MainTab.CHAT.route) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    navigator.navController.navigateToChat(navOptions)
+                }
+            )
 
             chatNavGraph(
                 navController = navigator.navController
             )
 
-            missionNavGraph(padding)
+            missionNavGraph(
+                padding = padding,
+                navigateToChat = {
+                    val navOptions = navOptions {
+                        popUpTo(MainTab.CHAT.route) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    navigator.navController.navigateToChat(navOptions)
+                }
+            )
 
             profileNavGraph(padding)
 

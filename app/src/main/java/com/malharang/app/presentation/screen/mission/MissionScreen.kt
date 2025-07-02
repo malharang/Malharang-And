@@ -1,8 +1,5 @@
 package com.malharang.app.presentation.screen.mission
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,61 +9,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.malharang.app.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.core.component.MissionCard
-import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.ExportSentenceModel
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.screen.mission.component.MissionReviews
+import com.malharang.app.presentation.screen.mission.component.MissionSentenceItem
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionRoute(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navigateToChat: () -> Unit,
+    viewModel: MissionViewModel = hiltViewModel()
 ) {
-    val missionCardList = listOf(
-        MissionCardModel(
-            title = "Order food"
-        ),
-        MissionCardModel(
-            title = "Ask for directions"
-        )
-    )
-
-    val reviewMissions = listOf(
-        MissionCardModel("Order food"),
-        MissionCardModel("Ask for directions"),
-        MissionCardModel("Buy a ticket"),
-        MissionCardModel("Introduce yourself"),
-        MissionCardModel("Make a reservation")
-    )
+    val availableMissions by viewModel.availableMissions.collectAsStateWithLifecycle()
+    val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
 
     val exportSentences = listOf(
         ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
@@ -83,19 +56,25 @@ fun MissionRoute(
 
     MissionScreen(
         padding = padding,
-        missionCardList = missionCardList,
-        reviewMissionList = reviewMissions,
-        exportSentences = exportSentences
-
+        availableMissions = availableMissions,
+        reviewMissions = reviewMissions,
+        exportSentences = exportSentences,
+        navigateToChat = { id ->
+            if (id != null) {
+                viewModel.saveRecentConversationId(id)
+                navigateToChat()
+            }
+        }
     )
 }
 
 @Composable
 private fun MissionScreen(
     padding: PaddingValues,
-    missionCardList: List<MissionCardModel>,
-    reviewMissionList: List<MissionCardModel>,
-    exportSentences: List<ExportSentenceModel>
+    availableMissions: List<MissionCardModel>,
+    reviewMissions: List<MissionCardModel>,
+    exportSentences: List<ExportSentenceModel>,
+    navigateToChat: (Long?) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -124,7 +103,6 @@ private fun MissionScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 섹션: Available Missions
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     text = "Available Missions",
@@ -132,8 +110,10 @@ private fun MissionScreen(
                     fontSize = 18.sp
                 )
 
-                missionCardList.forEach { missionCardData ->
-                    MissionCard(data = missionCardData)
+                availableMissions.forEach { missionCardData ->
+                    MissionCard(
+                        data = missionCardData,
+                        onClick = {navigateToChat(missionCardData.conversationId)})
                 }
             }
 
@@ -148,151 +128,12 @@ private fun MissionScreen(
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
-                DropdownMissions("Review Mission", reviewMissionList)
-                SentenceItem("Export Sentences", exportSentences)
+                MissionReviews(
+                    reviewMissions = reviewMissions,
+                    navigateToChat = navigateToChat,
+                )
+                MissionSentenceItem(exportSentences)
                 Spacer(modifier = Modifier.height(20.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun DropdownMissions(
-    title: String,
-    completedMissionList: List<MissionCardModel>
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .background(colors.white, RoundedCornerShape(12.dp))
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .noRippleClickable { expanded = !expanded }, // 아이콘 클릭 처리
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = colors.black
-            )
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null
-            )
-        }
-        if (expanded) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                completedMissionList.forEach { mission ->
-                    MissionCard(mission)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun SentenceItem(
-    title: String,
-    exportSentences: List<ExportSentenceModel>,
-    onSoundClick: (ExportSentenceModel) -> Unit = {},
-    onBookmarkClick: (ExportSentenceModel) -> Unit = {}
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .background(colors.white, RoundedCornerShape(12.dp))
-            .padding(16.dp)
-    ) {
-        // Title Section
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .noRippleClickable { expanded = !expanded },
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = colors.black
-            )
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null
-            )
-        }
-
-        if (expanded) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                exportSentences.forEach { sentence ->
-                    Column {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = colors.gray.copy(alpha = 0.08f),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_sound_green_24),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .clickable { onSoundClick(sentence) }
-
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Column {
-                                    Text(sentence.text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                                    Text(sentence.translation, fontSize = 12.sp, color = colors.grayDark)
-                                }
-                            }
-
-                            Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_mission_bookmark_filled),
-                                contentDescription = "Bookmark",
-                                colorFilter = ColorFilter.tint(colors.greenBasic),
-                                modifier = Modifier
-                                    .noRippleClickable { onBookmarkClick(sentence) } // ✅ 북마크 클릭
-                            )
-                        }
-
-                        // Divider
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = colors.black.copy(alpha = 0.2f),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        )
-                    }
-                }
             }
         }
     }
@@ -335,10 +176,10 @@ private fun PreviewMissionScreen() {
 
         MissionScreen(
             padding = PaddingValues(),
-            missionCardList = missionCardList,
-            reviewMissionList = reviewMissions,
-            exportSentences = exportSentences
-
+            exportSentences = exportSentences,
+            availableMissions = missionCardList,
+            reviewMissions = reviewMissions,
+            navigateToChat = {},
         )
     }
 }
