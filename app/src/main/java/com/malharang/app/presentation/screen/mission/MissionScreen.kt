@@ -1,8 +1,11 @@
 package com.malharang.app.presentation.screen.mission
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +24,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,7 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -130,10 +138,13 @@ private fun MissionScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                text = "go to quiz",
-                modifier = Modifier.clickable { navigateToQuizStart() },
+            StartQuizButton(
+                onClick =  navigateToQuizStart,
             )
+//            Text(
+//                text = "go to quiz",
+//                modifier = Modifier.clickable {) },
+//            )
             // 섹션: Available Missions
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
@@ -165,6 +176,45 @@ private fun MissionScreen(
         }
     }
 }
+
+@Composable
+private fun StartQuizButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        label = "scaleAnimation"
+    )
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .graphicsLayer(scaleX = scale, scaleY = scale),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MalHaRangTheme.colors.greenTint, // 보라 계열 강조 색
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(20.dp),
+        interactionSource = interactionSource
+    ) {
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        Text(
+            text = "퀴즈 시작하기",
+            style = MalHaRangTheme.typography.titleLarge
+        )
+    }
+}
+
 
 @Composable
 fun DropdownMissions(
