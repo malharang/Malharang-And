@@ -1,5 +1,6 @@
 package com.malharang.app.presentation.screen.chat.component
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,9 +44,11 @@ fun ChatBubble(
     modifier: Modifier = Modifier,
     translatedText: String? = null,
     onTranslateClick: (String) -> Unit = {},
-    onVoiceClick: () -> Unit = {},
+    onVoiceClick: (String) -> Unit = {},
     onBookmarkClick: () -> Unit = {},
-    isTranslating: Boolean = false
+    isTranslating: Boolean = false,
+    isSoundPlaying: Boolean = false,
+    isTranslationVisible: Boolean = false
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
@@ -57,6 +60,12 @@ fun ChatBubble(
         bottomEnd = 16.dp
     )
     val isLoading = remember { mutableStateOf(false) }
+    val soundIconRes = when {
+        isFromBot && isSoundPlaying -> R.drawable.ic_chat_stop_white_24
+        isFromBot && !isSoundPlaying -> R.drawable.ic_chat_sound_white_24
+        !isFromBot && isSoundPlaying -> R.drawable.ic_chat_stop_green_24
+        else -> R.drawable.ic_chat_sound_green_24
+    }
 
     Row(
         modifier = modifier
@@ -87,15 +96,17 @@ fun ChatBubble(
                 color = if (isFromBot) colors.white else colors.black
             )
 
-            translatedText?.let { text ->
-                Text(
-                    text = if (isTranslating) "..." else text,
-                    textAlign = TextAlign.Start,
-                    softWrap = true,
-                    modifier = Modifier.padding(top = 5.dp),
-                    style = typography.bodySmallPlus,
-                    color = if (isFromBot) colors.white else colors.black
-                )
+            if (translatedText != null) {
+                AnimatedVisibility(visible = isTranslationVisible) {
+                    Text(
+                        text = if (isTranslating) "..." else translatedText,
+                        textAlign = TextAlign.Start,
+                        softWrap = true,
+                        modifier = Modifier.padding(top = 5.dp),
+                        style = typography.bodySmallPlus,
+                        color = if (isFromBot) colors.white else colors.black
+                    )
+                }
             }
 
             HorizontalDivider(
@@ -121,9 +132,9 @@ fun ChatBubble(
                     }
                 )
                 ChatIcon(
-                    icon = if (isFromBot) R.drawable.ic_chat_sound_white_24 else R.drawable.ic_chat_sound_green_24,
+                    icon = soundIconRes,
                     description = "Voice",
-                    onClick = onVoiceClick
+                    onClick = { onVoiceClick(text) }
                 )
                 ChatIcon(
                     icon = if (isFromBot) R.drawable.ic_chat_bookmark_white_24 else R.drawable.ic_chat_bookmark_green_24,

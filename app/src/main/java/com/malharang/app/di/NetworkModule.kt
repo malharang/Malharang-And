@@ -84,4 +84,20 @@ object NetworkModule {
                 json.asConverterFactory(requireNotNull("application/json".toMediaTypeOrNull()))
             )
             .build()
+
+    @ExperimentalSerializationApi
+    @Provides
+    @Singleton
+    @javax.inject.Named("Speech")
+    fun providesSpeechRetrofit(
+        okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BuildConfig.SPEECH_URL)
+            .client(okHttpClient)
+            .addConverterFactory(
+                json.asConverterFactory(requireNotNull("application/json".toMediaTypeOrNull()))
+            )
+            .build()
 }

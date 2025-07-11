@@ -3,6 +3,7 @@ package com.malharang.app.presentation.screen.main
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -23,11 +24,16 @@ class MainNavigator(
     val startDestination = MainTabRoute.Home
 
     val currentTab: MainTab?
-        @Composable get() = MainTab.entries.find { tab ->
-            when (tab.route) {
-                else -> currentDestination?.route == tab.route::class.qualifiedName
+        @Composable get() =
+            when {
+                else -> MainTab.find { tab -> currentDestination?.hasRoute(tab::class) == true }
             }
-        }
+
+    var selectedConversationId: Long? = null
+
+    fun navigateUp() {
+        navController.navigateUp()
+    }
 
     fun navigate(tab: MainTab) {
         val navOptions = navOptions {
@@ -39,17 +45,22 @@ class MainNavigator(
         }
 
         when (tab) {
-            MainTab.HOME -> navController.navigateToHome(navOptions)
-            MainTab.CHAT -> navController.navigateToChat(navOptions)
+            MainTab.HOME -> navController.navigateToHome(navOptions = navOptions)
+            MainTab.CHAT -> navController.navigateToChat(navOptions = navOptions)
             MainTab.MISSION -> navController.navigateToMission(navOptions)
             MainTab.PROFILE -> navController.navigateToProfile(navOptions)
         }
     }
 
     @Composable
-    fun shouldShowBottomBar() = MainTab.contains {
+    fun shouldShowBottomBar(): Boolean {
+        val isMainTabRoute = MainTab.contains {
+            currentDestination?.hasRoute(it::class) == true
+        }
+
         val currentRoute = currentDestination?.route
-        currentRoute == it::class.qualifiedName && currentRoute != MainTabRoute.Chat::class.qualifiedName
+
+        return isMainTabRoute && currentDestination?.hasRoute(MainTab.CHAT.route::class) != true
     }
 }
 

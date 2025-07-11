@@ -41,4 +41,5 @@ sealed interface QuizRoute {
     data class QuizResult(
         val countResult: String,
     ): QuizRoute
+    data object Goal : HomeRoute
 }

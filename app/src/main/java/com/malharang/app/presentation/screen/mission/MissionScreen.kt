@@ -1,11 +1,5 @@
 package com.malharang.app.presentation.screen.mission
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,14 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -31,10 +19,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,11 +34,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.malharang.app.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.core.component.MissionCard
-import com.malharang.app.core.util.noRippleClickable
-import com.malharang.app.presentation.model.ExportSentenceModel
+import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.screen.mission.component.MissionReviews
+import com.malharang.app.presentation.screen.mission.component.MissionSentenceItem
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
@@ -60,38 +48,15 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 fun MissionRoute(
     padding: PaddingValues,
     navigateToQuizStart: () -> Unit,
+    padding: PaddingValues,
+    navigateToChat: () -> Unit,
+    viewModel: MissionViewModel = hiltViewModel()
 ) {
-    val missionCardList = listOf(
-        MissionCardModel(
-            title = "Order food",
-            description = "Learn to order food in Korean"
-        ),
-        MissionCardModel(
-            title = "Ask for directions",
-            description = "Practice asking for directions"
-        )
-    )
+    val availableMissions by viewModel.availableMissions.collectAsStateWithLifecycle()
+    val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
+    val exportList by viewModel.exportList.collectAsStateWithLifecycle()
 
-    val reviewMissions = listOf(
-        MissionCardModel("Order food", "Learn to order food in Korean"),
-        MissionCardModel("Ask for directions", "Practice asking for directions"),
-        MissionCardModel("Buy a ticket", "Handle ticket buying situation"),
-        MissionCardModel("Introduce yourself", "Practice self introduction"),
-        MissionCardModel("Make a reservation", "Phone call reservation practice")
-    )
-
-    val exportSentences = listOf(
-        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
-        ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-        ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-        ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-        ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-        ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
-    )
+    val ttsPlayingId by viewModel.ttsPlayingId.collectAsState()
 
     MissionScreen(
         padding = padding,
@@ -99,12 +64,33 @@ fun MissionRoute(
         reviewMissionList = reviewMissions,
         exportSentences = exportSentences,
         navigateToQuizStart = navigateToQuizStart,
+        availableMissions = availableMissions,
+        reviewMissions = reviewMissions,
+        exportSentences = exportList,
+        navigateToChat = { id ->
+            if (id != null) {
+                viewModel.saveRecentConversationId(id)
+                navigateToChat()
+            }
+        },
+        onExportBookmarkClick = { },
+        onExportSoundClick = { id, text ->
+            viewModel.playOrStopTTS(id = id, text = text)
+        },
+        ttsPlayingId = ttsPlayingId
     )
 }
 
 @Composable
 private fun MissionScreen(
     padding: PaddingValues,
+    availableMissions: List<MissionCardModel>,
+    reviewMissions: List<MissionCardModel>,
+    exportSentences: List<ExportSentenceData>,
+    navigateToChat: (Long?) -> Unit,
+    onExportBookmarkClick: (Long) -> Unit = {},
+    onExportSoundClick: (Long, String) -> Unit = { _, _ -> },
+    ttsPlayingId: Long? = null
     missionCardList: List<MissionCardModel>,
     reviewMissionList: List<MissionCardModel>,
     exportSentences: List<ExportSentenceModel>,
@@ -153,8 +139,11 @@ private fun MissionScreen(
                     fontSize = 18.sp
                 )
 
-                missionCardList.forEach { missionCardData ->
-                    MissionCard(data = missionCardData)
+                availableMissions.forEach { missionCardData ->
+                    MissionCard(
+                        data = missionCardData,
+                        onClick = { navigateToChat(missionCardData.conversationId) }
+                    )
                 }
             }
 
@@ -169,8 +158,16 @@ private fun MissionScreen(
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
-                DropdownMissions("Review Mission", reviewMissionList)
-                SentenceItem("Export Sentences", exportSentences)
+                MissionReviews(
+                    reviewMissions = reviewMissions,
+                    navigateToChat = navigateToChat
+                )
+                MissionSentenceItem(
+                    exportSentences = exportSentences,
+                    onBookmarkClick = onExportBookmarkClick,
+                    onSoundClick = onExportSoundClick,
+                    ttsPlayingId = ttsPlayingId
+                )
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
@@ -365,39 +362,27 @@ private fun PreviewMissionScreen() {
     MalHaRangTheme {
         val missionCardList = listOf(
             MissionCardModel(
-                title = "Order food",
-                description = "Learn to order food in Korean"
+                title = "Order food"
             ),
             MissionCardModel(
-                title = "Ask for directions",
-                description = "Practice asking for directions"
+                title = "Ask for directions"
             )
         )
 
         val reviewMissions = listOf(
-            MissionCardModel("Order food", "Learn to order food in Korean"),
-            MissionCardModel("Ask for directions", "Practice asking for directions"),
-            MissionCardModel("Buy a ticket", "Handle ticket buying situation"),
-            MissionCardModel("Introduce yourself", "Practice self introduction"),
-            MissionCardModel("Make a reservation", "Phone call reservation practice")
-        )
-
-        val exportSentences = listOf(
-            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어."),
-            ExportSentenceModel("Can I have some tissues?", "티슈 좀 얻을 수 있을까?"),
-            ExportSentenceModel("How can I go to the Byeongjeom station?", "병점역에 어떻게 가야해?"),
-            ExportSentenceModel("My name is Massi!", "내 이름은 말씨야!"),
-            ExportSentenceModel("Where can I buy this ticket?", "이 티켓은 어디서 사니?"),
-            ExportSentenceModel("I would like to reserve a suite for 4 people", "4인용 스위트룸을 예약하고 싶어.")
-
+            MissionCardModel("Order food"),
+            MissionCardModel("Ask for directions"),
+            MissionCardModel("Buy a ticket"),
+            MissionCardModel("Introduce yourself"),
+            MissionCardModel("Make a reservation")
         )
 
         MissionScreen(
             padding = PaddingValues(),
+            exportSentences = emptyList(),
+            availableMissions = missionCardList,
+            reviewMissions = reviewMissions,
+            navigateToChat = {}
             missionCardList = missionCardList,
             reviewMissionList = reviewMissions,
             exportSentences = exportSentences,

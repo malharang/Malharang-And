@@ -25,7 +25,8 @@ fun ChatTopBar(
     Row(
         modifier = modifier
             .padding(top = 20.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -37,7 +38,8 @@ fun ChatTopBar(
 
         Text(
             text = title,
-            style = typography.bodyMediumBold
+            style = typography.bodyMediumBold,
+            modifier = Modifier.padding(horizontal = 10.dp)
         )
 
         Image(

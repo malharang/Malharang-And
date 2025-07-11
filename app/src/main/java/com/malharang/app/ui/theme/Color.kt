@@ -20,6 +20,7 @@ val GrayDark = Color(0xFF8E8E93)
 // Green
 val GreenUltraLight = Color(0xFFF0FFF7)
 val GreenLight = Color(0xFFD3EEDD)
+val GreenLight30 = GreenLight.copy(alpha = 0.3f)
 val GreenDark = Color(0xFF006358)
 val GreenProfileBackgroundBottom = Color(0xFFEFF9E9)
 val GreenProfileBackgroundTop = Color(0xFFFCFEF8)
@@ -33,6 +34,9 @@ val AndSysWhite = Color(0xFFF6F6F8)
 
 // Tint
 val GreenTint = Color(0xFF22C55E)
+
+// Transparent
+val Transparent = Color.Transparent
 
 @Immutable
 data class MalHaRangColors(
@@ -49,11 +53,13 @@ data class MalHaRangColors(
     val grayDark: Color,
     val greenUltraLight: Color,
     val greenLight: Color,
+    val greenLight30: Color,
     val greenDark: Color,
     val green: Color,
     val andSysGray: Color,
     val andSysWhite: Color,
-    val greenTint: Color
+    val greenTint: Color,
+    val transparent: Color
 )
 
 val defaultMalHaRangColors = MalHaRangColors(
@@ -70,11 +76,13 @@ val defaultMalHaRangColors = MalHaRangColors(
     greenBasic = GreenBasic,
     greenUltraLight = GreenUltraLight,
     greenLight = GreenLight,
+    greenLight30 = GreenLight30,
     greenDark = GreenDark,
     green = Green,
     andSysGray = AndSysGray,
     andSysWhite = AndSysWhite,
-    greenTint = GreenTint
+    greenTint = GreenTint,
+    transparent = Transparent
 )
 
 val LocalMalHaRangColorsProvider = staticCompositionLocalOf { defaultMalHaRangColors }
