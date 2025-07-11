@@ -38,7 +38,8 @@ fun ChatTopBar(
 
         Text(
             text = title,
-            style = typography.bodyMediumBold
+            style = typography.bodyMediumBold,
+            modifier = Modifier.padding(horizontal = 10.dp)
         )
 
         Image(

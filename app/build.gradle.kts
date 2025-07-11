@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.androidx.datastore.preferences)
 
     // Network
     implementation(libs.kotlinx.serialization.json)
@@ -117,6 +118,11 @@ dependencies {
     // Rive
     implementation(libs.rive)
     implementation(libs.startup)
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 }
 
 ktlint {

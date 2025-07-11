@@ -23,7 +23,6 @@ enum class MainTab(
         activeIconResId = R.drawable.ic_navi_chat_inactive_24,
         title = R.string.navi_chat_title,
         route = MainTabRoute.Chat
-
     ),
     MISSION(
         inactiveIconResId = R.drawable.ic_navi_mission_inactive_24,

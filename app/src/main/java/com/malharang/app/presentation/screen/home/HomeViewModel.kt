@@ -15,6 +15,9 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.malharang.app.data.local.datastore.ConversationDataStore
+import com.malharang.app.domain.model.ConversationData
+import com.malharang.app.domain.usecase.InsertConversationUseCase
 import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
@@ -31,9 +34,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val conversationIdDataStore: ConversationDataStore,
     private val locationClient: FusedLocationProviderClient,
     @ApplicationContext private val context: Context,
-    private val scenarioUseCase: ScenarioUseCase
+    private val scenarioUseCase: ScenarioUseCase,
+    private val insertConversationUseCase: InsertConversationUseCase
 ) : ViewModel() {
 
     private val _currentLocation = MutableStateFlow<LatLng?>(null)
@@ -61,6 +66,12 @@ class HomeViewModel @Inject constructor(
         level = 5,
         exp = 70
     )
+
+    fun saveRecentConversationId(id: Long) {
+        viewModelScope.launch {
+            conversationIdDataStore.saveConversationId(id)
+        }
+    }
 
     fun fetchScenario(placeType: String, goal: String?) {
         viewModelScope.launch {
@@ -133,7 +144,7 @@ class HomeViewModel @Inject constructor(
             goalTypes = updatedGoals
         ) ?: return
 
-        currentInfo?.locationType?.name?.let { placeType ->
+        currentInfo.locationType?.name?.let { placeType ->
             fetchScenario(placeType, goal)
         }
     }
@@ -174,6 +185,38 @@ class HomeViewModel @Inject constructor(
             locationType = placeInfo.value?.locationType,
             goalTypes = placeInfo.value?.goalTypes ?: emptyList()
         )
+    }
+
+    fun saveScenario(
+        scenarioTitle: String?,
+        onComplete: (Long) -> Unit
+    ) {
+        val location = _placeInfo.value?.locationType?.name
+        if (location.isNullOrEmpty()) {
+            _errorMessage.value = "장소 정보가 없습니다."
+            return
+        }
+
+        if (scenarioTitle.isNullOrEmpty()) {
+            _errorMessage.value = "시나리오 제목이 비어 있습니다."
+            return
+        }
+
+        val newConversation = ConversationData(
+            id = 0L,
+            mode = "scenario_selection",
+            selectedLocation = location,
+            selectedScenario = scenarioTitle
+        )
+
+        viewModelScope.launch {
+            try {
+                val conversationId = insertConversationUseCase(newConversation)
+                onComplete(conversationId)
+            } catch (e: Exception) {
+                _errorMessage.value = "시나리오 저장 실패: ${e.localizedMessage}"
+            }
+        }
     }
 
     fun clearPlaceInfo() {

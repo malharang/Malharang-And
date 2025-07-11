@@ -62,6 +62,7 @@ fun HomeRoute(
     padding: PaddingValues,
     navigateToPlaceType: () -> Unit,
     navigateToGoal: () -> Unit,
+    navigateToChat: () -> Unit,
     placeTypeArg: String?,
     goalArg: String?,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -145,6 +146,14 @@ fun HomeRoute(
         isMissionLoading = isLoading,
         navigateToPlaceType = navigateToPlaceType,
         navigateToGoal = navigateToGoal,
+        onMissionCardClick = { scenarioTitle ->
+            viewModel.saveScenario(
+                scenarioTitle = scenarioTitle
+            ) { conversationId ->
+                viewModel.saveRecentConversationId(conversationId)
+                navigateToChat()
+            }
+        },
         onGoalRemoveClick = viewModel::removeGoalAt,
         missionCards = missionCardList,
         cameraPositionState = cameraPositionState
@@ -175,6 +184,7 @@ private fun HomeScreen(
     isMissionLoading: Boolean = false,
     navigateToPlaceType: () -> Unit = {},
     navigateToGoal: () -> Unit = {},
+    onMissionCardClick: (String?) -> Unit = {},
     onGoalRemoveClick: (Int) -> Unit = {},
     onRequestCurrentLocation: () -> Unit = {}
 ) {
@@ -260,6 +270,7 @@ private fun HomeScreen(
                             goalTypes = placeInfo?.goalTypes ?: listOf(),
                             missionCards = missionCards,
                             isMissionLoading = isMissionLoading,
+                            onMissionCardClick = onMissionCardClick,
                             onLocationTypeClick = navigateToPlaceType,
                             onGoalClick = navigateToGoal,
                             onGoalRemoveClick = onGoalRemoveClick

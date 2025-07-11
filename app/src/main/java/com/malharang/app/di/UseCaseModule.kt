@@ -1,12 +1,12 @@
 package com.malharang.app.di
 
-import com.malharang.app.domain.repository.DummyRepository
+import com.malharang.app.domain.repository.ChatRepository
 import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.repository.ScenarioRepository
 import com.malharang.app.domain.repository.SpeechRepository
-import com.malharang.app.domain.usecase.DummyUseCase
-import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import com.malharang.app.domain.repository.TranslateRepository
+import com.malharang.app.domain.usecase.ChatUseCase
+import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import com.malharang.app.domain.usecase.STTUseCase
 import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
@@ -20,12 +20,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {
-    @Provides
-    @Singleton
-    fun provideDummyUseCase(
-        dummyRepository: DummyRepository
-    ): DummyUseCase = DummyUseCase(dummyRepository)
-
     @Provides
     @Singleton
     fun providePlaceTypeUseCase(
@@ -55,4 +49,10 @@ object UseCaseModule {
     fun provideScenarioUseCase(
         scenarioRepository: ScenarioRepository
     ): ScenarioUseCase = ScenarioUseCase(scenarioRepository)
+
+    @Provides
+    @Singleton
+    fun provideChatUseCase(
+        chatRepository: ChatRepository
+    ): ChatUseCase = ChatUseCase(chatRepository)
 }

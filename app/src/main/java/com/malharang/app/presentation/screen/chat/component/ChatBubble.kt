@@ -1,5 +1,6 @@
 package com.malharang.app.presentation.screen.chat.component
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,7 +47,8 @@ fun ChatBubble(
     onVoiceClick: (String) -> Unit = {},
     onBookmarkClick: () -> Unit = {},
     isTranslating: Boolean = false,
-    isSoundPlaying: Boolean = false
+    isSoundPlaying: Boolean = false,
+    isTranslationVisible: Boolean = false
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
@@ -94,15 +96,17 @@ fun ChatBubble(
                 color = if (isFromBot) colors.white else colors.black
             )
 
-            translatedText?.let { text ->
-                Text(
-                    text = if (isTranslating) "..." else text,
-                    textAlign = TextAlign.Start,
-                    softWrap = true,
-                    modifier = Modifier.padding(top = 5.dp),
-                    style = typography.bodySmallPlus,
-                    color = if (isFromBot) colors.white else colors.black
-                )
+            if (translatedText != null) {
+                AnimatedVisibility(visible = isTranslationVisible) {
+                    Text(
+                        text = if (isTranslating) "..." else translatedText,
+                        textAlign = TextAlign.Start,
+                        softWrap = true,
+                        modifier = Modifier.padding(top = 5.dp),
+                        style = typography.bodySmallPlus,
+                        color = if (isFromBot) colors.white else colors.black
+                    )
+                }
             }
 
             HorizontalDivider(

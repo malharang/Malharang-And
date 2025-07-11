@@ -2,10 +2,21 @@ package com.malharang.app.presentation.screen.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.malharang.app.data.local.datastore.ConversationDataStore
+import com.malharang.app.domain.mapper.toChatMessageDataList
+import com.malharang.app.domain.mapper.toChatMessageModelList
+import com.malharang.app.domain.mapper.toMessageData
+import com.malharang.app.domain.model.ChatStateData
+import com.malharang.app.domain.usecase.ChatUseCase
+import com.malharang.app.domain.usecase.GetConversationByIdUseCase
+import com.malharang.app.domain.usecase.GetMessagesByConversationIdUseCase
+import com.malharang.app.domain.usecase.InsertMessageUseCase
 import com.malharang.app.domain.usecase.STTUseCase
+import com.malharang.app.domain.usecase.SaveExportSentenceUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
 import com.malharang.app.domain.usecase.TranslateUseCase
-import com.malharang.app.presentation.model.ChatMessage
+import com.malharang.app.domain.usecase.UpdateConversationModeUseCase
+import com.malharang.app.presentation.model.ChatMessageModel
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.component.SpeechRecorderManager
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
@@ -28,10 +39,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    private val conversationIdDataStore: ConversationDataStore,
     private val translateUseCase: TranslateUseCase,
     private val recorder: SpeechRecorderManager,
     private val sttUseCase: STTUseCase,
-    private val ttsUseCase: TTSUseCase
+    private val ttsUseCase: TTSUseCase,
+    private val chatUseCase: ChatUseCase,
+    private val getConversationByIdUseCase: GetConversationByIdUseCase,
+    private val insertMessageUseCase: InsertMessageUseCase,
+    private val getMessageByConversationByIdUseCase: GetMessagesByConversationIdUseCase,
+    private val updateConversationModeUseCase: UpdateConversationModeUseCase,
+    private val saveExportSentenceUseCase: SaveExportSentenceUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -48,22 +66,39 @@ class ChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val botReply = ChatMessage("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
-            val updatedChat = _state.value.chatList + botReply
-            _state.update { it.copy(chatList = updatedChat, isLoading = false) }
+            val id = conversationIdDataStore.getRecentConversationId()
+            initConversation(id)
         }
     }
 
     private fun sendMessage(message: String) {
-        val currentChat = _state.value.chatList + ChatMessage(message, SenderType.USER)
+        val currentChat = _state.value.chatList + ChatMessageModel(message, SenderType.USER)
         _state.update { it.copy(chatList = currentChat, input = "", isLoading = true) }
 
         viewModelScope.launch {
-            delay(1000)
+            val conversationId = _state.value.chatId ?: return@launch
 
-            val botReply = ChatMessage("안녕하세요! 무엇을 도와드릴까요?", SenderType.BOT)
-            val updatedChat = _state.value.chatList + botReply
-            _state.update { it.copy(chatList = updatedChat, isLoading = false) }
+            val userMessageData = ChatMessageModel(
+                text = message,
+                sender = SenderType.USER
+            ).toMessageData(conversationId)
+            insertMessageUseCase(userMessageData)
+
+            val conversation = getConversationByIdUseCase(conversationId) ?: return@launch
+            val messages = getMessageByConversationByIdUseCase(conversationId)
+
+            val state = ChatStateData(
+                mode = conversation.mode,
+                selectedLocation = conversation.selectedLocation,
+                selectedScenario = conversation.selectedScenario,
+                messages = messages.toChatMessageDataList()
+            )
+
+            postChat(
+                userInput = message,
+                state = state,
+                conversationId = conversationId
+            )
         }
     }
 
@@ -87,6 +122,107 @@ class ChatViewModel @Inject constructor(
                 } else {
                     _state.update { it.copy(isVoiced = true) }
                 }
+            }
+        }
+    }
+
+    private fun updateChatMessageAt(index: Int, update: (ChatMessageModel) -> ChatMessageModel) {
+        _state.update { currentState ->
+            val updatedList = currentState.chatList.toMutableList()
+            val original = updatedList.getOrNull(index)
+
+            if (original != null) {
+                updatedList[index] = update(original)
+            }
+
+            currentState.copy(chatList = updatedList)
+        }
+    }
+
+    fun initConversation(conversationId: Long?) {
+        Timber.tag("POST_CHAT_STATE").d("conversationId: $conversationId")
+
+        if (conversationId == null) {
+            _state.update { it.copy(isInitialized = true) }
+
+            return
+        }
+
+        viewModelScope.launch {
+            val conversation = getConversationByIdUseCase(conversationId)
+
+            if (conversation == null) {
+                _errorMessage.value = "❌ 대화 정보를 불러올 수 없습니다."
+                _state.update { it.copy(isInitialized = true) }
+                return@launch
+            }
+
+            val messages = getMessageByConversationByIdUseCase(conversationId).toChatMessageModelList()
+
+            val isScenarioInitialized = messages.isNotEmpty()
+
+            _state.update {
+                it.copy(
+                    chatId = conversationId,
+                    chatList = messages,
+                    title = conversation.selectedScenario,
+                    isInitialized = isScenarioInitialized
+                )
+            }
+
+            if (!isScenarioInitialized) {
+                postChat(
+                    userInput = conversation.selectedScenario,
+                    state = ChatStateData(
+                        mode = conversation.mode,
+                        selectedLocation = conversation.selectedLocation,
+                        selectedScenario = conversation.selectedScenario,
+                        messages = emptyList()
+                    ),
+                    conversationId = conversationId
+                )
+            } else {
+                _state.update { it.copy(isInitialized = true) }
+            }
+        }
+    }
+
+    private fun postChat(
+        userInput: String,
+        state: ChatStateData,
+        conversationId: Long
+    ) {
+        viewModelScope.launch {
+            chatUseCase(
+                userInput = userInput,
+                state = state
+            ).onSuccess { chatData ->
+                val messageDb = getMessageByConversationByIdUseCase(conversationId)
+
+                if (messageDb.isEmpty()) {
+                    chatData.state.messages.firstOrNull { it.role == "system" }?.let { systemMsg ->
+                        insertMessageUseCase(systemMsg.toMessageData(conversationId))
+                    }
+                }
+
+                val assistantMessage = ChatMessageModel(
+                    text = chatData.reply,
+                    sender = SenderType.BOT
+                )
+
+                insertMessageUseCase(assistantMessage.toMessageData(conversationId))
+                updateConversationModeUseCase(conversationId, chatData.state.mode)
+
+                _state.update {
+                    it.copy(
+                        chatList = it.chatList + assistantMessage,
+                        isLoading = false,
+                        isInitialized = true
+                    )
+                }
+            }.onFailure {
+                _errorMessage.value = it.message
+                _state.update { it.copy(isLoading = false, isInitialized = true) }
             }
         }
     }
@@ -212,40 +348,62 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun getTranslate(index: Int, text: String, language: String = "en") {
-        viewModelScope.launch {
-            updateChatMessageAt(index) { it.copy(isTranslating = true, translatedText = null) }
+    fun getTranslate(
+        index: Int,
+        text: String,
+        language: String = "en",
+        isArchive: Boolean = false
+    ) {
+        val currentMessage = _state.value.chatList.getOrNull(index)
 
-            translateUseCase(
-                text = text,
-                language = language
-            )
+        if (currentMessage?.translatedText != null) {
+            if (isArchive) {
+                saveSentence(text, currentMessage.translatedText)
+            } else {
+                toggleTranslationVisibility(index)
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            updateChatMessageAt(index) {
+                it.copy(
+                    isTranslating = true,
+                    translatedText = null,
+                    isTranslationVisible = !isArchive
+                )
+            }
+
+            translateUseCase(text = text, language = language)
                 .onSuccess { translateData ->
                     updateChatMessageAt(index) {
                         it.copy(
                             translatedText = translateData.translatedText,
-                            isTranslating = false
+                            isTranslating = false,
+                            isTranslationVisible = !isArchive
                         )
+                    }
+
+                    if (isArchive) {
+                        saveSentence(text, translateData.translatedText)
                     }
                 }
                 .onFailure {
-                    _errorMessage.value = _errorMessage.toString()
+                    _errorMessage.value = it.message
                     updateChatMessageAt(index) { it.copy(isTranslating = false) }
                 }
         }
     }
 
-    private fun updateChatMessageAt(index: Int, update: (ChatMessage) -> ChatMessage) {
-        _state.update { currentState ->
-            val updatedList = currentState.chatList.toMutableList()
-            val original = updatedList.getOrNull(index)
-
-            if (original != null) {
-                updatedList[index] = update(original)
-            }
-
-            currentState.copy(chatList = updatedList)
+    fun saveSentence(sentence: String, translation: String) {
+        viewModelScope.launch {
+            saveExportSentenceUseCase(sentence, translation)
+            _sideEffect.emit(ChatSideEffect.ShowToast(""))
         }
+    }
+
+    fun toggleTranslationVisibility(index: Int) {
+        updateChatMessageAt(index) { it.copy(isTranslationVisible = !it.isTranslationVisible) }
     }
 
     fun clearToastErrorMessage() {

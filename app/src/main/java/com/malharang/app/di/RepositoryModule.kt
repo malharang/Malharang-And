@@ -1,12 +1,18 @@
 package com.malharang.app.di
 
-import com.malharang.app.data.repositoryimpl.DummyRepositoryImpl
+import com.malharang.app.data.repositoryimpl.ChatRepositoryImpl
+import com.malharang.app.data.repositoryimpl.ConversationRepositoryImpl
+import com.malharang.app.data.repositoryimpl.ExportSentenceRepositoryImpl
+import com.malharang.app.data.repositoryimpl.MessageRepositoryImpl
 import com.malharang.app.data.repositoryimpl.PlaceTypeRepositoryImpl
 import com.malharang.app.data.repositoryimpl.ScenarioRepositoryImpl
 import com.malharang.app.data.repositoryimpl.SpeechRepositoryImpl
-import com.malharang.app.domain.repository.DummyRepository
-import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.data.repositoryimpl.TranslateRepositoryImpl
+import com.malharang.app.domain.repository.ChatRepository
+import com.malharang.app.domain.repository.ConversationRepository
+import com.malharang.app.domain.repository.ExportSentenceRepository
+import com.malharang.app.domain.repository.MessageRepository
+import com.malharang.app.domain.repository.PlaceTypeRepository
 import com.malharang.app.domain.repository.ScenarioRepository
 import com.malharang.app.domain.repository.SpeechRepository
 import com.malharang.app.domain.repository.TranslateRepository
@@ -19,10 +25,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    @Binds
-    @Singleton
-    abstract fun bindDummyRepository(dummyRepositoryImpl: DummyRepositoryImpl): DummyRepository
-
     @Binds
     @Singleton
     abstract fun bindPlaceTypeRepository(placeTypeRepositoryImpl: PlaceTypeRepositoryImpl): PlaceTypeRepository
@@ -38,4 +40,26 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindScenarioRepository(scenarioRepositoryImpl: ScenarioRepositoryImpl): ScenarioRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(chatRepositoryImpl: ChatRepositoryImpl): ChatRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindConversationRepository(
+        conversationRepositoryImpl: ConversationRepositoryImpl
+    ): ConversationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMessageRepository(
+        messageRepositoryImpl: MessageRepositoryImpl
+    ): MessageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindExportSentenceRepository(
+        exportSentenceRepositoryImpl: ExportSentenceRepositoryImpl
+    ): ExportSentenceRepository
 }
