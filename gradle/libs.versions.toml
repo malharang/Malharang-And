@@ -55,6 +55,7 @@ startup = "1.1.1"
 
 # Room
 room = "2.7.2"
+navigationComposeAndroid = "2.9.1"
 
 [libraries]
 # Core
@@ -120,6 +121,7 @@ startup = { group = "androidx.startup", name = "startup-runtime", version.ref = 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-navigation-compose-android = { group = "androidx.navigation", name = "navigation-compose-android", version.ref = "navigationComposeAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

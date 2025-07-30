@@ -20,6 +20,9 @@ sealed interface HomeRoute {
     @Serializable
     data object PlaceType : HomeRoute
 
+    @Serializable
+    data object Goal : HomeRoute
+
 }
 
 sealed interface QuizRoute {
@@ -41,5 +44,4 @@ sealed interface QuizRoute {
     data class QuizResult(
         val countResult: String,
     ): QuizRoute
-    data object Goal : HomeRoute
 }

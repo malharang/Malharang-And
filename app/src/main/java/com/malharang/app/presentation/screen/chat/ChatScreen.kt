@@ -126,11 +126,10 @@ fun ChatRoute(
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
         navigateToQuizStart = navigateToQuizStart,
-        onTranslateClick = { index, text -> viewModel.getTranslate(index, text) }
         onTranslateClick = { index, text, isBookmark ->
             viewModel.getTranslate(index = index, text = text, isArchive = isBookmark)
         },
-        onVoiceClick = viewModel::postTextToSpeech
+        onVoiceClick = viewModel::postTextToSpeech,
     )
 }
 
@@ -144,7 +143,6 @@ private fun ChatScreen(
     onIntent: (ChatIntent) -> Unit,
     onTranslateClick: (Int, String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
     onBackClick: () -> Unit = {},
     navigateToQuizStart: () -> Unit = {},
     missionDescription: String = "How to Order at a Coffe Shop"

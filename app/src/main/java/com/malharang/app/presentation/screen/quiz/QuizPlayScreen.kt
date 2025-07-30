@@ -1,21 +1,27 @@
 package com.malharang.app.presentation.screen.quiz
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,9 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.malharang.app.presentation.model.QuizQuestionModel
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.malharang.app.R
 import com.malharang.app.ui.theme.MalHaRangTheme
 
 @Composable
@@ -35,21 +45,22 @@ fun QuizPlayRoute(
     scenarioId: Int,
     type: String,
     navigateToQuizResult: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: QuizViewModel = hiltViewModel()
 ) {
-    val quizList = remember {
-        listOf(
-            QuizQuestionModel(
-                question = "커피는 영어로?",
-                options = listOf("Water", "Tea", "Coffee"),
-                answer = "Coffee"
-            ),
-            QuizQuestionModel(
-                question = "화장실은 영어로?",
-                options = listOf("Toilet", "Kitchen", "Library"),
-                answer = "Toilet"
-            )
-        )
+    // 최초 한 번 메시지 + 퀴즈 로딩
+    LaunchedEffect(Unit) {
+        viewModel.loadMessages(scenarioId.toLong(), type)
+    }
+
+    val quizList by viewModel.quizList.collectAsState()
+
+    // 👉 초기 로딩 중이면 스켈레톤 or 로딩 처리
+    if (quizList.isEmpty()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Quiz loading...")
+        }
+        return
     }
 
     var currentIndex by remember { mutableIntStateOf(0) }
@@ -83,7 +94,8 @@ fun QuizPlayRoute(
                 selectedAnswer = null
                 isCorrect = null
             }
-        }
+        },
+        onBackClick = onBackClick
     )
 }
 
@@ -97,51 +109,75 @@ fun QuizPlayScreen(
     selectedAnswer: String?,
     onAnswerSelected: (String) -> Unit,
     onNextClick: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFE6F0FA)) // 연한 하늘색
+            .background(Color(0xFFE6F0FA)) // light sky blue
             .padding(padding)
             .padding(horizontal = 24.dp)
     ) {
-        if (isSubmitted) {
-            // 전체 화면: 정답 피드백만
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 🔙 Header Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = if (isCorrect == true) "✅ 정답입니다!" else "❌ 오답입니다.",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = if (isCorrect == true) Color(0xFF2E7D32) else Color(0xFFD32F2F)
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_place_type_arrow_back_24),
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .clickable { onBackClick() }
+                        .padding(end = 12.dp)
+                        .size(24.dp)
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-                Button(
-                    onClick = onNextClick,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("다음 문제")
-                }
+                Text(
+                    text = "Quiz",
+                    style = MalHaRangTheme.typography.bodyMediumBold,
+                    fontSize = 24.sp
+                )
             }
-        } else {
-            // 문제와 보기 표시
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(60.dp))
 
+            Spacer(modifier = Modifier.height(48.dp))
+
+            if (isSubmitted) {
+                // ✅ Submitted: Show result
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (isCorrect == true) "✅ Correct!" else "❌ Wrong!",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = if (isCorrect == true) Color(0xFF2E7D32) else Color(0xFFD32F2F)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = onNextClick,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Next")
+                    }
+                }
+            } else {
+                // ❓ Quiz mode
                 Text(
                     text = question,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black,
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
@@ -167,6 +203,7 @@ fun QuizPlayScreen(
     }
 }
 
+
 @Preview
 @Composable
 private fun QuizPlayScreenPreview() {
@@ -180,6 +217,7 @@ private fun QuizPlayScreenPreview() {
             selectedAnswer = null,
             onAnswerSelected = {},
             onNextClick = {},
+            onBackClick = {}
         )
     }
 }

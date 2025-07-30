@@ -55,6 +55,7 @@ fun MainNavHost(
 
             missionNavGraph(
                 padding = padding,
+                navController = navigator.navController,
                 navigateToChat = {
                     val navOptions = navOptions {
                         popUpTo(MainTab.CHAT.route) {
@@ -64,11 +65,8 @@ fun MainNavHost(
                         restoreState = true
                     }
                     navigator.navController.navigateToChat(navOptions)
-                }
+                },
             )
-            missionNavGraph(
-                padding,
-                navController = navigator.navController)
 
             profileNavGraph(padding)
 

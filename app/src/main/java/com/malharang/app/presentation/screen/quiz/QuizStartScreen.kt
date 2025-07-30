@@ -1,45 +1,67 @@
 package com.malharang.app.presentation.screen.quiz
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun QuizStartRoute(
     padding: PaddingValues,
-    navigateToQuizType: (Int) -> Unit,
+    navigateToQuizType: (Long?) -> Unit,
     onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: QuizViewModel = hiltViewModel()
 ) {
+    val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
+    val isInitialized = remember { mutableStateOf(false) }
 
-    val scenarioList = listOf(
-        "Scenario 1",
-        "Scenario 2",
-        "Scenario 3",
-    )
+    LaunchedEffect(key1 = true) {
+        if (!isInitialized.value) {
+            viewModel.getFinishedConversations()
+            isInitialized.value = true
+        }
+    }
+
 
     QuizStartScreen(
         padding = padding,
-        scenarioList = scenarioList,
+        scenarioList = reviewMissions,
         onScenarioSelected = { scenarioId -> navigateToQuizType(scenarioId) },
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        modifier = modifier,
     )
 }
 
 @Composable
 fun QuizStartScreen(
     padding: PaddingValues,
-    scenarioList: List<String>, // TODO: 전체 종료된 시나리오 바탕으로 선택되 시나리오 변경 해야할듯?
-    onScenarioSelected: (Int) -> Unit,
+    scenarioList: List<MissionCardModel>,
+    onScenarioSelected: (Long?) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -51,18 +73,51 @@ fun QuizStartScreen(
             .padding(20.dp)
     ) {
         Text(
-            "시나리오를 선택하는 화면" +
-                    "" +
-                    "여기서 시나리오를 선택해서 " +
-                    "onScenarioSelected 콜백을 호출해" +
-                    "선택된 시나리오 아이디를 넘겨줘야함"
+            text = "Choose a scenario to start the quiz",
+            style = MalHaRangTheme.typography.bodyMediumBold,
         )
 
-        Button(
-            onClick = { onScenarioSelected(2) }
-        ) { Text("타입 선택하기") }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        scenarioList.forEachIndexed { index, scenario ->
+            ScenarioCard(
+                scenarioTitle = scenario.title,
+                onClick = { onScenarioSelected(scenario.conversationId) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+        }
     }
 }
+
+@Composable
+fun ScenarioCard(
+    scenarioTitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(Color.White, shape = RoundedCornerShape(8.dp))
+            .clickable { onClick() }
+            .border(
+                width = 1.dp,
+                color = colors.green, // 말하랑의 테마 색상
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(
+            text = scenarioTitle,
+            style = MalHaRangTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Medium,
+                color = colors.black
+            )
+        )
+    }
+}
+
 
 @Preview
 @Composable
@@ -70,7 +125,7 @@ private fun QuizStartScreenPreview() {
     MalHaRangTheme {
         QuizStartScreen(
             padding = PaddingValues(),
-            scenarioList = listOf("Scenario 1", "Scenario 2", "Scenario 3"),
+            scenarioList = listOf(),
             onScenarioSelected = {},
             onBackClick = {},
         )

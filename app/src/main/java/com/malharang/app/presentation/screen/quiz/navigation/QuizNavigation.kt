@@ -30,7 +30,8 @@ fun NavGraphBuilder.quizNavGraph(
         QuizStartRoute(
             padding = padding,
             navigateToQuizType = {
-                navController.navigateToQuiz(QuizRoute.QuizType(scenarioId = 123))
+                navController.navigateToQuiz(
+                    QuizRoute.QuizType(scenarioId = 123))
             },
             onBackClick = {
                 navController.popBackStack()
