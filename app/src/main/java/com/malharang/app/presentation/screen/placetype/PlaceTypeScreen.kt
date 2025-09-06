@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,7 +47,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun PlaceTypeRoute(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     onHomeNavigate: (String) -> Unit,
     onBackButtonClick: () -> Unit,
     viewModel: PlaceTypeViewModel = hiltViewModel()
@@ -65,7 +64,7 @@ fun PlaceTypeRoute(
     }
 
     PlaceTypeScreen(
-        padding = padding,
+        modifier = modifier,
         query = query,
         onQueryChange = viewModel::updateQuery,
         searchResult = searchResult,
@@ -79,7 +78,7 @@ fun PlaceTypeRoute(
 
 @Composable
 fun PlaceTypeScreen(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     query: String,
     onQueryChange: (String) -> Unit,
     searchResult: List<String>,
@@ -90,10 +89,9 @@ fun PlaceTypeScreen(
     onBackButtonClick: () -> Unit
 ) {
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .background(colors.white)
-            .padding(padding)
     ) {
         Row(
             modifier = Modifier
@@ -330,15 +328,14 @@ fun PlaceTypePill(
 private fun PreviewPlaceTypeScreen() {
     MalHaRangTheme {
         PlaceTypeScreen(
-            padding = TODO(),
-            query = TODO(),
-            onQueryChange = TODO(),
-            searchResult = TODO(),
-            recentTypes = TODO(),
-            selectedType = TODO(),
-            onTypeSelected = TODO(),
-            onHomeButtonClick = TODO(),
-            onBackButtonClick = TODO()
+            query = "cafe",
+            onQueryChange = {},
+            searchResult = listOf("cafe", "restaurant", "bar"),
+            recentTypes = listOf("museum", "park"),
+            selectedType = "cafe",
+            onTypeSelected = {},
+            onHomeButtonClick = {},
+            onBackButtonClick = {}
         )
     }
 }

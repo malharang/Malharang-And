@@ -37,25 +37,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.malharang.app.R
+import com.malharang.app.presentation.screen.quiz.model.QuizType
 import com.malharang.app.ui.theme.MalHaRangTheme
 
 @Composable
 fun QuizPlayRoute(
-    padding: PaddingValues,
-    scenarioId: Int,
-    type: String,
-    navigateToQuizResult: (String) -> Unit,
-    onBackClick: () -> Unit,
-    viewModel: QuizViewModel = hiltViewModel()
+    navigateToUp: () -> Unit,
+    navigateToQuizResult: () -> Unit,
+    viewModel: QuizViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    // 최초 한 번 메시지 + 퀴즈 로딩
-    LaunchedEffect(Unit) {
-        viewModel.loadMessages(scenarioId.toLong(), type)
-    }
-
+    val state by viewModel.state.collectAsState()
     val quizList by viewModel.quizList.collectAsState()
 
-    // 👉 초기 로딩 중이면 스켈레톤 or 로딩 처리
+    // 최초 한 번 메시지 + 퀴즈 로딩
+    LaunchedEffect(state.selectedScenarioId, state.quizType) {
+        if (state.selectedScenarioId != null && state.quizType != null) {
+            val quizTypeString = when(state.quizType) {
+                QuizType.WORD -> "word"
+                QuizType.SENTENCE -> "sentence"
+                null -> return@LaunchedEffect
+            }
+            val scenarioId = state.selectedScenarioId ?: return@LaunchedEffect
+            viewModel.loadMessages(scenarioId.toLong(), quizTypeString)
+        }
+    }
+
     if (quizList.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Quiz loading...")
@@ -72,7 +79,6 @@ fun QuizPlayRoute(
     val current = quizList[currentIndex]
 
     QuizPlayScreen(
-        padding = padding,
         question = current.question,
         options = current.options,
         isSubmitted = submitted,
@@ -86,8 +92,7 @@ fun QuizPlayRoute(
         },
         onNextClick = {
             if (currentIndex == quizList.lastIndex) {
-                val result = "$correctCount / ${quizList.size}"
-                navigateToQuizResult(result)
+                navigateToQuizResult()
             } else {
                 currentIndex++
                 submitted = false
@@ -95,13 +100,13 @@ fun QuizPlayRoute(
                 isCorrect = null
             }
         },
-        onBackClick = onBackClick
+        onBackClick = navigateToUp,
+        modifier = modifier,
     )
 }
 
 @Composable
 fun QuizPlayScreen(
-    padding: PaddingValues,
     question: String,
     options: List<String>,
     isSubmitted: Boolean,
@@ -115,12 +120,12 @@ fun QuizPlayScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFE6F0FA)) // light sky blue
-            .padding(padding)
-            .padding(horizontal = 24.dp)
+            .background(Color(0xFFE6F0FA))
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
@@ -209,7 +214,6 @@ fun QuizPlayScreen(
 private fun QuizPlayScreenPreview() {
     MalHaRangTheme {
         QuizPlayScreen(
-            padding = PaddingValues(),
             question = "커피는 영어로?",
             options = listOf("Water", "Tea", "Coffee"),
             isSubmitted = false,

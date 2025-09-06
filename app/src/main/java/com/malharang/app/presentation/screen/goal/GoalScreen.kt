@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +37,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun GoalRoute(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onConfirmClick: (String) -> Unit,
     viewModel: GoalViewModel = hiltViewModel()
@@ -46,7 +45,7 @@ fun GoalRoute(
     val query by viewModel.query.collectAsState()
 
     GoalScreen(
-        padding = padding,
+        modifier = modifier,
         query = query,
         onQueryChange = viewModel::updateQuery,
         onBackClick = onBackClick,
@@ -59,18 +58,17 @@ fun GoalRoute(
 
 @Composable
 fun GoalScreen(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     query: String,
     onQueryChange: (String) -> Unit,
     onConfirmClick: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .background(colors.white)
             .imePadding()
-            .padding(padding)
     ) {
         Row(
             modifier = Modifier
@@ -154,7 +152,6 @@ fun GoalScreen(
 private fun GoalScreenPreview() {
     MalHaRangTheme {
         GoalScreen(
-            padding = PaddingValues(0.dp),
             query = "",
             onQueryChange = {},
             onConfirmClick = {},

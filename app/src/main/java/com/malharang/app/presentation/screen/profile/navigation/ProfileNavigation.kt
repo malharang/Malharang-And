@@ -1,6 +1,6 @@
 package com.malharang.app.presentation.screen.profile.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,9 +13,9 @@ fun NavController.navigateToProfile(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.profileNavGraph(
-    padding: PaddingValues
+    modifier: Modifier = Modifier
 ) {
     composable<MainTabRoute.Profile> {
-        ProfileRoute(padding = padding)
+        ProfileRoute(modifier = modifier)
     }
 }

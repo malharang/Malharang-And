@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.ui.theme.MalHaRangTheme
@@ -31,11 +30,10 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun QuizStartRoute(
-    padding: PaddingValues,
-    navigateToQuizType: (Long?) -> Unit,
-    onBackClick: () -> Unit,
+    navigateToUp: () -> Unit,
+    navigateToQuizType: () -> Unit,
+    viewModel: QuizViewModel,
     modifier: Modifier = Modifier,
-    viewModel: QuizViewModel = hiltViewModel()
 ) {
     val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
     val isInitialized = remember { mutableStateOf(false) }
@@ -47,34 +45,33 @@ fun QuizStartRoute(
         }
     }
 
-
     QuizStartScreen(
-        padding = padding,
         scenarioList = reviewMissions,
-        onScenarioSelected = { scenarioId -> navigateToQuizType(scenarioId) },
-        onBackClick = onBackClick,
+        onScenarioSelected = { selectedMission ->
+            viewModel.selectScenario(selectedMission.conversationId?.toInt() ?: 0)
+            navigateToQuizType()
+        },
+        onBackClick = navigateToUp,
         modifier = modifier,
     )
 }
 
 @Composable
 fun QuizStartScreen(
-    padding: PaddingValues,
     scenarioList: List<MissionCardModel>,
-    onScenarioSelected: (Long?) -> Unit,
+    onScenarioSelected: (MissionCardModel) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .padding(padding)
             .fillMaxSize()
             .background(colors.white)
-            .padding(20.dp)
     ) {
         Text(
             text = "Choose a scenario to start the quiz",
             style = MalHaRangTheme.typography.bodyMediumBold,
+            modifier = Modifier.padding(20.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -82,10 +79,10 @@ fun QuizStartScreen(
         scenarioList.forEachIndexed { index, scenario ->
             ScenarioCard(
                 scenarioTitle = scenario.title,
-                onClick = { onScenarioSelected(scenario.conversationId) },
+                onClick = { onScenarioSelected(scenario) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
             )
         }
     }
@@ -124,7 +121,6 @@ fun ScenarioCard(
 private fun QuizStartScreenPreview() {
     MalHaRangTheme {
         QuizStartScreen(
-            padding = PaddingValues(),
             scenarioList = listOf(),
             onScenarioSelected = {},
             onBackClick = {},

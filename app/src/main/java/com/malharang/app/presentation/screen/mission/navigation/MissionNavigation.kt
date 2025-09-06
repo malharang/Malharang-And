@@ -1,6 +1,6 @@
 package com.malharang.app.presentation.screen.mission.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -14,13 +14,13 @@ fun NavController.navigateToMission(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.missionNavGraph(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     navigateToChat: () -> Unit,
     navController: NavController
 ) {
     composable<MainTabRoute.Mission> {
         MissionRoute(
-            padding = padding,
+            modifier = modifier,
             navigateToQuizStart = { navController.navigateToQuizStart() },
             navigateToChat = navigateToChat,
 

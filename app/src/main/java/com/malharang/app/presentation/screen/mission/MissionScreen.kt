@@ -49,7 +49,7 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionRoute(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     navigateToQuizStart: () -> Unit,
     navigateToChat: () -> Unit,
     viewModel: MissionViewModel = hiltViewModel()
@@ -61,7 +61,7 @@ fun MissionRoute(
     val ttsPlayingId by viewModel.ttsPlayingId.collectAsState()
 
     MissionScreen(
-        padding = padding,
+        modifier = modifier,
         navigateToQuizStart = navigateToQuizStart,
         availableMissions = availableMissions,
         reviewMissions = reviewMissions,
@@ -82,7 +82,7 @@ fun MissionRoute(
 
 @Composable
 private fun MissionScreen(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     availableMissions: List<MissionCardModel>,
     reviewMissions: List<MissionCardModel>,
     exportSentences: List<ExportSentenceData>,
@@ -93,9 +93,8 @@ private fun MissionScreen(
     navigateToQuizStart: () -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(padding)
             .padding(horizontal = 20.dp)
     ) {
 
@@ -245,7 +244,6 @@ private fun PreviewMissionScreen() {
         )
 
         MissionScreen(
-            padding = PaddingValues(),
             exportSentences = emptyList(),
             availableMissions = missionCardList,
             reviewMissions = reviewMissions,

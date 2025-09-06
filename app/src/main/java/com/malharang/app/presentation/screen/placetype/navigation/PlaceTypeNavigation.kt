@@ -1,7 +1,7 @@
 package com.malharang.app.presentation.screen.placetype.navigation
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -16,14 +16,14 @@ fun NavGraphBuilder.placeTypeNavGraph(
     navigateToUp: () -> Unit,
     navigateToHome: () -> Unit,
     navController: NavController,
-    padding: PaddingValues
+    modifier: Modifier = Modifier
 ) {
     composable<HomeRoute.PlaceType> {
         BackHandler {
             navigateToUp()
         }
         PlaceTypeRoute(
-            padding = padding,
+            modifier = modifier,
             onHomeNavigate = { selected ->
                 navController.previousBackStackEntry?.savedStateHandle?.set("selected_place_type", selected)
                 navigateToHome()

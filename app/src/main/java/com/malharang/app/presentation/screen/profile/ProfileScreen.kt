@@ -34,19 +34,19 @@ import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun ProfileRoute(
-    padding: PaddingValues
+    modifier: Modifier = Modifier
 ) {
-    ProfileScreen(padding = padding)
+    ProfileScreen(modifier = modifier)
 }
 
 @Composable
-fun ProfileScreen(padding: PaddingValues) {
+fun ProfileScreen(modifier: Modifier = Modifier) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .background(colors.greenProfileBackgroundTop)
                 .fillMaxSize()
-                .padding(padding),
+                .then(modifier),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             UserStatusBar(
@@ -180,6 +180,6 @@ fun BadgeCard(
 @Composable
 private fun PreviewProfileScreen() {
     MalHaRangTheme {
-        ProfileScreen(padding = PaddingValues())
+        ProfileScreen()
     }
 }

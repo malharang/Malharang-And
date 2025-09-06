@@ -1,7 +1,7 @@
 package com.malharang.app.presentation.screen.goal.navigation
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -16,14 +16,14 @@ fun NavGraphBuilder.goalNavGraph(
     navigateToUp: () -> Unit,
     navigateToHome: () -> Unit,
     navController: NavController,
-    padding: PaddingValues
+    modifier: Modifier = Modifier
 ) {
     composable<HomeRoute.Goal> {
         BackHandler {
             navigateToUp()
         }
         GoalRoute(
-            padding = padding,
+            modifier = modifier,
             onBackClick = navigateToUp,
             onConfirmClick = { selected ->
                 navController.previousBackStackEntry

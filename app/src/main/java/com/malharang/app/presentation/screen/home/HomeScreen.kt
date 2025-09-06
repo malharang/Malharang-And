@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeRoute(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     navigateToPlaceType: () -> Unit,
     navigateToGoal: () -> Unit,
     navigateToChat: () -> Unit,
@@ -131,7 +131,7 @@ fun HomeRoute(
     }
 
     HomeScreen(
-        padding = padding,
+        modifier = modifier,
         context = context,
         userStatusModel = viewModel.userStatusModel,
         onRequestCurrentLocation = {
@@ -175,7 +175,7 @@ fun moveCameraPosition(currentLocation: LatLng?, cameraPositionState: CameraPosi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     context: Context,
     userStatusModel: UserStatusModel,
     cameraPositionState: CameraPositionState,
@@ -201,8 +201,7 @@ private fun HomeScreen(
     }
 
     Column(
-        modifier = Modifier
-            .padding(padding)
+        modifier = modifier
             .fillMaxSize()
     ) {
         UserStatusBar(userStatusModel, modifier = Modifier.padding(top = 5.dp, bottom = 3.dp))
@@ -300,9 +299,10 @@ fun HomeScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewHomeScreen() {
+    val context = LocalContext.current
     MalHaRangTheme {
         HomeScreen(
-            padding = PaddingValues(),
+            context = context,
             userStatusModel = UserStatusModel(
                 profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&siAze=64",
                 name = "Malssi",
@@ -314,8 +314,7 @@ private fun PreviewHomeScreen() {
             navigateToPlaceType = {},
             navigateToGoal = {},
             onGoalRemoveClick = {},
-            onRequestCurrentLocation = {},
-            context = TODO()
+            onRequestCurrentLocation = {}
         )
     }
 }

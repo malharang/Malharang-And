@@ -25,16 +25,18 @@ import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
 @Composable
 fun QuizResultRoute(
-    countResult: String,
+    navigateToUp: () -> Unit,
     navigateToQuizStart: () -> Unit,
     navigateToMission: () -> Unit,
-    onBackClick: () -> Unit
+    viewModel: QuizViewModel,
+    modifier: Modifier = Modifier
 ) {
     QuizResultScreen(
-        countResult = countResult,
+        countResult = "Quiz completed!",
         onRetryClick = navigateToQuizStart,
         onCompleteClick = navigateToMission,
-        onBackClick = onBackClick
+        onBackClick = navigateToUp,
+        modifier = modifier
     )
 }
 
@@ -43,10 +45,11 @@ fun QuizResultScreen(
     countResult: String,
     onRetryClick: () -> Unit,
     onCompleteClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(colors.white)
             .padding(24.dp),
