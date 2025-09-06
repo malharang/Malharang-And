@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -61,7 +60,7 @@ fun MainBottomBar(
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
-                        .height((LocalConfiguration.current.screenHeightDp * 0.091f).dp)
+                        .height(80.dp)
                 ) {
                     tabs.forEach { tab ->
                         MainBottomBarItem(

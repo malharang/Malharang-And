@@ -1,48 +1,36 @@
 package com.malharang.app.presentation.screen.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import okhttp3.internal.toImmutableList
 
 @Composable
 fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator()
-) {
-    MainScreenContent(
-        navigator = navigator
-    )
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun MainScreenContent(
-    modifier: Modifier = Modifier,
-    navigator: MainNavigator
+    navigator: MainNavigator = rememberMainNavigator(),
 ) {
     Scaffold(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize(),
-        content = { padding ->
-            MainNavHost(
-                navigator = navigator,
-                padding = padding
-            )
-        },
         bottomBar = {
             MainBottomBar(
                 modifier = Modifier
-                    .background(color = colors.white)
                     .navigationBarsPadding(),
                 visible = navigator.shouldShowBottomBar(),
-                tabs = MainTab.entries,
+                tabs = MainTab.entries.toImmutableList(),
                 currentTab = navigator.currentTab,
-                onTabSelected = navigator::navigate
+                onTabSelected = navigator::navigate,
             )
-        }
-    )
+        },
+        containerColor = colors.white,
+    ) { innerPadding ->
+        MainNavHost(
+            navigator = navigator,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
 }

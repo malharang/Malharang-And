@@ -9,7 +9,7 @@ import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.mission.MissionRoute
 import com.malharang.app.presentation.screen.quiz.navigation.navigateToQuizStart
 
-fun NavController.navigateToMission(navOptions: NavOptions) {
+fun NavController.navigateToMission(navOptions: NavOptions? = null) {
     navigate(MainTabRoute.Mission, navOptions)
 }
 

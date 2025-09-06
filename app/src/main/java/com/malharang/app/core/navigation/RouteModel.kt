@@ -30,18 +30,11 @@ sealed interface QuizRoute {
     data object QuizStart : QuizRoute
 
     @Serializable
-    data class QuizType(
-        val scenarioId: Int,
-    ): QuizRoute
+    data object QuizType: QuizRoute
 
     @Serializable
-    data class QuizPlay(
-        val scenarioId: Int,
-        val type: String,
-    ): QuizRoute
+    data object QuizPlay: QuizRoute
 
     @Serializable
-    data class QuizResult(
-        val countResult: String,
-    ): QuizRoute
+    data object QuizResult: QuizRoute
 }

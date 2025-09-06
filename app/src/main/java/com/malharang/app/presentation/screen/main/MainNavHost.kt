@@ -1,9 +1,5 @@
 package com.malharang.app.presentation.screen.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -14,96 +10,89 @@ import com.malharang.app.presentation.screen.goal.navigation.goalNavGraph
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
 import com.malharang.app.presentation.screen.home.navigation.navigateToHome
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
+import com.malharang.app.presentation.screen.mission.navigation.navigateToMission
 import com.malharang.app.presentation.screen.placetype.navigation.placeTypeNavGraph
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
 import com.malharang.app.presentation.screen.quiz.navigation.quizNavGraph
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun MainNavHost(
     navigator: MainNavigator,
-    padding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = colors.white)
+    NavHost(
+        navController = navigator.navController,
+        startDestination = navigator.startDestination,
     ) {
-        NavHost(
+        homeNavGraph(
             navController = navigator.navController,
-            startDestination = navigator.startDestination
-        ) {
-            homeNavGraph(
-                padding = padding,
-                navController = navigator.navController,
-                navigateToChat = {
-                    val navOptions = navOptions {
-                        popUpTo(MainTab.CHAT.route) {
-                            inclusive = false
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+            modifier = modifier,
+            navigateToChat = {
+                val navOptions = navOptions {
+                    popUpTo(MainTab.CHAT.route) {
+                        inclusive = false
                     }
-                    navigator.navController.navigateToChat(navOptions)
+                    launchSingleTop = true
+                    restoreState = true
                 }
-            )
+                navigator.navController.navigateToChat(navOptions)
+            }
+        )
 
-            chatNavGraph(
-                navController = navigator.navController
-            )
+        chatNavGraph(
+            navController = navigator.navController
+        )
 
-            missionNavGraph(
-                padding = padding,
-                navController = navigator.navController,
-                navigateToChat = {
-                    val navOptions = navOptions {
-                        popUpTo(MainTab.CHAT.route) {
-                            inclusive = false
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+        missionNavGraph(
+            navController = navigator.navController,
+            navigateToChat = {
+                val navOptions = navOptions {
+                    popUpTo(MainTab.CHAT.route) {
+                        inclusive = false
                     }
-                    navigator.navController.navigateToChat(navOptions)
-                },
-            )
+                    launchSingleTop = true
+                    restoreState = true
+                }
+                navigator.navController.navigateToChat(navOptions)
+            },
+        )
 
-            profileNavGraph(padding)
+        profileNavGraph(modifier)
 
-            placeTypeNavGraph(
-                padding = padding,
-                navigateToUp = navigator::navigateUp,
-                navigateToHome = {
-                    val navOptions = navOptions {
-                        popUpTo(MainTab.HOME.route) {
-                            inclusive = false
-                        }
-                        launchSingleTop = true
+        placeTypeNavGraph(
+            navigateToUp = navigator::navigateUp,
+            navigateToHome = {
+                val navOptions = navOptions {
+                    popUpTo(MainTab.HOME.route) {
+                        inclusive = false
                     }
-                    navigator.navController.navigateToHome(navOptions)
-                },
-                navController = navigator.navController
-            )
+                    launchSingleTop = true
+                }
+                navigator.navController.navigateToHome(navOptions)
+            },
+            navController = navigator.navController
+        )
 
-            goalNavGraph(
-                navController = navigator.navController,
-                navigateToUp = navigator::navigateUp,
-                navigateToHome = {
-                    val navOptions = navOptions {
-                        popUpTo(MainTab.HOME.route) {
-                            inclusive = false
-                        }
-                        launchSingleTop = true
+        goalNavGraph(
+            navController = navigator.navController,
+            navigateToUp = navigator::navigateUp,
+            navigateToHome = {
+                val navOptions = navOptions {
+                    popUpTo(MainTab.HOME.route) {
+                        inclusive = false
                     }
-                    navigator.navController.navigateToHome(navOptions)
-                },
-                padding = padding
-            )
+                    launchSingleTop = true
+                }
+                navigator.navController.navigateToHome(navOptions)
+            },
+            modifier = modifier
+        )
 
-            quizNavGraph(
-                padding = padding,
-                navController = navigator.navController
-            )
-        }
+        quizNavGraph(
+            navController = navigator.navController,
+            navigateToUp = navigator::navigateUp,
+            navigateToMission = navigator.navController::navigateToMission,
+            modifier = modifier,
+        )
     }
 }
