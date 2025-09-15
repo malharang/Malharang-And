@@ -27,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,12 +50,14 @@ import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.component.ChatBottomContents
 import com.malharang.app.presentation.screen.chat.component.ChatBubble
 import com.malharang.app.presentation.screen.chat.component.ChatTopBar
+import com.malharang.app.presentation.screen.chat.component.EvaluationDetailDialog
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatSideEffect
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatUiState
 import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import com.malharang.app.presentation.screen.chat.sideeffect.uiState
+import com.malharang.app.presentation.screen.chat.type.EvaluationState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -147,6 +151,7 @@ private fun ChatScreen(
     navigateToQuiz: () -> Unit = {},
     missionDescription: String = "How to Order at a Coffe Shop"
 ) {
+    var selectedEvaluationData by remember { mutableStateOf<com.malharang.app.domain.model.EvaluationResponseData?>(null) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -230,7 +235,14 @@ private fun ChatScreen(
                             },
                             onVoiceClick = { onVoiceClick(index, chat.text) },
                             isSoundPlaying = chat.isSoundPlaying,
-                            isTranslationVisible = chat.isTranslationVisible
+                            isTranslationVisible = chat.isTranslationVisible,
+                            evaluationState = chat.evaluationState ?: EvaluationState.EMPTY,
+                            evaluationData = chat.evaluationData,
+                            onEvaluationClick = {
+                                chat.evaluationData?.let { evaluationData ->
+                                    selectedEvaluationData = evaluationData
+                                }
+                            }
                         )
                     }
 
@@ -260,6 +272,14 @@ private fun ChatScreen(
                 )
             }
         }
+    }
+
+    // 평가 상세 다이얼로그
+    selectedEvaluationData?.let { evaluationData ->
+        EvaluationDetailDialog(
+            evaluationData = evaluationData,
+            onDismiss = { selectedEvaluationData = null }
+        )
     }
 }
 

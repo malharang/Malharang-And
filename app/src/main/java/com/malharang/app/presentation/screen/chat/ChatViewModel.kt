@@ -7,7 +7,9 @@ import com.malharang.app.domain.mapper.toChatMessageDataList
 import com.malharang.app.domain.mapper.toChatMessageModelList
 import com.malharang.app.domain.mapper.toMessageData
 import com.malharang.app.domain.model.ChatStateData
+import com.malharang.app.domain.model.EvaluationRequestData
 import com.malharang.app.domain.usecase.ChatUseCase
+import com.malharang.app.domain.usecase.EvaluationUseCase
 import com.malharang.app.domain.usecase.GetConversationByIdUseCase
 import com.malharang.app.domain.usecase.GetMessagesByConversationIdUseCase
 import com.malharang.app.domain.usecase.InsertMessageUseCase
@@ -23,6 +25,7 @@ import com.malharang.app.presentation.screen.chat.sideeffect.ChatIntent
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatSideEffect
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.presentation.screen.chat.sideeffect.MicState
+import com.malharang.app.presentation.screen.chat.type.EvaluationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -49,7 +52,8 @@ class ChatViewModel @Inject constructor(
     private val insertMessageUseCase: InsertMessageUseCase,
     private val getMessageByConversationByIdUseCase: GetMessagesByConversationIdUseCase,
     private val updateConversationModeUseCase: UpdateConversationModeUseCase,
-    private val saveExportSentenceUseCase: SaveExportSentenceUseCase
+    private val saveExportSentenceUseCase: SaveExportSentenceUseCase,
+    private val evaluationUseCase: EvaluationUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -220,9 +224,17 @@ class ChatViewModel @Inject constructor(
                         isInitialized = true
                     )
                 }
-            }.onFailure {
-                _errorMessage.value = it.message
-                _state.update { it.copy(isLoading = false, isInitialized = true) }
+
+                // 새로운 응답이 왔을 때 평가 시작
+                fetchEvaluation(conversationId)
+            }.onFailure { error ->
+                _errorMessage.value = error.message
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        isInitialized = true
+                    )
+                }
             }
         }
     }
@@ -388,8 +400,8 @@ class ChatViewModel @Inject constructor(
                         saveSentence(text, translateData.translatedText)
                     }
                 }
-                .onFailure {
-                    _errorMessage.value = it.message
+                .onFailure { error ->
+                    _errorMessage.value = error.message
                     updateChatMessageAt(index) { it.copy(isTranslating = false) }
                 }
         }
@@ -408,5 +420,43 @@ class ChatViewModel @Inject constructor(
 
     fun clearToastErrorMessage() {
         _errorMessage.value = null
+    }
+
+    fun fetchEvaluation(conversationId: Long) {
+        viewModelScope.launch {
+            // 마지막 사용자 메시지의 인덱스 찾기
+            val lastUserMessageIndex = _state.value.chatList.indexOfLast { it.sender == SenderType.USER }
+            if (lastUserMessageIndex == -1) return@launch
+
+            // 마지막 사용자 메시지에 Loading 상태 설정
+            updateChatMessageAt(lastUserMessageIndex) {
+                it.copy(evaluationState = EvaluationState.Loading)
+            }
+
+            evaluationUseCase(
+                EvaluationRequestData(
+                    messages = _state.value.chatList.map { it.toMessageData(conversationId) },
+                ),
+            ).onSuccess { response ->
+                val evaluationState = if (response.data.contextuality.pass) {
+                    EvaluationState.PASS
+                } else {
+                    EvaluationState.NOT_PASS
+                }
+                // 마지막 사용자 메시지에 평가 결과와 데이터 설정
+                updateChatMessageAt(lastUserMessageIndex) {
+                    it.copy(
+                        evaluationState = evaluationState,
+                        evaluationData = response
+                    )
+                }
+            }.onFailure { error ->
+                // 마지막 사용자 메시지에 실패 상태 설정
+                updateChatMessageAt(lastUserMessageIndex) {
+                    it.copy(evaluationState = EvaluationState.NOT_PASS)
+                }
+                _errorMessage.value = error.message
+            }
+        }
     }
 }

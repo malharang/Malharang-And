@@ -2,6 +2,7 @@ package com.malharang.app.di
 
 import com.malharang.app.data.repositoryimpl.ChatRepositoryImpl
 import com.malharang.app.data.repositoryimpl.ConversationRepositoryImpl
+import com.malharang.app.data.repositoryimpl.EvaluationRepositoryImpl
 import com.malharang.app.data.repositoryimpl.ExportSentenceRepositoryImpl
 import com.malharang.app.data.repositoryimpl.MessageRepositoryImpl
 import com.malharang.app.data.repositoryimpl.PlaceTypeRepositoryImpl
@@ -11,6 +12,7 @@ import com.malharang.app.data.repositoryimpl.SpeechRepositoryImpl
 import com.malharang.app.data.repositoryimpl.TranslateRepositoryImpl
 import com.malharang.app.domain.repository.ChatRepository
 import com.malharang.app.domain.repository.ConversationRepository
+import com.malharang.app.domain.repository.EvaluationRepository
 import com.malharang.app.domain.repository.ExportSentenceRepository
 import com.malharang.app.domain.repository.MessageRepository
 import com.malharang.app.domain.repository.PlaceTypeRepository
@@ -70,4 +72,10 @@ abstract class RepositoryModule {
     abstract fun bindQuizRepository(
         quizRepositoryImpl: QuizRepositoryImpl
     ): QuizRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEvaluationRepository(
+        evaluationRepositoryImpl: EvaluationRepositoryImpl
+    ): EvaluationRepository
 }

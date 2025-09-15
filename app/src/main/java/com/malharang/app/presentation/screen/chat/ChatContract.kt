@@ -15,7 +15,7 @@ class ChatContract {
         val isSpeaking: Boolean = false,
         val errorMessage: String? = null,
         val conversationId: Long? = null,
-        val isTyping: Boolean = false
+        val isTyping: Boolean = false,
     )
 
     sealed interface ChatSideEffect {
