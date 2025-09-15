@@ -68,7 +68,7 @@ fun ChatBottomContents(
             ChatTextField(
                 chat = chat,
                 onTextChanged = onTextChanged,
-                onSendClick = onSendClick,
+                onSendClick = onSendClick
             )
         } else {
             Row(

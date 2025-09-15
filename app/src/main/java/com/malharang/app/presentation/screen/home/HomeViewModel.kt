@@ -228,7 +228,7 @@ class HomeViewModel @Inject constructor(
                 val existingConversations = getAllConversationsUseCase()
                 val existingConversation = existingConversations.find { conversation ->
                     conversation.selectedScenario == scenarioTitle &&
-                            conversation.mode != "finished"
+                        conversation.mode != "finished"
                 }
 
                 if (existingConversation != null) {
