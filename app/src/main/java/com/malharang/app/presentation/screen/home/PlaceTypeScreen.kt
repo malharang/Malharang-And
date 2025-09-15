@@ -1,4 +1,4 @@
-package com.malharang.app.presentation.screen.placetype
+package com.malharang.app.presentation.screen.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -29,18 +29,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.R
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
@@ -48,31 +46,32 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 @Composable
 fun PlaceTypeRoute(
     modifier: Modifier = Modifier,
-    onHomeNavigate: (String) -> Unit,
-    onBackButtonClick: () -> Unit,
-    viewModel: PlaceTypeViewModel = hiltViewModel()
+    navigateToUp: () -> Unit,
+    viewModel: HomeViewModel,
 ) {
-    val query by viewModel.query.collectAsState()
-    val searchResult by viewModel.searchResult.collectAsState()
-    val recentTypes by viewModel.recentTypes.collectAsState()
-    val selectedType by viewModel.selectedType.collectAsState()
-
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val query = uiState.placeTypeQuery
+    val searchResult = uiState.placeTypeSearchResult
+    val recentTypes = uiState.recentPlaceTypes
+    val selectedType = uiState.selectedPlaceType
 
     LaunchedEffect(Unit) {
-        viewModel.initPlaceTypes(context)
+        viewModel.initPlaceTypes()
     }
 
     PlaceTypeScreen(
         modifier = modifier,
         query = query,
-        onQueryChange = viewModel::updateQuery,
+        onQueryChange = viewModel::updatePlaceTypeQuery,
         searchResult = searchResult,
         recentTypes = recentTypes,
         selectedType = selectedType,
         onTypeSelected = viewModel::selectPlaceType,
-        onHomeButtonClick = onHomeNavigate,
-        onBackButtonClick = onBackButtonClick
+        onBackClick = navigateToUp,
+        onConfirmClick = {
+            viewModel.clearPlaceTypeQuery()
+            navigateToUp()
+        }
     )
 }
 
@@ -85,8 +84,8 @@ fun PlaceTypeScreen(
     recentTypes: List<String>,
     selectedType: String?,
     onTypeSelected: (String) -> Unit,
-    onHomeButtonClick: (String) -> Unit,
-    onBackButtonClick: () -> Unit
+    onBackClick: () -> Unit,
+    onConfirmClick: () -> Unit
 ) {
     Column(
         modifier
@@ -99,7 +98,7 @@ fun PlaceTypeScreen(
                 .padding(start = 8.dp, end = 20.dp, top = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackButtonClick) {
+            IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_place_type_arrow_back_24),
                     contentDescription = "뒤로가기",
@@ -281,7 +280,7 @@ fun PlaceTypeScreen(
                         .height(48.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(colors.greenDark)
-                        .clickable { onHomeButtonClick(selectedType) },
+                        .clickable { onConfirmClick() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -334,8 +333,8 @@ private fun PreviewPlaceTypeScreen() {
             recentTypes = listOf("museum", "park"),
             selectedType = "cafe",
             onTypeSelected = {},
-            onHomeButtonClick = {},
-            onBackButtonClick = {}
+            onBackClick = {},
+            onConfirmClick = {}
         )
     }
 }

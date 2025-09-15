@@ -12,14 +12,12 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.presentation.screen.chat.navigation.Chat
 import com.malharang.app.presentation.screen.chat.navigation.chatNavGraph
 import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
-import com.malharang.app.presentation.screen.home.navigation.Home
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
-import com.malharang.app.presentation.screen.home.navigation.navigateToHome
+import com.malharang.app.presentation.screen.home.navigation.navigateToGoal
+import com.malharang.app.presentation.screen.home.navigation.navigateToPlaceType
 import com.malharang.app.presentation.screen.main.component.MainBottomBar
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
 import com.malharang.app.presentation.screen.mission.navigation.navigateToMission
-import com.malharang.app.presentation.screen.placetype.navigation.navigateToPlaceType
-import com.malharang.app.presentation.screen.placetype.navigation.placeTypeNavGraph
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
 import com.malharang.app.presentation.screen.quiz.navigation.navigateToQuiz
 import com.malharang.app.presentation.screen.quiz.navigation.quizNavGraph
@@ -64,6 +62,7 @@ private fun MainNavHost(
             navController = navigator.navController,
             navigateToChat = navigator.navController::navigateToChat,
             navigateToPlaceType = navigator.navController::navigateToPlaceType,
+            navigateToGoal = navigator.navController::navigateToGoal,
             navigateToUp = navigator::navigateUp,
             modifier = modifier,
         )
@@ -88,19 +87,6 @@ private fun MainNavHost(
         profileNavGraph(
             modifier,
         )
-
-        placeTypeNavGraph(
-            navigateToUp = navigator::navigateUp,
-            navigateToHome = {
-                navigator.navController.navigateToHome(navOptions = navOptions {
-                    popUpTo<Home> {
-                        inclusive = true
-                    }
-                })
-            },
-            navController = navigator.navController,
-        )
-
 
         quizNavGraph(
             navController = navigator.navController,

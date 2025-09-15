@@ -17,6 +17,10 @@ class HomeContract {
         val errorMessage: String? = null,
         val isLoading: Boolean = false,
         val goalQuery: String = "",
+        val placeTypeQuery: String = "",
+        val selectedPlaceType: String? = null,
+        val recentPlaceTypes: List<String> = emptyList(),
+        val placeTypeSearchResult: List<String> = emptyList(),
         val userStatusModel: UserStatusModel = UserStatusModel(
             profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
             name = "Malssi",

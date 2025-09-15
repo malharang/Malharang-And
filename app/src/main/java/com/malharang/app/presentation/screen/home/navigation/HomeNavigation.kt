@@ -1,6 +1,5 @@
 package com.malharang.app.presentation.screen.home.navigation
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -13,6 +12,7 @@ import com.malharang.app.core.common.navigation.Route
 import com.malharang.app.core.util.sharedViewModel
 import com.malharang.app.presentation.screen.home.GoalRoute
 import com.malharang.app.presentation.screen.home.HomeViewModel
+import com.malharang.app.presentation.screen.home.PlaceTypeRoute
 import kotlinx.serialization.Serializable
 import com.malharang.app.presentation.screen.home.HomeRoute as HomeScreenRoute
 
@@ -23,10 +23,14 @@ fun NavController.navigateToHome(
 fun NavController.navigateToGoal(navOptions: NavOptions? = null) =
     navigate(Goal, navOptions)
 
+fun NavController.navigateToPlaceType(navOptions: NavOptions? = null) =
+    navigate(PlaceType, navOptions)
+
 fun NavGraphBuilder.homeNavGraph(
     navController: NavHostController,
     navigateToChat: () -> Unit,
     navigateToPlaceType: () -> Unit,
+    navigateToGoal: () -> Unit,
     navigateToUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -35,31 +39,32 @@ fun NavGraphBuilder.homeNavGraph(
     ) {
         composable<HomeMain> { backStackEntry ->
             val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
-            val savedStateHandle = backStackEntry.savedStateHandle
-
-            val selectedPlaceType = savedStateHandle.get<String>("selected_place_type")
-            val selectedGoal = savedStateHandle.get<String>("selected_goal")
 
             HomeScreenRoute(
-                modifier = modifier,
                 navigateToPlaceType = navigateToPlaceType,
-                navigateToGoal = navController::navigateToGoal,
+                navigateToGoal = navigateToGoal,
                 navigateToChat = navigateToChat,
+                modifier = modifier,
                 viewModel = viewModel,
             )
-
-            LaunchedEffect(Unit) {
-                savedStateHandle.remove<String>("selected_place_type")
-                savedStateHandle.remove<String>("selected_goal")
-            }
         }
 
         composable<Goal> { backStackEntry ->
             val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
 
             GoalRoute(
-                modifier = modifier,
                 navigateToUp = navigateToUp,
+                modifier = modifier,
+                viewModel = viewModel,
+            )
+        }
+
+        composable<PlaceType> { backStackEntry ->
+            val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
+
+            PlaceTypeRoute(
+                navigateToUp = navigateToUp,
+                modifier = modifier,
                 viewModel = viewModel,
             )
         }
@@ -74,3 +79,6 @@ data object HomeMain : MainTabRoute
 
 @Serializable
 data object Goal : Route
+
+@Serializable
+data object PlaceType : Route

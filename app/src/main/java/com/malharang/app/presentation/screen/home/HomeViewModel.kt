@@ -15,10 +15,14 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.malharang.app.R
 import com.malharang.app.data.local.datastore.ConversationDataStore
 import com.malharang.app.domain.model.ConversationData
 import com.malharang.app.domain.usecase.GetAllConversationsUseCase
 import com.malharang.app.domain.usecase.InsertConversationUseCase
+import com.malharang.app.domain.usecase.PlaceTypeUseCase
 import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
@@ -44,7 +48,8 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val scenarioUseCase: ScenarioUseCase,
     private val insertConversationUseCase: InsertConversationUseCase,
-    private val getAllConversationsUseCase: GetAllConversationsUseCase
+    private val getAllConversationsUseCase: GetAllConversationsUseCase,
+    private val placeTypeUseCase: PlaceTypeUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -56,6 +61,8 @@ class HomeViewModel @Inject constructor(
     private val placesClient: PlacesClient by lazy {
         Places.createClient(context)
     }
+
+    private var allPlaceTypes: List<String> = emptyList()
 
     fun saveRecentConversationId(id: Long) {
         viewModelScope.launch {
@@ -266,6 +273,80 @@ class HomeViewModel @Inject constructor(
     fun clearGoalQuery() {
         _uiState.update { currentState ->
             currentState.copy(goalQuery = "")
+        }
+    }
+
+    fun initPlaceTypes() {
+        viewModelScope.launch {
+            allPlaceTypes = loadPlaceTypesFromRaw()
+            val recentTypes = placeTypeUseCase.getRecentPlaceTypes()
+            _uiState.update { currentState ->
+                currentState.copy(recentPlaceTypes = recentTypes)
+            }
+        }
+    }
+
+    private fun loadPlaceTypesFromRaw(): List<String> {
+        val inputStream = context.resources.openRawResource(R.raw.place_types)
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+        val gson = Gson()
+        return gson.fromJson(jsonString, object : TypeToken<List<String>>() {}.type)
+    }
+
+    fun updatePlaceTypeQuery(newQuery: String) {
+        _uiState.update { currentState ->
+            currentState.copy(placeTypeQuery = newQuery)
+        }
+
+        if (newQuery.isBlank()) {
+            _uiState.update { currentState ->
+                currentState.copy(placeTypeSearchResult = emptyList())
+            }
+            return
+        }
+
+        val startsWithResults = allPlaceTypes.filter {
+            it.replace("_", " ").startsWith(newQuery.lowercase())
+        }
+        val containsResults = allPlaceTypes.filter {
+            it.replace("_", " ").contains(newQuery.lowercase()) &&
+                !it.replace("_", " ").startsWith(newQuery.lowercase())
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(placeTypeSearchResult = startsWithResults + containsResults)
+        }
+    }
+
+    fun selectPlaceType(type: String) {
+        val currentSelectedType = _uiState.value.selectedPlaceType
+        val newSelectedType = if (currentSelectedType == type) null else type
+
+        _uiState.update { currentState ->
+            currentState.copy(selectedPlaceType = newSelectedType)
+        }
+
+        if (newSelectedType != null) {
+            val updatedRecentTypes = _uiState.value.recentPlaceTypes
+                .toMutableList()
+                .apply {
+                    remove(type)
+                    add(0, type)
+                }
+                .take(5)
+
+            _uiState.update { currentState ->
+                currentState.copy(recentPlaceTypes = updatedRecentTypes)
+            }
+
+            setSelectedPlaceType(type)
+        }
+    }
+
+    fun clearPlaceTypeQuery() {
+        _uiState.update { currentState ->
+            currentState.copy(placeTypeQuery = "")
         }
     }
 
