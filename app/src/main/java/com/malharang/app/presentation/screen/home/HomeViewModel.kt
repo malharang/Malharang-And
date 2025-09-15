@@ -228,7 +228,7 @@ class HomeViewModel @Inject constructor(
                 val existingConversations = getAllConversationsUseCase()
                 val existingConversation = existingConversations.find { conversation ->
                     conversation.selectedScenario == scenarioTitle &&
-                        conversation.mode != "finished"
+                            conversation.mode != "finished"
                 }
 
                 if (existingConversation != null) {
@@ -306,16 +306,16 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        val startsWithResults = allPlaceTypes.filter {
-            it.replace("_", " ").startsWith(newQuery.lowercase())
-        }
-        val containsResults = allPlaceTypes.filter {
-            it.replace("_", " ").contains(newQuery.lowercase()) &&
-                !it.replace("_", " ").startsWith(newQuery.lowercase())
-        }
+        val searchResults = allPlaceTypes
+            .map { it to it.replace("_", " ").lowercase() }
+            .filter { (_, normalized) -> normalized.contains(newQuery.lowercase()) }
+            .sortedBy { (_, normalized) ->
+                if (normalized.startsWith(newQuery.lowercase())) 0 else 1
+            }
+            .map { it.first }
 
         _uiState.update { currentState ->
-            currentState.copy(placeTypeSearchResult = startsWithResults + containsResults)
+            currentState.copy(placeTypeSearchResult = searchResults)
         }
     }
 
