@@ -10,20 +10,19 @@ import com.malharang.app.presentation.screen.mission.MissionRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToMission(
-    navOptions: NavOptions? = null,
+    navOptions: NavOptions? = null
 ) = navigate(Mission, navOptions)
-
 
 fun NavGraphBuilder.missionNavGraph(
     navigateToChat: () -> Unit,
     navigateToQuiz: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     composable<Mission> {
         MissionRoute(
             modifier = modifier,
             navigateToQuiz = navigateToQuiz,
-            navigateToChat = navigateToChat,
+            navigateToChat = navigateToChat
         )
     }
 }

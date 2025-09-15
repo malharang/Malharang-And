@@ -12,14 +12,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 class QuizContract {
-    
+
     enum class QuizLoadingState {
         LOADING,
-        QUESTION, 
-        ERROR,
+        QUESTION, ERROR,
         RESULT
     }
-    
+
     @Immutable
     data class QuizUiState(
         val currentStep: QuizStep = QuizStep.START,

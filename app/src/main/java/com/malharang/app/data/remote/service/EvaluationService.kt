@@ -8,6 +8,6 @@ import retrofit2.http.POST
 interface EvaluationService {
     @POST("/evaluation")
     suspend fun postEvaluation(
-        @Body request: EvaluationRequestDto,
+        @Body request: EvaluationRequestDto
     ): EvaluationResponseDto
 }

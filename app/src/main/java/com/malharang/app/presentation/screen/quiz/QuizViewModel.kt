@@ -201,7 +201,7 @@ class QuizViewModel @Inject constructor(
             state.copy(
                 userAnswers = newAnswers.toImmutableList(),
                 score = newScore,
-                selectedAnswerIndex = null,
+                selectedAnswerIndex = null
             )
         }
 

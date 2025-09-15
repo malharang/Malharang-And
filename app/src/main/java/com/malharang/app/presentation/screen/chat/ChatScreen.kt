@@ -129,7 +129,7 @@ fun ChatRoute(
         onTranslateClick = { index, text, isBookmark ->
             viewModel.getTranslate(index = index, text = text, isArchive = isBookmark)
         },
-        onVoiceClick = viewModel::postTextToSpeech,
+        onVoiceClick = viewModel::postTextToSpeech
     )
 }
 

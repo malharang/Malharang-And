@@ -38,7 +38,7 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 fun GoalRoute(
     modifier: Modifier = Modifier,
     navigateToUp: () -> Unit,
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val query = uiState.goalQuery

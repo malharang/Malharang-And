@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 import com.malharang.app.presentation.screen.home.HomeRoute as HomeScreenRoute
 
 fun NavController.navigateToHome(
-    navOptions: NavOptions? = null,
+    navOptions: NavOptions? = null
 ) = navigate(Home, navOptions)
 
 fun NavController.navigateToGoal(navOptions: NavOptions? = null) =
@@ -32,10 +32,10 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToPlaceType: () -> Unit,
     navigateToGoal: () -> Unit,
     navigateToUp: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     navigation<Home>(
-        startDestination = HomeMain,
+        startDestination = HomeMain
     ) {
         composable<HomeMain> { backStackEntry ->
             val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
@@ -45,7 +45,7 @@ fun NavGraphBuilder.homeNavGraph(
                 navigateToGoal = navigateToGoal,
                 navigateToChat = navigateToChat,
                 modifier = modifier,
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
 
@@ -55,7 +55,7 @@ fun NavGraphBuilder.homeNavGraph(
             GoalRoute(
                 navigateToUp = navigateToUp,
                 modifier = modifier,
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
 
@@ -65,7 +65,7 @@ fun NavGraphBuilder.homeNavGraph(
             PlaceTypeRoute(
                 navigateToUp = navigateToUp,
                 modifier = modifier,
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
     }

@@ -60,7 +60,7 @@ import com.malharang.app.core.util.noRippleClickable
 fun QuizPlayRoute(
     navigateToUp: () -> Unit,
     navigateToQuizResult: () -> Unit,
-    viewModel: QuizViewModel,
+    viewModel: QuizViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -80,7 +80,7 @@ fun QuizPlayRoute(
         QuizContract.QuizLoadingState.LOADING -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -90,13 +90,15 @@ fun QuizPlayRoute(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "The AI is generating your quiz...", style = MalHaRangTheme.typography.bodyMedium.copy(
+                        text = "The AI is generating your quiz...",
+                        style = MalHaRangTheme.typography.bodyMedium.copy(
                             color = colors.grayDark
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "This may take up to 2 minutes.", style = MalHaRangTheme.typography.bodySmall.copy(
+                        text = "This may take up to 2 minutes.",
+                        style = MalHaRangTheme.typography.bodySmall.copy(
                             color = colors.andSysGray
                         )
                     )
@@ -107,19 +109,22 @@ fun QuizPlayRoute(
 
         QuizContract.QuizLoadingState.ERROR -> {
             Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Failed to load quiz", style = MalHaRangTheme.typography.titleLarge.copy(
+                        text = "Failed to load quiz",
+                        style = MalHaRangTheme.typography.titleLarge.copy(
                             color = colors.black
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = uiState.errorMessage ?: "An unknown error occurred", style = MalHaRangTheme.typography.bodySmall.copy(
+                        text = uiState.errorMessage ?: "An unknown error occurred",
+                        style = MalHaRangTheme.typography.bodySmall.copy(
                             color = colors.grayDark
                         )
                     )
@@ -141,7 +146,8 @@ fun QuizPlayRoute(
                             )
                         ) {
                             Text(
-                                text = "Try again", color = colors.white
+                                text = "Try again",
+                                color = colors.white
                             )
                         }
 
@@ -152,7 +158,8 @@ fun QuizPlayRoute(
                             )
                         ) {
                             Text(
-                                text = "Go back", color = colors.green
+                                text = "Go back",
+                                color = colors.green
                             )
                         }
                     }
@@ -164,17 +171,19 @@ fun QuizPlayRoute(
         else -> {
             if (uiState.quizQuestions.isEmpty()) {
                 Box(
-                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator(
-                            color = colors.green,
+                            color = colors.green
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Ready to Quiz...", style = MalHaRangTheme.typography.bodyMedium.copy(
+                            text = "Ready to Quiz...",
+                            style = MalHaRangTheme.typography.bodyMedium.copy(
                                 color = colors.grayDark
                             )
                         )
@@ -213,7 +222,7 @@ fun QuizPlayRoute(
         },
         onBackClick = navigateToUp,
         currentQuestionIndex = uiState.currentQuestionIndex,
-        totalQuestions = uiState.quizQuestions.size,
+        totalQuestions = uiState.quizQuestions.size
     )
 }
 
@@ -229,7 +238,7 @@ private fun QuizPlayScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     currentQuestionIndex: Int = 0,
-    totalQuestions: Int = 1,
+    totalQuestions: Int = 1
 ) {
     val progress = (currentQuestionIndex + 1).toFloat() / totalQuestions
 
@@ -239,11 +248,13 @@ private fun QuizPlayScreen(
             .background(
                 brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                     colors = listOf(
-                        colors.greenUltraLight, colors.white, colors.greenLight.copy(alpha = 0.2f)
+                        colors.greenUltraLight,
+                        colors.white,
+                        colors.greenLight.copy(alpha = 0.2f)
                     )
                 )
             )
-            .systemBarsPadding(),
+            .systemBarsPadding()
     ) {
         Column(
             modifier = Modifier
@@ -251,28 +262,33 @@ private fun QuizPlayScreen(
         ) {
             // Modern Header with Progress
             ModernQuizHeader(
-                currentQuestion = currentQuestionIndex + 1, totalQuestions = totalQuestions, progress = progress, onBackClick = onBackClick
+                currentQuestion = currentQuestionIndex + 1,
+                totalQuestions = totalQuestions,
+                progress = progress,
+                onBackClick = onBackClick
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             AnimatedContent(
-                targetState = isSubmitted, transitionSpec = {
+                targetState = isSubmitted,
+                transitionSpec = {
                     slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
-                }) { submitted ->
+                }
+            ) { submitted ->
                 if (submitted) {
                     // Result Screen
                     ModernResultDisplay(
                         isCorrect = isCorrect,
-                        onNextClick = onNextClick,
+                        onNextClick = onNextClick
                     )
                 } else {
-                    // Question Screen  
+                    // Question Screen
                     ModernQuestionDisplay(
                         question = question,
                         options = options,
                         selectedAnswer = selectedAnswer,
-                        onAnswerSelected = onAnswerSelected,
+                        onAnswerSelected = onAnswerSelected
                     )
                 }
             }
@@ -280,14 +296,17 @@ private fun QuizPlayScreen(
     }
 }
 
-
 @Composable
 private fun ModernQuizHeader(
-    currentQuestion: Int, totalQuestions: Int, progress: Float, onBackClick: () -> Unit
+    currentQuestion: Int,
+    totalQuestions: Int,
+    progress: Float,
+    onBackClick: () -> Unit
 ) {
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
                 modifier = Modifier
@@ -301,7 +320,7 @@ private fun ModernQuizHeader(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_chat_arrow_back_black_24),
                     contentDescription = "Back",
                     tint = colors.black,
-                    modifier = Modifier.padding(10.dp),
+                    modifier = Modifier.padding(10.dp)
                 )
             }
 
@@ -309,12 +328,14 @@ private fun ModernQuizHeader(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Question $currentQuestion of $totalQuestions", style = MalHaRangTheme.typography.bodySmall.copy(
+                    text = "Question $currentQuestion of $totalQuestions",
+                    style = MalHaRangTheme.typography.bodySmall.copy(
                         color = colors.grayDark
                     )
                 )
                 Text(
-                    text = "Quiz Challenge", style = MalHaRangTheme.typography.bodyMediumBold.copy(
+                    text = "Quiz Challenge",
+                    style = MalHaRangTheme.typography.bodyMediumBold.copy(
                         color = colors.black
                     )
                 )
@@ -325,7 +346,9 @@ private fun ModernQuizHeader(
 
         // Progress Bar
         Surface(
-            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), color = colors.greenLight.copy(alpha = 0.3f)
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            color = colors.greenLight.copy(alpha = 0.3f)
         ) {
             Box(
                 modifier = Modifier
@@ -333,12 +356,15 @@ private fun ModernQuizHeader(
                     .fillMaxWidth()
             ) {
                 val animatedProgress by animateFloatAsState(
-                    targetValue = progress, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    targetValue = progress,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 )
                 Surface(
                     modifier = Modifier
                         .height(8.dp)
-                        .fillMaxWidth(animatedProgress), color = colors.green, shape = RoundedCornerShape(8.dp)
+                        .fillMaxWidth(animatedProgress),
+                    color = colors.green,
+                    shape = RoundedCornerShape(8.dp)
                 ) {}
             }
         }
@@ -347,17 +373,26 @@ private fun ModernQuizHeader(
 
 @Composable
 private fun ModernQuestionDisplay(
-    question: String, options: List<String>, selectedAnswer: String?, onAnswerSelected: (String) -> Unit
+    question: String,
+    options: List<String>,
+    selectedAnswer: String?,
+    onAnswerSelected: (String) -> Unit
 ) {
     Column {
         // Question Card
         Card(
-            modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = colors.white), shape = RoundedCornerShape(20.dp)
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = colors.white),
+            shape = RoundedCornerShape(20.dp)
         ) {
             Text(
-                text = question, style = MalHaRangTheme.typography.bodyMediumBold.copy(
-                    color = colors.black, fontSize = 20.sp
-                ), modifier = Modifier.padding(24.dp)
+                text = question,
+                style = MalHaRangTheme.typography.bodyMediumBold.copy(
+                    color = colors.black,
+                    fontSize = 20.sp
+                ),
+                modifier = Modifier.padding(24.dp)
             )
         }
 
@@ -369,14 +404,19 @@ private fun ModernQuestionDisplay(
         ) {
             options.forEachIndexed { index, option ->
                 AnimatedVisibility(
-                    visible = true, enter = fadeIn(
+                    visible = true,
+                    enter = fadeIn(
                         animationSpec = tween(300, delayMillis = index * 100)
                     ) + slideInHorizontally(
-                        initialOffsetX = { it }, animationSpec = tween(300, delayMillis = index * 100)
+                        initialOffsetX = { it },
+                        animationSpec = tween(300, delayMillis = index * 100)
                     )
                 ) {
                     ModernAnswerOption(
-                        text = option, isSelected = selectedAnswer == option, onClick = { onAnswerSelected(option) })
+                        text = option,
+                        isSelected = selectedAnswer == option,
+                        onClick = { onAnswerSelected(option) }
+                    )
                 }
             }
         }
@@ -385,33 +425,45 @@ private fun ModernQuestionDisplay(
 
 @Composable
 private fun ModernAnswerOption(
-    text: String, isSelected: Boolean, onClick: () -> Unit
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 0.95f else 1f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+        targetValue = if (isSelected) 0.95f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .noRippleClickable(onClick = onClick)
-            .scale(scale), elevation = CardDefaults.cardElevation(
+            .scale(scale),
+        elevation = CardDefaults.cardElevation(
             defaultElevation = if (isSelected) 12.dp else 4.dp
-        ), colors = CardDefaults.cardColors(
+        ),
+        colors = CardDefaults.cardColors(
             containerColor = if (isSelected) colors.green else colors.white
-        ), shape = RoundedCornerShape(16.dp)
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp), verticalAlignment = Alignment.CenterVertically
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(24.dp), shape = CircleShape, color = if (isSelected) colors.white else colors.greenLight
+                modifier = Modifier.size(24.dp),
+                shape = CircleShape,
+                color = if (isSelected) colors.white else colors.greenLight
             ) {
                 if (isSelected) {
                     Icon(
-                        Icons.Rounded.CheckCircle, contentDescription = null, tint = colors.green, modifier = Modifier.padding(4.dp)
+                        Icons.Rounded.CheckCircle,
+                        contentDescription = null,
+                        tint = colors.green,
+                        modifier = Modifier.padding(4.dp)
                     )
                 }
             }
@@ -419,9 +471,11 @@ private fun ModernAnswerOption(
             Spacer(modifier = Modifier.width(16.dp))
 
             Text(
-                text = text, style = MalHaRangTheme.typography.bodyMedium.copy(
+                text = text,
+                style = MalHaRangTheme.typography.bodyMedium.copy(
                     color = if (isSelected) colors.white else colors.black
-                ), modifier = Modifier.weight(1f)
+                ),
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -433,19 +487,28 @@ private fun ModernResultDisplay(
     onNextClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AnimatedVisibility(
-            visible = true, enter = scaleIn(
+            visible = true,
+            enter = scaleIn(
                 animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
             ) + fadeIn()
         ) {
             // Result Icon
             Surface(
-                modifier = Modifier.size(120.dp), shape = CircleShape, color = if (isCorrect) colors.green else Color(0xFFFF6B6B), shadowElevation = 16.dp
+                modifier = Modifier.size(120.dp),
+                shape = CircleShape,
+                color = if (isCorrect) colors.green else Color(0xFFFF6B6B),
+                shadowElevation = 16.dp
             ) {
                 Icon(
-                    if (isCorrect) Icons.Rounded.CheckCircle else Icons.Rounded.Close, contentDescription = null, tint = colors.white, modifier = Modifier.padding(32.dp)
+                    if (isCorrect) Icons.Rounded.CheckCircle else Icons.Rounded.Close,
+                    contentDescription = null,
+                    tint = colors.white,
+                    modifier = Modifier.padding(32.dp)
                 )
             }
         }
@@ -453,7 +516,8 @@ private fun ModernResultDisplay(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = if (isCorrect) "Perfect!" else "Not quite right", style = MalHaRangTheme.typography.titleLarge.copy(
+            text = if (isCorrect) "Perfect!" else "Not quite right",
+            style = MalHaRangTheme.typography.titleLarge.copy(
                 color = colors.black
             )
         )
@@ -465,7 +529,8 @@ private fun ModernResultDisplay(
                 "Great job! Keep it up!"
             } else {
                 "Don't worry, keep learning!"
-            }, style = MalHaRangTheme.typography.bodyMedium.copy(
+            },
+            style = MalHaRangTheme.typography.bodyMedium.copy(
                 color = colors.grayDark
             )
         )
@@ -473,14 +538,18 @@ private fun ModernResultDisplay(
         Spacer(modifier = Modifier.height(48.dp))
 
         Button(
-            onClick = onNextClick, modifier = Modifier
+            onClick = onNextClick,
+            modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
                 containerColor = colors.green
             )
         ) {
             Text(
-                text = "Continue", style = MalHaRangTheme.typography.bodyMediumBold.copy(
+                text = "Continue",
+                style = MalHaRangTheme.typography.bodyMediumBold.copy(
                     color = colors.white
                 )
             )

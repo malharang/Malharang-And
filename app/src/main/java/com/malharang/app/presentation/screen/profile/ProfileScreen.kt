@@ -32,7 +32,7 @@ import com.malharang.app.presentation.model.UserStatusModel
 
 @Composable
 fun ProfileRoute(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     ProfileScreen(modifier = modifier)
 }

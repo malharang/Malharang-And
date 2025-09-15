@@ -83,7 +83,7 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlin.serialization.converter)
-    
+
     // Collections
     implementation(libs.kotlinx.immutable)
 

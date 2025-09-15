@@ -47,7 +47,7 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 fun PlaceTypeRoute(
     modifier: Modifier = Modifier,
     navigateToUp: () -> Unit,
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val query = uiState.placeTypeQuery

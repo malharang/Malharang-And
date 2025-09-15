@@ -11,7 +11,7 @@ class QuizUseCase @Inject constructor(
     suspend operator fun invoke(
         quizType: String,
         messages: List<MessageData>
-        ): Result<List<QuizData>> {
+    ): Result<List<QuizData>> {
         return quizRepository.postQuiz(quizType, messages)
     }
 }

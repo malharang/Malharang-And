@@ -12,15 +12,14 @@ fun NavController.navigateToChat(
     navOptions: NavOptions? = null
 ) = navigate(Chat, navOptions)
 
-
 fun NavGraphBuilder.chatNavGraph(
     navigateToUp: () -> Unit,
-    navigateToQuiz: () -> Unit,
+    navigateToQuiz: () -> Unit
 ) {
     composable<Chat> {
         ChatRoute(
             onBackClick = navigateToUp,
-            navigateToQuiz = navigateToQuiz,
+            navigateToQuiz = navigateToQuiz
         )
     }
 }

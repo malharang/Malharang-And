@@ -15,7 +15,7 @@ enum class MainTab(
     @DrawableRes val inactiveIconResId: Int,
     @DrawableRes val activeIconResId: Int,
     @StringRes val title: Int,
-    val route: MainTabRoute,
+    val route: MainTabRoute
 ) {
     HOME(
         inactiveIconResId = R.drawable.ic_navi_home_inactive_24,

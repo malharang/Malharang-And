@@ -43,7 +43,7 @@ import com.malharang.app.presentation.model.MissionCardModel
 @Composable
 fun QuizStartRoute(
     navigateToQuizType: () -> Unit,
-    viewModel: QuizViewModel,
+    viewModel: QuizViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -58,7 +58,7 @@ fun QuizStartRoute(
         onConversationSelected = { conversation ->
             viewModel.selectConversation(conversation)
             navigateToQuizType()
-        },
+        }
     )
 }
 
@@ -67,7 +67,7 @@ fun QuizStartScreen(
     conversations: List<MissionCardModel>,
     isLoading: Boolean,
     onConversationSelected: (MissionCardModel) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     if (isLoading) {
         Box(

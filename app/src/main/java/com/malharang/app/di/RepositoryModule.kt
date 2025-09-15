@@ -64,7 +64,7 @@ abstract class RepositoryModule {
     abstract fun bindExportSentenceRepository(
         exportSentenceRepositoryImpl: ExportSentenceRepositoryImpl
     ): ExportSentenceRepository
-    
+
     @Binds
     @Singleton
     abstract fun bindQuizRepository(

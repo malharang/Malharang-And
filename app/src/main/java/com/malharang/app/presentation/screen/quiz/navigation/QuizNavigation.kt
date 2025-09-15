@@ -36,16 +36,16 @@ fun NavGraphBuilder.quizNavGraph(
     navController: NavHostController,
     navigateToUp: () -> Unit,
     navigateToMission: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     navigation<Quiz>(
-        startDestination = QuizStart,
+        startDestination = QuizStart
     ) {
         composable<QuizStart> { backStackEntry ->
             val viewModel = backStackEntry.sharedViewModel<QuizViewModel>(navController)
             QuizStartRoute(
                 navigateToQuizType = navController::navigateToQuizType,
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
 
@@ -54,7 +54,7 @@ fun NavGraphBuilder.quizNavGraph(
             QuizTypeRoute(
                 navigateToUp = navigateToUp,
                 navigateToQuizPlay = navController::navigateToQuizPlay,
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
 
@@ -63,13 +63,15 @@ fun NavGraphBuilder.quizNavGraph(
             QuizPlayRoute(
                 navigateToUp = navigateToUp,
                 navigateToQuizResult = {
-                    navController.navigateToQuizResult(navOptions = navOptions {
-                        popUpTo<QuizResult> {
-                            inclusive = true
+                    navController.navigateToQuizResult(
+                        navOptions = navOptions {
+                            popUpTo<QuizResult> {
+                                inclusive = true
+                            }
                         }
-                    })
+                    )
                 },
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
 
@@ -77,14 +79,16 @@ fun NavGraphBuilder.quizNavGraph(
             val viewModel = backStackEntry.sharedViewModel<QuizViewModel>(navController)
             QuizResultRoute(
                 navigateToQuizStart = {
-                    navController.navigateToQuizStart(navOptions = navOptions {
-                        popUpTo<QuizStart> {
-                            inclusive = true
+                    navController.navigateToQuizStart(
+                        navOptions = navOptions {
+                            popUpTo<QuizStart> {
+                                inclusive = true
+                            }
                         }
-                    })
+                    )
                 },
                 navigateToMission = navigateToMission,
-                viewModel = viewModel,
+                viewModel = viewModel
             )
         }
     }

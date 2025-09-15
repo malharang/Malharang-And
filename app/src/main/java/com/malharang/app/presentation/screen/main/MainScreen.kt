@@ -26,7 +26,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator(),
+    navigator: MainNavigator = rememberMainNavigator()
 ) {
     Scaffold(
         modifier = Modifier
@@ -38,14 +38,14 @@ fun MainScreen(
                 visible = navigator.shouldShowBottomBar(),
                 tabs = MainTab.entries.toImmutableList(),
                 currentTab = navigator.currentTab,
-                onTabSelected = navigator::navigate,
+                onTabSelected = navigator::navigate
             )
         },
-        containerColor = colors.white,
+        containerColor = colors.white
     ) { innerPadding ->
         MainNavHost(
             navigator = navigator,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding)
         )
     }
 }
@@ -53,11 +53,11 @@ fun MainScreen(
 @Composable
 private fun MainNavHost(
     navigator: MainNavigator,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navigator.navController,
-        startDestination = navigator.startDestination,
+        startDestination = navigator.startDestination
     ) {
         homeNavGraph(
             navController = navigator.navController,
@@ -65,41 +65,45 @@ private fun MainNavHost(
             navigateToPlaceType = navigator.navController::navigateToPlaceType,
             navigateToGoal = navigator.navController::navigateToGoal,
             navigateToUp = navigator::navigateUp,
-            modifier = modifier,
+            modifier = modifier
         )
 
         chatNavGraph(
             navigateToUp = navigator::navigateUp,
-            navigateToQuiz = navigator.navController::navigateToQuiz,
+            navigateToQuiz = navigator.navController::navigateToQuiz
         )
 
         missionNavGraph(
             navigateToChat = {
-                navigator.navController.navigateToChat(navOptions = navOptions {
-                    popUpTo<Chat> {
-                        inclusive = true
+                navigator.navController.navigateToChat(
+                    navOptions = navOptions {
+                        popUpTo<Chat> {
+                            inclusive = true
+                        }
                     }
-                })
+                )
             },
             navigateToQuiz = navigator.navController::navigateToQuiz,
-            modifier = modifier,
+            modifier = modifier
         )
 
         profileNavGraph(
-            modifier,
+            modifier
         )
 
         quizNavGraph(
             navController = navigator.navController,
             navigateToUp = navigator::navigateUp,
             navigateToMission = {
-                navigator.navController.navigateToMission(navOptions = navOptions {
-                    popUpTo<Mission> {
-                        inclusive = true
+                navigator.navController.navigateToMission(
+                    navOptions = navOptions {
+                        popUpTo<Mission> {
+                            inclusive = true
+                        }
                     }
-                })
+                )
             },
-            modifier = modifier,
+            modifier = modifier
         )
     }
 }

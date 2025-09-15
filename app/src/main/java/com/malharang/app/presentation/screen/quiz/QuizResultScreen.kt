@@ -80,7 +80,7 @@ fun QuizResultScreen(
     correctAnswers: Int,
     onRetryClick: () -> Unit,
     onCompleteClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
@@ -93,7 +93,7 @@ fun QuizResultScreen(
                         colors.greenLight.copy(alpha = 0.3f)
                     )
                 )
-            ),
+            )
     ) {
         Column(
             modifier = Modifier
@@ -107,12 +107,12 @@ fun QuizResultScreen(
                 visible = true,
                 enter = scaleIn(
                     animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        dampingRatio = Spring.DampingRatioMediumBouncy
                     )
                 ) + fadeIn(animationSpec = tween(800))
             ) {
                 ModernResultHeader(
-                    score = score,
+                    score = score
                 )
             }
 
@@ -146,7 +146,7 @@ fun QuizResultScreen(
 
 @Composable
 fun ModernResultHeader(
-    score: Int,
+    score: Int
 ) {
     val isExcellent = score >= 80
     val isGood = score >= 60
@@ -223,7 +223,7 @@ fun ModernResultStats(
             ) {
                 StatItem(
                     label = "Score",
-                    value = "${score}%",
+                    value = "$score%",
                     color = colors.green
                 )
 
@@ -357,7 +357,7 @@ private fun QuizResultScreenPreview() {
             totalQuestions = 10,
             correctAnswers = 8,
             onRetryClick = {},
-            onCompleteClick = {},
+            onCompleteClick = {}
         )
     }
 }

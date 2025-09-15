@@ -70,7 +70,7 @@ fun MissionRoute(
         onExportSoundClick = { id, text ->
             viewModel.playOrStopTTS(id = id, text = text)
         },
-        ttsPlayingId = uiState.ttsPlayingId,
+        ttsPlayingId = uiState.ttsPlayingId
     )
 }
 
@@ -180,7 +180,7 @@ fun QuizEntryCard(
             .shadow(elevation = 6.dp, shape = RoundedCornerShape(16.dp))
             .background(
                 color = colors.white,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(16.dp)
             )
             .clickable(
                 interactionSource = interactionSource,
@@ -202,13 +202,13 @@ fun QuizEntryCard(
                     text = "Start Quiz",
                     style = MalHaRangTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black,
+                        color = Color.Black
                     )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Check your Korean skills with fun questions!",
-                    style = MalHaRangTheme.typography.bodySmall,
+                    style = MalHaRangTheme.typography.bodySmall
                 )
             }
         }
@@ -241,7 +241,7 @@ private fun PreviewMissionScreen() {
             availableMissions = missionCardList,
             reviewMissions = reviewMissions,
             navigateToChat = {},
-            navigateToQuiz = {},
+            navigateToQuiz = {}
         )
     }
 }

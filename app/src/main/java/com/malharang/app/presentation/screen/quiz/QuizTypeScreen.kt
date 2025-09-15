@@ -54,7 +54,7 @@ import com.malharang.app.presentation.screen.quiz.model.QuizType
 fun QuizTypeRoute(
     navigateToUp: () -> Unit,
     navigateToQuizPlay: () -> Unit,
-    viewModel: QuizViewModel,
+    viewModel: QuizViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
@@ -74,7 +74,7 @@ fun QuizTypeRoute(
         onTypeSelected = { type ->
             viewModel.selectQuizType(type)
         },
-        onBackClick = navigateToUp,
+        onBackClick = navigateToUp
     )
 }
 
@@ -82,7 +82,7 @@ fun QuizTypeRoute(
 fun QuizTypeScreen(
     onTypeSelected: (QuizType) -> Unit,
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -90,12 +90,14 @@ fun QuizTypeScreen(
             .background(
                 brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                     colors = listOf(
-                        colors.greenUltraLight, colors.white, colors.greenLight.copy(alpha = 0.2f)
-                    ),
+                        colors.greenUltraLight,
+                        colors.white,
+                        colors.greenLight.copy(alpha = 0.2f)
+                    )
                 )
             )
             .padding(20.dp)
-            .systemBarsPadding(),
+            .systemBarsPadding()
     ) {
         ModernQuizTypeHeader(onBackClick = onBackClick)
 
@@ -127,7 +129,7 @@ fun QuizTypeScreen(
                 enter = fadeIn(animationSpec = tween(600, delayMillis = 200)) + scaleIn(
                     initialScale = 0.8f,
                     animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        dampingRatio = Spring.DampingRatioMediumBouncy
                     )
                 )
             ) {
@@ -166,7 +168,7 @@ fun ModernQuizTypeHeader(
             modifier = Modifier
                 .size(44.dp)
                 .noRippleClickable(
-                    onClick = onBackClick,
+                    onClick = onBackClick
                 ),
             shape = RoundedCornerShape(12.dp),
             color = colors.white,
@@ -248,7 +250,7 @@ fun ModernQuizTypeCard(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            color = colors.white,
+                            color = colors.white
                         )
                 )
             }
