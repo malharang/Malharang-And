@@ -50,8 +50,7 @@ fun EvaluationDetailDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
+                .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = colors.white),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -90,7 +89,7 @@ fun EvaluationDetailDialog(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 120.dp, max = 520.dp),
+                        .heightIn(min = 120.dp, max = 480.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // Contextuality Section

@@ -1,5 +1,7 @@
 package com.malharang.app.domain.model
 
+import kotlinx.serialization.Serializable
+
 data class EvaluationRequestData(
     val messages: List<MessageData>
 )
@@ -32,6 +34,7 @@ data class GrammarData(
     val pass: Boolean
 )
 
+@Serializable
 data class GrammarErrorData(
     val originalSentence: String,
     val correctedSentence: String,

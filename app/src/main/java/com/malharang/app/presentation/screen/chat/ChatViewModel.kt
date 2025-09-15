@@ -8,11 +8,14 @@ import com.malharang.app.domain.mapper.toChatMessageModelList
 import com.malharang.app.domain.mapper.toMessageData
 import com.malharang.app.domain.model.ChatStateData
 import com.malharang.app.domain.model.EvaluationRequestData
+import com.malharang.app.domain.model.MessageData
+import com.malharang.app.domain.model.GrammarErrorData
 import com.malharang.app.domain.usecase.ChatUseCase
 import com.malharang.app.domain.usecase.EvaluationUseCase
 import com.malharang.app.domain.usecase.GetConversationByIdUseCase
 import com.malharang.app.domain.usecase.GetMessagesByConversationIdUseCase
 import com.malharang.app.domain.usecase.InsertMessageUseCase
+import com.malharang.app.domain.usecase.UpdateMessageUseCase
 import com.malharang.app.domain.usecase.STTUseCase
 import com.malharang.app.domain.usecase.SaveExportSentenceUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
@@ -27,6 +30,8 @@ import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import com.malharang.app.presentation.screen.chat.type.EvaluationState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -54,6 +59,7 @@ class ChatViewModel @Inject constructor(
     private val updateConversationModeUseCase: UpdateConversationModeUseCase,
     private val saveExportSentenceUseCase: SaveExportSentenceUseCase,
     private val evaluationUseCase: EvaluationUseCase,
+    private val updateMessageUseCase: UpdateMessageUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -449,6 +455,31 @@ class ChatViewModel @Inject constructor(
                         evaluationState = evaluationState,
                         evaluationData = response
                     )
+                }
+
+                // DB에 평가 데이터 저장 (USER 메시지만)
+                val lastUserMessage = _state.value.chatList[lastUserMessageIndex]
+                if (lastUserMessage.sender == SenderType.USER) {
+                    val allMessages = getMessageByConversationByIdUseCase(conversationId)
+                    val userMessageFromDb = allMessages.findLast { it.role == "user" && it.content == lastUserMessage.text }
+
+                    userMessageFromDb?.let { dbMessage ->
+                        val grammarErrorsJson = Json.encodeToString(response.data.grammar.grammar)
+
+                        val updatedMessage = MessageData(
+                            id = dbMessage.id,
+                            conversationId = dbMessage.conversationId,
+                            role = dbMessage.role,
+                            content = dbMessage.content,
+                            contextualityPassed = response.data.contextuality.pass,
+                            contextualityComment = response.data.contextuality.comment,
+                            grammarPassed = response.data.grammar.pass,
+                            grammarComment = response.data.grammar.comment,
+                            grammarErrors = grammarErrorsJson
+                        )
+
+                        updateMessageUseCase(updatedMessage)
+                    }
                 }
             }.onFailure { error ->
                 // 마지막 사용자 메시지에 실패 상태 설정
