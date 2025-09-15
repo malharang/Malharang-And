@@ -40,6 +40,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 import com.malharang.app.core.util.toast
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.component.ChatBottomContents
@@ -51,14 +54,12 @@ import com.malharang.app.presentation.screen.chat.sideeffect.ChatState
 import com.malharang.app.presentation.screen.chat.sideeffect.ChatUiState
 import com.malharang.app.presentation.screen.chat.sideeffect.MicState
 import com.malharang.app.presentation.screen.chat.sideeffect.uiState
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import com.malharang.app.ui.theme.MalHaRangTheme.typography
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatRoute(
     onBackClick: () -> Unit,
+    navigateToQuiz: () -> Unit,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -124,6 +125,7 @@ fun ChatRoute(
         micClick = { viewModel.onMicClicked() },
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
+        navigateToQuiz = navigateToQuiz,
         onTranslateClick = { index, text, isBookmark ->
             viewModel.getTranslate(index = index, text = text, isArchive = isBookmark)
         },
@@ -141,7 +143,9 @@ private fun ChatScreen(
     onIntent: (ChatIntent) -> Unit,
     onTranslateClick: (Int, String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    navigateToQuiz: () -> Unit = {},
+    missionDescription: String = "How to Order at a Coffe Shop"
 ) {
     Column(
         modifier = modifier

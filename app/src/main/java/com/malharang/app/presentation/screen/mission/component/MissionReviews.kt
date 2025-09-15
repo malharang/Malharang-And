@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.MissionCardModel
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionReviews(

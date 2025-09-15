@@ -67,6 +67,7 @@ dependencies {
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.navigation.compose.android)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -82,6 +83,9 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlin.serialization.converter)
+
+    // Collections
+    implementation(libs.kotlinx.immutable)
 
     // Testing
     testImplementation(libs.junit)

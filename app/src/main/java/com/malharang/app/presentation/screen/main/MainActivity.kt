@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
-import com.malharang.app.ui.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,9 +30,8 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            val navigator: MainNavigator = rememberMainNavigator()
             MalHaRangTheme {
-                MainScreen(navigator = navigator)
+                MainScreen()
             }
         }
     }

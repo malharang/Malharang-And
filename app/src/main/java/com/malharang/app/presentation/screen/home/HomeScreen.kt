@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -46,26 +43,26 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
-import com.malharang.app.core.component.UserStatusBar
+import com.malharang.app.core.designsystem.component.UserStatusBar
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.core.util.toast
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.presentation.screen.home.component.CustomMarker
 import com.malharang.app.presentation.screen.home.component.HomeBottomSheet
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeRoute(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     navigateToPlaceType: () -> Unit,
     navigateToGoal: () -> Unit,
     navigateToChat: () -> Unit,
-    placeTypeArg: String?,
-    goalArg: String?,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel,
     zoomLevel: Float = 19f
 ) {
     val locationPermissions = rememberMultiplePermissionsState(
@@ -76,12 +73,9 @@ fun HomeRoute(
     )
 
     val context = LocalContext.current
-    val placeInfo by viewModel.placeInfo.collectAsState()
-    val missionCardList by viewModel.missionCardList.collectAsStateWithLifecycle()
-    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val currentLocation by viewModel.currentLocation.collectAsState()
+    val currentLocation = uiState.currentLocation
     val cameraPositionState = rememberCameraPositionState {
         currentLocation?.let {
             position = CameraPosition.fromLatLngZoom(
@@ -91,22 +85,10 @@ fun HomeRoute(
         }
     }
 
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
             context.toast(it)
             viewModel.clearToastMessage()
-        }
-    }
-
-    LaunchedEffect(placeTypeArg) {
-        placeTypeArg?.let {
-            viewModel.setSelectedPlaceType(it)
-        }
-    }
-
-    LaunchedEffect(goalArg) {
-        if (goalArg != null) {
-            viewModel.addGoal(goalArg)
         }
     }
 
@@ -129,21 +111,21 @@ fun HomeRoute(
     }
 
     HomeScreen(
-        padding = padding,
+        modifier = modifier,
         context = context,
-        userStatusModel = viewModel.userStatusModel,
+        userStatusModel = uiState.userStatusModel,
         onRequestCurrentLocation = {
             viewModel.fetchCurrentLocation()
             moveCameraPosition(currentLocation, cameraPositionState, zoomLevel)
         },
         currentLocation = currentLocation,
-        placeInfo = placeInfo,
+        placeInfo = uiState.placeInfo,
         onClickPOI = {
             viewModel.clearPlaceInfo()
             viewModel.fetchPlaceType(it.placeId)
             viewModel.setSelectedPlaceInfo(it.name, it.latLng)
         },
-        isMissionLoading = isLoading,
+        isMissionLoading = uiState.isLoading,
         navigateToPlaceType = navigateToPlaceType,
         navigateToGoal = navigateToGoal,
         onMissionCardClick = { scenarioTitle ->
@@ -155,7 +137,7 @@ fun HomeRoute(
             }
         },
         onGoalRemoveClick = viewModel::removeGoalAt,
-        missionCards = missionCardList,
+        missionCards = uiState.missionCardList,
         cameraPositionState = cameraPositionState
     )
 }
@@ -173,14 +155,14 @@ fun moveCameraPosition(currentLocation: LatLng?, cameraPositionState: CameraPosi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
-    padding: PaddingValues,
+    modifier: Modifier = Modifier,
     context: Context,
     userStatusModel: UserStatusModel,
     cameraPositionState: CameraPositionState,
     currentLocation: LatLng? = null,
     placeInfo: PlaceInfoModel? = null,
     onClickPOI: (PointOfInterest) -> Unit = {},
-    missionCards: List<MissionCardModel>,
+    missionCards: ImmutableList<MissionCardModel>,
     isMissionLoading: Boolean = false,
     navigateToPlaceType: () -> Unit = {},
     navigateToGoal: () -> Unit = {},
@@ -199,8 +181,7 @@ private fun HomeScreen(
     }
 
     Column(
-        modifier = Modifier
-            .padding(padding)
+        modifier = modifier
             .fillMaxSize()
     ) {
         UserStatusBar(userStatusModel, modifier = Modifier.padding(top = 5.dp, bottom = 3.dp))
@@ -293,9 +274,10 @@ private fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewHomeScreen() {
+    val context = LocalContext.current
     MalHaRangTheme {
         HomeScreen(
-            padding = PaddingValues(),
+            context = context,
             userStatusModel = UserStatusModel(
                 profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&siAze=64",
                 name = "Malssi",
@@ -303,12 +285,11 @@ private fun PreviewHomeScreen() {
                 exp = 70
             ),
             cameraPositionState = rememberCameraPositionState(),
-            missionCards = listOf(),
+            missionCards = persistentListOf(),
             navigateToPlaceType = {},
             navigateToGoal = {},
             onGoalRemoveClick = {},
-            onRequestCurrentLocation = {},
-            context = TODO()
+            onRequestCurrentLocation = {}
         )
     }
 }

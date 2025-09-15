@@ -35,9 +35,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.malharang.app.R
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import com.malharang.app.ui.theme.MalHaRangTheme.typography
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

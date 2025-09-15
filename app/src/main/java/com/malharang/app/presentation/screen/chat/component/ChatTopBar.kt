@@ -14,7 +14,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.malharang.app.R
 import com.malharang.app.core.util.noRippleClickable
-import com.malharang.app.ui.theme.MalHaRangTheme.typography
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 
 @Composable
 fun ChatTopBar(

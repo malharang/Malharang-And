@@ -35,16 +35,16 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient =
         OkHttpClient.Builder().apply {
-            connectTimeout(10, TimeUnit.SECONDS)
-            writeTimeout(10, TimeUnit.SECONDS)
-            readTimeout(10, TimeUnit.SECONDS)
-            addInterceptor(loggingInterceptor)
+            connectTimeout(30, TimeUnit.SECONDS)
+            writeTimeout(30, TimeUnit.SECONDS)
+            readTimeout(30, TimeUnit.SECONDS)
             addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .addHeader("Accept", "*/*")
                     .build()
                 chain.proceed(request)
             }
+            addInterceptor(loggingInterceptor)
         }.build()
 
     @Provides

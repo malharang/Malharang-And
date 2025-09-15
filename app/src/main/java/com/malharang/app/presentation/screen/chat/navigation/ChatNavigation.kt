@@ -4,21 +4,25 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.malharang.app.core.navigation.MainTabRoute
+import com.malharang.app.core.common.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.chat.ChatRoute
+import kotlinx.serialization.Serializable
 
 fun NavController.navigateToChat(
-    navOptions: NavOptions
-) {
-    navigate(MainTabRoute.Chat, navOptions)
-}
+    navOptions: NavOptions? = null
+) = navigate(Chat, navOptions)
 
 fun NavGraphBuilder.chatNavGraph(
-    navController: NavController
+    navigateToUp: () -> Unit,
+    navigateToQuiz: () -> Unit
 ) {
-    composable<MainTabRoute.Chat> {
+    composable<Chat> {
         ChatRoute(
-            onBackClick = { navController.popBackStack() }
+            onBackClick = navigateToUp,
+            navigateToQuiz = navigateToQuiz
         )
     }
 }
+
+@Serializable
+data object Chat : MainTabRoute

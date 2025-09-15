@@ -1,6 +1,8 @@
 package com.malharang.app.di
 
 import com.malharang.app.data.remote.service.ChatService
+import com.malharang.app.data.remote.service.EvaluationService
+import com.malharang.app.data.remote.service.QuizService
 import com.malharang.app.data.remote.service.ScenarioService
 import com.malharang.app.data.remote.service.SpeechService
 import com.malharang.app.data.remote.service.TranslateService
@@ -37,4 +39,14 @@ object ServiceModule {
     @Singleton
     fun providesChatService(retrofit: Retrofit): ChatService =
         retrofit.create(ChatService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesEvaluationService(retrofit: Retrofit): EvaluationService =
+        retrofit.create(EvaluationService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesQuizService(retrofit: Retrofit): QuizService =
+        retrofit.create(QuizService::class.java)
 }
