@@ -44,14 +44,16 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.malharang.app.R
 import com.malharang.app.core.designsystem.component.UserStatusBar
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.core.util.toast
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.presentation.screen.home.component.CustomMarker
 import com.malharang.app.presentation.screen.home.component.HomeBottomSheet
-import com.malharang.app.core.designsystem.theme.MalHaRangTheme
-import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,8 +62,6 @@ fun HomeRoute(
     navigateToPlaceType: () -> Unit,
     navigateToGoal: () -> Unit,
     navigateToChat: () -> Unit,
-    placeTypeArg: String?,
-    goalArg: String?,
     viewModel: HomeViewModel,
     zoomLevel: Float = 19f
 ) {
@@ -89,18 +89,6 @@ fun HomeRoute(
         uiState.errorMessage?.let {
             context.toast(it)
             viewModel.clearToastMessage()
-        }
-    }
-
-    LaunchedEffect(placeTypeArg) {
-        placeTypeArg?.let {
-            viewModel.setSelectedPlaceType(it)
-        }
-    }
-
-    LaunchedEffect(goalArg) {
-        if (goalArg != null) {
-            viewModel.addGoal(goalArg)
         }
     }
 
@@ -149,7 +137,7 @@ fun HomeRoute(
             }
         },
         onGoalRemoveClick = viewModel::removeGoalAt,
-        missionCards = uiState.missionCardList.toList(),
+        missionCards = uiState.missionCardList,
         cameraPositionState = cameraPositionState
     )
 }
@@ -174,7 +162,7 @@ private fun HomeScreen(
     currentLocation: LatLng? = null,
     placeInfo: PlaceInfoModel? = null,
     onClickPOI: (PointOfInterest) -> Unit = {},
-    missionCards: List<MissionCardModel>,
+    missionCards: ImmutableList<MissionCardModel>,
     isMissionLoading: Boolean = false,
     navigateToPlaceType: () -> Unit = {},
     navigateToGoal: () -> Unit = {},
@@ -297,7 +285,7 @@ private fun PreviewHomeScreen() {
                 exp = 70
             ),
             cameraPositionState = rememberCameraPositionState(),
-            missionCards = listOf(),
+            missionCards = persistentListOf(),
             navigateToPlaceType = {},
             navigateToGoal = {},
             onGoalRemoveClick = {},

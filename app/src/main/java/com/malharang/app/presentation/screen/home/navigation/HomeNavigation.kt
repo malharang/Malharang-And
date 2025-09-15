@@ -11,10 +11,10 @@ import androidx.navigation.compose.navigation
 import com.malharang.app.core.common.navigation.MainTabRoute
 import com.malharang.app.core.common.navigation.Route
 import com.malharang.app.core.util.sharedViewModel
-import com.malharang.app.presentation.screen.home.HomeRoute as HomeScreenRoute
-import com.malharang.app.presentation.screen.home.HomeViewModel
 import com.malharang.app.presentation.screen.home.GoalRoute
+import com.malharang.app.presentation.screen.home.HomeViewModel
 import kotlinx.serialization.Serializable
+import com.malharang.app.presentation.screen.home.HomeRoute as HomeScreenRoute
 
 fun NavController.navigateToHome(
     navOptions: NavOptions? = null,
@@ -42,8 +42,6 @@ fun NavGraphBuilder.homeNavGraph(
 
             HomeScreenRoute(
                 modifier = modifier,
-                placeTypeArg = selectedPlaceType,
-                goalArg = selectedGoal,
                 navigateToPlaceType = navigateToPlaceType,
                 navigateToGoal = navController::navigateToGoal,
                 navigateToChat = navigateToChat,
@@ -55,20 +53,14 @@ fun NavGraphBuilder.homeNavGraph(
                 savedStateHandle.remove<String>("selected_goal")
             }
         }
-        
+
         composable<Goal> { backStackEntry ->
             val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
-            
+
             GoalRoute(
                 modifier = modifier,
-                onBackClick = navigateToUp,
-                sharedViewModel = viewModel,
-                onConfirmClick = { selected ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("selected_goal", selected)
-                    navController.popBackStack()
-                }
+                navigateToUp = navigateToUp,
+                viewModel = viewModel,
             )
         }
     }

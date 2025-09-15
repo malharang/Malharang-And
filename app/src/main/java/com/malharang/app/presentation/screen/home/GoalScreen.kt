@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +29,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.R
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
@@ -37,21 +37,21 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 @Composable
 fun GoalRoute(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-    onConfirmClick: (String) -> Unit,
-    sharedViewModel: HomeViewModel
+    navigateToUp: () -> Unit,
+    viewModel: HomeViewModel,
 ) {
-    val uiState by sharedViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val query = uiState.goalQuery
 
     GoalScreen(
         modifier = modifier,
         query = query,
-        onQueryChange = sharedViewModel::updateGoalQuery,
-        onBackClick = onBackClick,
+        onQueryChange = viewModel::updateGoalQuery,
+        onBackClick = navigateToUp,
         onConfirmClick = {
-            onConfirmClick(it)
-            sharedViewModel.clearGoalQuery()
+            viewModel.addGoal(it)
+            viewModel.clearGoalQuery()
+            navigateToUp()
         }
     )
 }

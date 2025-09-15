@@ -106,7 +106,7 @@ class HomeViewModel @Inject constructor(
                 val primaryType = response.place.primaryType
                 setSelectedPlaceType(primaryType)
             }
-            .addOnFailureListener { 
+            .addOnFailureListener {
                 setSelectedPlaceType(null)
             }
     }
@@ -122,7 +122,7 @@ class HomeViewModel @Inject constructor(
                 locationType = PlaceTypeItem.Location(name = placeType),
                 goalTypes = emptyList()
             )
-            
+
             _uiState.update { currentState ->
                 currentState.copy(placeInfo = newPlaceInfo)
             }
@@ -154,7 +154,7 @@ class HomeViewModel @Inject constructor(
 
     fun removeGoalAt(index: Int) {
         val currentInfo = _uiState.value.placeInfo ?: return
-        
+
         if (index < 0 || index >= currentInfo.goalTypes.size) return
 
         val updatedGoals = currentInfo.goalTypes.toMutableList().also {
@@ -195,7 +195,7 @@ class HomeViewModel @Inject constructor(
             locationType = currentPlaceInfo?.locationType,
             goalTypes = currentPlaceInfo?.goalTypes ?: emptyList()
         )
-        
+
         _uiState.update { currentState ->
             currentState.copy(placeInfo = newPlaceInfo)
         }
@@ -220,8 +220,8 @@ class HomeViewModel @Inject constructor(
             try {
                 val existingConversations = getAllConversationsUseCase()
                 val existingConversation = existingConversations.find { conversation ->
-                    conversation.selectedScenario == scenarioTitle && 
-                    conversation.mode != "finished"
+                    conversation.selectedScenario == scenarioTitle &&
+                            conversation.mode != "finished"
                 }
 
                 if (existingConversation != null) {
