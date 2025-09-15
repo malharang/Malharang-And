@@ -38,7 +38,6 @@ import com.malharang.app.R
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
-import com.malharang.app.domain.model.EvaluationResponseData
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.type.EvaluationState
 
@@ -52,7 +51,6 @@ fun ChatBubble(
     isTranslationVisible: Boolean = false,
     isSoundPlaying: Boolean = false,
     evaluationState: EvaluationState = EvaluationState.EMPTY,
-    evaluationData: EvaluationResponseData? = null,
     onTranslateClick: (String) -> Unit = {},
     onVoiceClick: (String) -> Unit = {},
     onBookmarkClick: () -> Unit = {},
@@ -182,12 +180,10 @@ private fun ChatIcon(icon: Int, description: String, onClick: () -> Unit) {
 @Composable
 private fun EvaluationIcon(
     evaluationState: EvaluationState,
-    onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
     loadingStrokeWidthDp: Float = 2f
 ) {
-    val colors = MalHaRangTheme.colors
-
     when (evaluationState) {
         EvaluationState.EMPTY -> {
             // 아무것도 표시하지 않음
@@ -209,7 +205,8 @@ private fun EvaluationIcon(
                 tint = Color.Unspecified,
                 modifier = modifier
                     .size(24.dp)
-                    .clickable { onClick() }
+                    .clip(CircleShape)
+                    .clickable(onClick = onClick)
             )
         }
     }

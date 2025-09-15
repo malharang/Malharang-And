@@ -237,7 +237,6 @@ private fun ChatScreen(
                             isSoundPlaying = chat.isSoundPlaying,
                             isTranslationVisible = chat.isTranslationVisible,
                             evaluationState = chat.evaluationState ?: EvaluationState.EMPTY,
-                            evaluationData = chat.evaluationData,
                             onEvaluationClick = {
                                 chat.evaluationData?.let { evaluationData ->
                                     selectedEvaluationData = evaluationData
