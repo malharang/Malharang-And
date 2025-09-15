@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,8 +33,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,22 +48,29 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 
 @Composable
 fun QuizResultRoute(
-    navigateToUp: () -> Unit,
     navigateToQuizStart: () -> Unit,
     navigateToMission: () -> Unit,
     viewModel: QuizViewModel,
     modifier: Modifier = Modifier
 ) {
-    // 실제 결과 데이터를 받아올 수 있도록 확장 가능
-    QuizResultScreen(
-        score = 85, // 예시 점수
-        totalQuestions = 10,
-        correctAnswers = 8,
-        onRetryClick = navigateToQuizStart,
-        onCompleteClick = navigateToMission,
-        onBackClick = navigateToUp,
-        modifier = modifier
-    )
+    val uiState by viewModel.uiState.collectAsState()
+    val countResult = uiState.countResult
+
+    if (countResult != null) {
+        val accuracy = (countResult.correct.toFloat() / countResult.total * 100).toInt()
+
+        QuizResultScreen(
+            score = accuracy,
+            totalQuestions = countResult.total,
+            correctAnswers = countResult.correct,
+            onRetryClick = {
+                viewModel.resetQuiz()
+                navigateToQuizStart()
+            },
+            onCompleteClick = navigateToMission,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -72,27 +80,26 @@ fun QuizResultScreen(
     correctAnswers: Int,
     onRetryClick: () -> Unit,
     onCompleteClick: () -> Unit,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(
-                brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                brush = Brush.verticalGradient(
                     colors = listOf(
                         colors.greenUltraLight,
                         colors.white,
                         colors.greenLight.copy(alpha = 0.3f)
                     )
                 )
-            )
-            .windowInsetsPadding(WindowInsets.systemBars)
+            ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(24.dp)
+                .systemBarsPadding(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -106,13 +113,11 @@ fun QuizResultScreen(
             ) {
                 ModernResultHeader(
                     score = score,
-                    totalQuestions = totalQuestions,
-                    correctAnswers = correctAnswers
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(48.dp))
-            
+
             AnimatedVisibility(
                 visible = true,
                 enter = fadeIn(animationSpec = tween(800, delayMillis = 400))
@@ -123,9 +128,9 @@ fun QuizResultScreen(
                     score = score
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(48.dp))
-            
+
             AnimatedVisibility(
                 visible = true,
                 enter = fadeIn(animationSpec = tween(800, delayMillis = 600))
@@ -142,12 +147,10 @@ fun QuizResultScreen(
 @Composable
 fun ModernResultHeader(
     score: Int,
-    totalQuestions: Int,
-    correctAnswers: Int
 ) {
     val isExcellent = score >= 80
     val isGood = score >= 60
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -169,9 +172,9 @@ fun ModernResultHeader(
                 modifier = Modifier.padding(32.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.height(24.dp))
-        
+
         Text(
             text = when {
                 isExcellent -> "Outstanding!"
@@ -183,9 +186,9 @@ fun ModernResultHeader(
                 color = colors.black
             )
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Text(
             text = when {
                 isExcellent -> "You're a language master!"
@@ -223,22 +226,22 @@ fun ModernResultStats(
                     value = "${score}%",
                     color = colors.green
                 )
-                
+
                 StatItem(
                     label = "Correct",
                     value = "$correctAnswers/$totalQuestions",
                     color = colors.greenTint
                 )
-                
+
                 StatItem(
                     label = "Accuracy",
                     value = "${(correctAnswers.toFloat() / totalQuestions * 100).toInt()}%",
                     color = colors.greenDark
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Progress Bar
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -320,7 +323,7 @@ fun ModernResultActions(
                 )
             )
         }
-        
+
         OutlinedButton(
             onClick = onCompleteClick,
             modifier = Modifier
@@ -355,7 +358,6 @@ private fun QuizResultScreenPreview() {
             correctAnswers = 8,
             onRetryClick = {},
             onCompleteClick = {},
-            onBackClick = {}
         )
     }
 }

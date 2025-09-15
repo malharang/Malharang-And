@@ -47,19 +47,19 @@ class MissionViewModel @Inject constructor(
             updateIsLoading(true)
             try {
                 val conversations = getAllConversationsUseCase()
-                
+
                 val available = conversations.filter { it.mode != "finished" }.map {
                     MissionCardModel(
-                        title = it.selectedScenario ?: "Unknown",
-                        type = PlaceTypeItem.Location(it.selectedLocation ?: "Unknown"),
+                        title = it.selectedScenario,
+                        type = PlaceTypeItem.Location(it.selectedLocation),
                         conversationId = it.id
                     )
                 }
-                
+
                 val completed = conversations.filter { it.mode == "finished" }.map {
                     MissionCardModel(
-                        title = it.selectedScenario ?: "Unknown",
-                        type = PlaceTypeItem.Location(it.selectedLocation ?: "Unknown"),
+                        title = it.selectedScenario,
+                        type = PlaceTypeItem.Location(it.selectedLocation),
                         conversationId = it.id
                     )
                 }
@@ -99,7 +99,7 @@ class MissionViewModel @Inject constructor(
     fun playOrStopTTS(id: Long, text: String) {
         viewModelScope.launch {
             val currentPlayingId = _uiState.value.ttsPlayingId
-            
+
             if (currentPlayingId == id) {
                 // Stop current TTS
                 recorder.stopTTS {
@@ -111,11 +111,11 @@ class MissionViewModel @Inject constructor(
             } else {
                 // Stop any current TTS and start new one
                 recorder.stopTTS { }
-                
+
                 _uiState.update { currentState ->
                     currentState.copy(ttsPlayingId = id)
                 }
-                
+
                 ttsUseCase(text)
                     .onSuccess { ttsData ->
                         recorder.playTTSStream(
@@ -133,7 +133,7 @@ class MissionViewModel @Inject constructor(
                         }
                         updateErrorMessage("TTS Error: ${throwable.message}")
                     }
-                
+
                 _sideEffect.emit(MissionSideEffect.PlayTTS(id, text))
             }
         }

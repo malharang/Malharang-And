@@ -38,12 +38,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.R
 import com.malharang.app.core.designsystem.component.MissionCard
-import com.malharang.app.core.designsystem.theme.MalHaRangTheme
-import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.screen.mission.component.MissionReviews
 import com.malharang.app.presentation.screen.mission.component.MissionSentenceItem
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionRoute(
@@ -91,7 +91,6 @@ private fun MissionScreen(
             .fillMaxSize()
             .padding(horizontal = 20.dp)
     ) {
-
         item {
             Row(
                 modifier = Modifier

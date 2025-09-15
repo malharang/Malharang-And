@@ -2,18 +2,17 @@ package com.malharang.app.presentation.screen.quiz
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.malharang.app.data.local.datastore.ConversationDataStore
 import com.malharang.app.domain.mapper.toChatMessageModelList
+import com.malharang.app.domain.model.MessageData
 import com.malharang.app.domain.usecase.GetAllConversationsUseCase
-import com.malharang.app.domain.usecase.GetConversationByIdUseCase
 import com.malharang.app.domain.usecase.GetMessagesByConversationIdUseCase
 import com.malharang.app.domain.usecase.QuizUseCase
+import com.malharang.app.presentation.model.ChatMessageModel
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceTypeItem
 import com.malharang.app.presentation.screen.quiz.QuizContract.QuizSideEffect
 import com.malharang.app.presentation.screen.quiz.QuizContract.QuizUiState
 import com.malharang.app.presentation.screen.quiz.model.CountResult
-import com.malharang.app.presentation.screen.quiz.model.QuizState
 import com.malharang.app.presentation.screen.quiz.model.QuizStep
 import com.malharang.app.presentation.screen.quiz.model.QuizType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +30,6 @@ import javax.inject.Inject
 class QuizViewModel @Inject constructor(
     private val getAllConversationsUseCase: GetAllConversationsUseCase,
     private val quizUseCase: QuizUseCase,
-    private val conversationDataStore: ConversationDataStore,
-    private val getConversationByIdUseCase: GetConversationByIdUseCase,
     private val getMessagesByConversationIdUseCase: GetMessagesByConversationIdUseCase
 ) : ViewModel() {
 
@@ -46,23 +43,12 @@ class QuizViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(selectedType = type)
         }
-        when (type) {
-            QuizType.CONVERSATION -> {
-                loadConversations()
-                navigateToStep(QuizStep.CONVERSATION_SELECTION)
-            }
-            QuizType.RANDOM -> {
-                generateRandomQuiz()
-                navigateToStep(QuizStep.PLAYING)
-            }
-            QuizType.WORD -> {
-                generateRandomQuiz()
-                navigateToStep(QuizStep.PLAYING)
-            }
-            QuizType.SENTENCE -> {
-                generateRandomQuiz()
-                navigateToStep(QuizStep.PLAYING)
-            }
+
+        val currentState = _uiState.value
+        val selectedConversation = currentState.selectedConversation
+
+        if (selectedConversation?.conversationId != null) {
+            loadChatMessagesForQuiz(selectedConversation.conversationId, type)
         }
     }
 
@@ -73,14 +59,14 @@ class QuizViewModel @Inject constructor(
                 val conversations = getAllConversationsUseCase()
                 val finishedConversations = conversations
                     .filter { it.mode == "finished" }
-                    .map { 
+                    .map {
                         MissionCardModel(
-                            title = it.selectedScenario ?: "Unknown",
-                            type = PlaceTypeItem.Location(it.selectedLocation ?: "Unknown"),
+                            title = it.selectedScenario,
+                            type = PlaceTypeItem.Location(it.selectedLocation),
                             conversationId = it.id
                         )
                     }
-                
+
                 _uiState.update { currentState ->
                     currentState.copy(conversations = finishedConversations.toImmutableList())
                 }
@@ -95,84 +81,96 @@ class QuizViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(selectedConversation = conversation)
         }
-        loadChatMessages(conversation.conversationId!!)
     }
 
-    private fun loadChatMessages(conversationId: Long) {
-        viewModelScope.launch {
-            updateIsLoading(true)
-            try {
-                val messages = getMessagesByConversationIdUseCase(conversationId)
-                val chatMessages = messages.toChatMessageModelList()
-                
-                _uiState.update { currentState ->
-                    currentState.copy(chatMessages = chatMessages.toImmutableList())
-                }
-                
-                generateConversationQuiz(chatMessages)
-                navigateToStep(QuizStep.PLAYING)
-            } catch (e: Exception) {
-                updateErrorMessage("Failed to load chat messages: ${e.localizedMessage}")
-            }
-            updateIsLoading(false)
-        }
-    }
-
-    private fun generateConversationQuiz(chatMessages: List<com.malharang.app.presentation.model.ChatMessageModel>) {
+    fun loadChatMessagesForQuiz(conversationId: Long, quizType: QuizType) {
         viewModelScope.launch {
             updateQuizLoadingState(QuizContract.QuizLoadingState.LOADING)
             try {
-                val messageDataList = chatMessages.map { 
-                    com.malharang.app.domain.model.MessageData(
-                        role = it.sender.name,
-                        content = it.text
-                    ) 
+                val messages = getMessagesByConversationIdUseCase(conversationId)
+                val chatMessages = messages.toChatMessageModelList()
+
+                _uiState.update { currentState ->
+                    currentState.copy(chatMessages = chatMessages.toImmutableList())
                 }
-                val result = quizUseCase("conversation", messageDataList)
-                result.onSuccess { quizList ->
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            quizQuestions = quizList.toImmutableList(),
-                            currentQuestionIndex = 0,
-                            selectedAnswerIndex = null,
-                            userAnswers = emptyList<Int>().toImmutableList(),
-                            score = 0
-                        )
-                    }
-                }.onFailure { 
-                    updateErrorMessage("Failed to generate quiz: ${it.localizedMessage}")
-                    updateQuizLoadingState(QuizContract.QuizLoadingState.ERROR)
-                }
-                updateQuizLoadingState(QuizContract.QuizLoadingState.QUESTION)
+
+                // 퀴즈 생성
+                generateQuizWithConversation(chatMessages, quizType)
             } catch (e: Exception) {
-                updateErrorMessage("Failed to generate quiz: ${e.localizedMessage}")
+                updateErrorMessage("Failed to load chat messages: ${e.localizedMessage}")
                 updateQuizLoadingState(QuizContract.QuizLoadingState.ERROR)
             }
         }
     }
 
-    private fun generateRandomQuiz() {
+    private fun generateQuizWithConversation(chatMessages: List<ChatMessageModel>, quizType: QuizType) {
+        val messageDataList = chatMessages.map {
+            MessageData(
+                role = when (it.sender) {
+                    com.malharang.app.presentation.model.SenderType.BOT -> "assistant"
+                    com.malharang.app.presentation.model.SenderType.USER -> "user"
+                },
+                content = it.text
+            )
+        }
+
+        generateQuizByType(quizType.typeLabel, messageDataList)
+
+        // 퀴즈 플레이 화면으로 이동
+        _uiState.update { currentState ->
+            currentState.copy(currentStep = QuizStep.PLAYING)
+        }
+        viewModelScope.launch {
+            _sideEffect.emit(QuizSideEffect.NavigateToNextStep(QuizStep.PLAYING))
+        }
+    }
+
+    private fun generateQuizByType(quizType: String, messages: List<MessageData>) {
         viewModelScope.launch {
             updateQuizLoadingState(QuizContract.QuizLoadingState.LOADING)
+            updateErrorMessage(null) // 이전 에러 메시지 초기화
+
             try {
-                val result = quizUseCase("random", emptyList()) // Random quiz
-                result.onSuccess { quizList ->
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            quizQuestions = quizList.toImmutableList(),
-                            currentQuestionIndex = 0,
-                            selectedAnswerIndex = null,
-                            userAnswers = emptyList<Int>().toImmutableList(),
-                            score = 0
-                        )
+                quizUseCase(quizType, messages)
+                    .onSuccess { quizList ->
+                        if (quizList.isEmpty()) {
+                            updateErrorMessage("생성된 퀴즈가 없습니다. 다른 대화를 선택해주세요.")
+                            updateQuizLoadingState(QuizContract.QuizLoadingState.ERROR)
+                        } else {
+                            _uiState.update { currentState ->
+                                currentState.copy(
+                                    quizQuestions = quizList.toImmutableList(),
+                                    currentQuestionIndex = 0,
+                                    selectedAnswerIndex = null,
+                                    userAnswers = emptyList<Int>().toImmutableList(),
+                                    score = 0
+                                )
+                            }
+                            updateQuizLoadingState(QuizContract.QuizLoadingState.QUESTION)
+                        }
+                    }.onFailure { exception ->
+                        val errorMessage = when {
+                            exception.message?.contains("시간이 오래 걸리고") == true ->
+                                "퀴즈 생성에 시간이 오래 걸리고 있습니다.\n잠시 후 다시 시도해주세요."
+
+                            exception.message?.contains("네트워크 연결") == true ->
+                                "네트워크 연결을 확인해주세요."
+
+                            else ->
+                                "퀴즈 생성 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요."
+                        }
+                        updateErrorMessage(errorMessage)
+                        updateQuizLoadingState(QuizContract.QuizLoadingState.ERROR)
                     }
-                }.onFailure { 
-                    updateErrorMessage("Failed to generate random quiz: ${it.localizedMessage}")
-                    updateQuizLoadingState(QuizContract.QuizLoadingState.ERROR)
-                }
-                updateQuizLoadingState(QuizContract.QuizLoadingState.QUESTION)
             } catch (e: Exception) {
-                updateErrorMessage("Failed to generate random quiz: ${e.localizedMessage}")
+                val errorMessage = when {
+                    e.message?.contains("timeout") == true || e.message?.contains("시간이 오래 걸리고") == true ->
+                        "퀴즈 생성에 시간이 오래 걸리고 있습니다.\n잠시 후 다시 시도해주세요."
+
+                    else ->
+                        "퀴즈 생성 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요."
+                }
+                updateErrorMessage(errorMessage)
                 updateQuizLoadingState(QuizContract.QuizLoadingState.ERROR)
             }
         }
@@ -188,22 +186,25 @@ class QuizViewModel @Inject constructor(
         val currentState = _uiState.value
         val quizQuestions = currentState.quizQuestions
         if (quizQuestions.isEmpty()) return
+
         val selectedIndex = currentState.selectedAnswerIndex ?: return
-        
+
         val currentQuestion = quizQuestions[currentState.currentQuestionIndex]
-        val selectedAnswer = currentQuestion.options[selectedIndex]
-        val isCorrect = selectedAnswer == currentQuestion.answer
+        val correctAnswerIndex = currentQuestion.answerIndex
+
+        val isCorrect = (selectedIndex == correctAnswerIndex)
+
         val newScore = if (isCorrect) currentState.score + 1 else currentState.score
         val newAnswers = currentState.userAnswers + selectedIndex
-        
-        _uiState.update { currentState ->
-            currentState.copy(
+
+        _uiState.update { state ->
+            state.copy(
                 userAnswers = newAnswers.toImmutableList(),
                 score = newScore,
-                selectedAnswerIndex = null
+                selectedAnswerIndex = null,
             )
         }
-        
+
         updateQuizLoadingState(QuizContract.QuizLoadingState.RESULT)
     }
 
@@ -212,7 +213,7 @@ class QuizViewModel @Inject constructor(
         val quizQuestions = currentState.quizQuestions
         if (quizQuestions.isEmpty()) return
         val nextIndex = currentState.currentQuestionIndex + 1
-        
+
         if (nextIndex < quizQuestions.size) {
             _uiState.update { currentState ->
                 currentState.copy(currentQuestionIndex = nextIndex)
@@ -227,16 +228,19 @@ class QuizViewModel @Inject constructor(
         val currentState = _uiState.value
         val quizQuestions = currentState.quizQuestions
         if (quizQuestions.isEmpty()) return
-        
+
         val countResult = CountResult(
             total = quizQuestions.size,
             correct = currentState.score
         )
-        
-        _uiState.update { currentState ->
-            currentState.copy(countResult = countResult)
+
+        _uiState.update { state ->
+            state.copy(
+                countResult = countResult,
+                currentStep = QuizStep.RESULT
+            )
         }
-        
+
         viewModelScope.launch {
             _sideEffect.emit(QuizSideEffect.NavigateToResult(currentState.score, quizQuestions.size))
         }
@@ -256,15 +260,6 @@ class QuizViewModel @Inject constructor(
                 countResult = null,
                 quizLoadingState = QuizContract.QuizLoadingState.LOADING
             )
-        }
-    }
-
-    private fun navigateToStep(step: QuizStep) {
-        _uiState.update { currentState ->
-            currentState.copy(currentStep = step)
-        }
-        viewModelScope.launch {
-            _sideEffect.emit(QuizSideEffect.NavigateToNextStep(step))
         }
     }
 

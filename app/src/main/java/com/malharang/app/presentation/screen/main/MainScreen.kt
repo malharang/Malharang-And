@@ -16,6 +16,7 @@ import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
 import com.malharang.app.presentation.screen.home.navigation.navigateToGoal
 import com.malharang.app.presentation.screen.home.navigation.navigateToPlaceType
 import com.malharang.app.presentation.screen.main.component.MainBottomBar
+import com.malharang.app.presentation.screen.mission.navigation.Mission
 import com.malharang.app.presentation.screen.mission.navigation.missionNavGraph
 import com.malharang.app.presentation.screen.mission.navigation.navigateToMission
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
@@ -91,7 +92,13 @@ private fun MainNavHost(
         quizNavGraph(
             navController = navigator.navController,
             navigateToUp = navigator::navigateUp,
-            navigateToMission = navigator.navController::navigateToMission,
+            navigateToMission = {
+                navigator.navController.navigateToMission(navOptions = navOptions {
+                    popUpTo<Mission> {
+                        inclusive = true
+                    }
+                })
+            },
             modifier = modifier,
         )
     }

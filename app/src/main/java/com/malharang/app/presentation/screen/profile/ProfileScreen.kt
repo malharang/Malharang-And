@@ -3,7 +3,6 @@ package com.malharang.app.presentation.screen.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,65 +26,63 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 import com.malharang.app.core.designsystem.component.UserStatusBar
-import com.malharang.app.presentation.model.UserStatusModel
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.presentation.model.UserStatusModel
 
 @Composable
 fun ProfileRoute(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ProfileScreen(modifier = modifier)
 }
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+    Column(
+        modifier = Modifier
+            .background(colors.greenProfileBackgroundTop)
+            .fillMaxSize()
+            .then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        UserStatusBar(
+            userStatusModel = UserStatusModel(
+                profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
+                name = "Malssi",
+                level = 5,
+                exp = 70
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.greenProfileBackgroundTop)
+                .padding(top = 5.dp, bottom = 3.dp)
+        )
+
+        Spacer(
             modifier = Modifier
                 .background(colors.greenProfileBackgroundTop)
+                .height(50.dp)
+        )
+
+        ProfileCharacterImage()
+
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
-                .then(modifier),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(colors.greenProfileBackgroundBottom)
         ) {
-            UserStatusBar(
-                userStatusModel = UserStatusModel(
-                    profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
-                    name = "Malssi",
-                    level = 5,
-                    exp = 70
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colors.greenProfileBackgroundTop)
-                    .padding(top = 5.dp, bottom = 3.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+
+            ProfileStatsCard(
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
 
-            Spacer(
-                modifier = Modifier
-                    .background(colors.greenProfileBackgroundTop)
-                    .height(50.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            BadgeCard(
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
-
-            ProfileCharacterImage()
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colors.greenProfileBackgroundBottom)
-            ) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                ProfileStatsCard(
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                BadgeCard(
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-            }
         }
     }
 }

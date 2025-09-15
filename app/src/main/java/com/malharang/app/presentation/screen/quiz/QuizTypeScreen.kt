@@ -9,15 +9,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,146 +21,136 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.R.drawable
-import com.malharang.app.presentation.screen.quiz.model.QuizType
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.core.util.noRippleClickable
+import com.malharang.app.presentation.screen.quiz.model.QuizType
 
 @Composable
 fun QuizTypeRoute(
     navigateToUp: () -> Unit,
     navigateToQuizPlay: () -> Unit,
     viewModel: QuizViewModel,
-    modifier: Modifier = Modifier,
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { sideEffect ->
+            when (sideEffect) {
+                is QuizContract.QuizSideEffect.NavigateToNextStep -> {
+                    if (sideEffect.step == com.malharang.app.presentation.screen.quiz.model.QuizStep.PLAYING) {
+                        navigateToQuizPlay()
+                    }
+                }
+
+                else -> {}
+            }
+        }
+    }
+
     QuizTypeScreen(
         onTypeSelected = { type ->
-            when(type) {
-                "word" -> {
-                    viewModel.selectQuizType(QuizType.WORD)
-                    navigateToQuizPlay()
-                }
-                "sentence" -> {
-                    viewModel.selectQuizType(QuizType.SENTENCE)
-                    navigateToQuizPlay()
-                }
-                "random" -> {
-                    viewModel.selectQuizType(QuizType.RANDOM)
-                    navigateToQuizPlay()
-                }
-                "conversation" -> {
-                    viewModel.selectQuizType(QuizType.CONVERSATION)
-                    navigateToQuizPlay()
-                }
-            }
+            viewModel.selectQuizType(type)
         },
         onBackClick = navigateToUp,
-        modifier = modifier
     )
 }
 
 @Composable
 fun QuizTypeScreen(
-    onTypeSelected: (String) -> Unit,
+    onTypeSelected: (QuizType) -> Unit,
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(
                 brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                     colors = listOf(
-                        colors.greenUltraLight,
-                        colors.white,
-                        colors.greenLight.copy(alpha = 0.3f)
-                    )
+                        colors.greenUltraLight, colors.white, colors.greenLight.copy(alpha = 0.2f)
+                    ),
                 )
             )
-            .windowInsetsPadding(WindowInsets.systemBars)
+            .padding(20.dp)
+            .systemBarsPadding(),
     ) {
+        ModernQuizTypeHeader(onBackClick = onBackClick)
+
+        Spacer(modifier = Modifier.height(60.dp))
+
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Modern Header with Back Button
-            ModernQuizTypeHeader(onBackClick = onBackClick)
-            
-            Spacer(modifier = Modifier.height(60.dp))
-            
-            // Quiz Type Selection Cards
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(animationSpec = tween(600)) + scaleIn(
+                    initialScale = 0.8f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
             ) {
-                AnimatedVisibility(
-                    visible = true,
-                    enter = fadeIn(animationSpec = tween(600)) + scaleIn(
-                        initialScale = 0.8f,
-                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                    )
-                ) {
-                    ModernQuizTypeCard(
-                        title = "Word Quiz",
-                        description = "Test your vocabulary knowledge",
-                        imageResId = drawable.img_quiz_word,
-                        gradientColors = listOf(colors.green, colors.greenTint),
-                        onClick = { onTypeSelected("word") }
-                    )
-                }
-                
-                AnimatedVisibility(
-                    visible = true,
-                    enter = fadeIn(animationSpec = tween(600, delayMillis = 200)) + scaleIn(
-                        initialScale = 0.8f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                        )
-                    )
-                ) {
-                    ModernQuizTypeCard(
-                        title = "Sentence Quiz",
-                        description = "Practice sentence construction",
-                        imageResId = drawable.img_quiz_sentence,
-                        gradientColors = listOf(colors.greenDark, colors.green),
-                        onClick = { onTypeSelected("sentence") }
-                    )
-                }
+                ModernQuizTypeCard(
+                    title = "Word Quiz",
+                    description = "Test your vocabulary knowledge",
+                    imageResId = drawable.img_quiz_word,
+                    iconBackground = colors.green,
+                    onClick = { onTypeSelected(QuizType.WORD) }
+                )
             }
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            // Bottom hint text
-            Text(
-                text = "Choose the quiz type that matches your learning goals",
-                style = MalHaRangTheme.typography.bodySmall.copy(
-                    color = colors.grayDark
-                ),
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(animationSpec = tween(600, delayMillis = 200)) + scaleIn(
+                    initialScale = 0.8f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                    )
+                )
+            ) {
+                ModernQuizTypeCard(
+                    title = "Sentence Quiz",
+                    description = "Practice sentence construction",
+                    imageResId = drawable.img_quiz_sentence,
+                    iconBackground = colors.greenDark,
+                    onClick = { onTypeSelected(QuizType.SENTENCE) }
+                )
+            }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Bottom hint text
+        Text(
+            text = "Choose the quiz type that matches your learning goals",
+            style = MalHaRangTheme.typography.bodySmall.copy(
+                color = colors.grayDark
+            ),
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
     }
 }
 
@@ -179,7 +165,7 @@ fun ModernQuizTypeHeader(
         Surface(
             modifier = Modifier
                 .size(44.dp)
-                .clickable(
+                .noRippleClickable(
                     onClick = onBackClick,
                 ),
             shape = RoundedCornerShape(12.dp),
@@ -187,7 +173,7 @@ fun ModernQuizTypeHeader(
             shadowElevation = 4.dp
         ) {
             Icon(
-                Icons.Rounded.ArrowBack,
+                imageVector = ImageVector.vectorResource(drawable.ic_chat_arrow_back_black_24),
                 contentDescription = "Back",
                 tint = colors.black,
                 modifier = Modifier
@@ -195,9 +181,9 @@ fun ModernQuizTypeHeader(
                     .size(24.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         Column {
             Text(
                 text = "Quiz Type",
@@ -220,7 +206,7 @@ fun ModernQuizTypeCard(
     title: String,
     description: String,
     imageResId: Int,
-    gradientColors: List<androidx.compose.ui.graphics.Color>,
+    iconBackground: Color,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -231,7 +217,7 @@ fun ModernQuizTypeCard(
             stiffness = Spring.StiffnessLow
         )
     )
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,23 +239,20 @@ fun ModernQuizTypeCard(
         shape = RoundedCornerShape(20.dp)
     ) {
         Box {
-            // Gradient overlay
             Surface(
                 modifier = Modifier.fillMaxSize(),
-                color = androidx.compose.ui.graphics.Color.Transparent,
+                color = Color.Transparent,
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                gradientColors.map { it.copy(alpha = 0.1f) }
-                            )
+                            color = colors.white,
                         )
                 )
             }
-            
+
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -294,12 +277,12 @@ fun ModernQuizTypeCard(
                         )
                     )
                 }
-                
+
                 // Image with circular background
                 Surface(
                     modifier = Modifier.size(80.dp),
                     shape = RoundedCornerShape(16.dp),
-                    color = gradientColors.first(),
+                    color = iconBackground,
                     shadowElevation = 8.dp
                 ) {
                     Image(
@@ -312,38 +295,6 @@ fun ModernQuizTypeCard(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun QuizTypeButton(
-    label: String,
-    imageResId: Int,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(170.dp)
-            .clickable { onClick() }
-            .border(
-                width = 1.dp,
-                color = colors.green,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = imageResId),
-            contentDescription = label,
-            modifier = Modifier
-                .size(96.dp)
-                .padding(bottom = 8.dp)
-        )
-        Text(
-            text = label,
-            style = MalHaRangTheme.typography.bodyMedium,
-        )
     }
 }
 

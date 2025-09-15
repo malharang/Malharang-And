@@ -13,31 +13,28 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,58 +42,62 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.malharang.app.R
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
-import com.malharang.app.presentation.screen.quiz.model.QuizType
+import com.malharang.app.core.util.noRippleClickable
 
 @Composable
 fun QuizPlayRoute(
     navigateToUp: () -> Unit,
     navigateToQuizResult: () -> Unit,
     viewModel: QuizViewModel,
-    modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(uiState.quizState?.selectedScenarioId, uiState.quizState?.quizType) {
-        val quizState = uiState.quizState
-        if (quizState?.selectedScenarioId != null && quizState.quizType != null) {
-            val quizTypeString = when (quizState.quizType) {
-                QuizType.WORD -> "word"
-                QuizType.SENTENCE -> "sentence"
-                QuizType.CONVERSATION -> "conversation"
-                QuizType.RANDOM -> "random"
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { sideEffect ->
+            when (sideEffect) {
+                is QuizContract.QuizSideEffect.NavigateToResult -> {
+                    navigateToQuizResult()
+                }
+
+                else -> {}
             }
-            val scenarioId = quizState.selectedScenarioId
         }
     }
 
     when (uiState.quizLoadingState) {
         QuizContract.QuizLoadingState.LOADING -> {
             Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    androidx.compose.material3.CircularProgressIndicator(
+                    CircularProgressIndicator(
                         color = colors.green
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "퀴즈 생성 중...", style = MalHaRangTheme.typography.bodyMedium.copy(
+                        text = "The AI is generating your quiz...", style = MalHaRangTheme.typography.bodyMedium.copy(
                             color = colors.grayDark
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "This may take up to 2 minutes.", style = MalHaRangTheme.typography.bodySmall.copy(
+                            color = colors.andSysGray
                         )
                     )
                 }
@@ -112,25 +113,48 @@ fun QuizPlayRoute(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "퀴즈 로드 실패", style = MalHaRangTheme.typography.titleLarge.copy(
+                        text = "Failed to load quiz", style = MalHaRangTheme.typography.titleLarge.copy(
                             color = colors.black
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = uiState.errorMessage ?: "알 수 없는 오류가 발생했습니다", style = MalHaRangTheme.typography.bodySmall.copy(
+                        text = uiState.errorMessage ?: "An unknown error occurred", style = MalHaRangTheme.typography.bodySmall.copy(
                             color = colors.grayDark
                         )
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = navigateToUp, colors = ButtonDefaults.buttonColors(
-                            containerColor = colors.green
-                        )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "돌아가기", color = colors.white
-                        )
+                        Button(
+                            onClick = {
+                                val currentState = viewModel.uiState.value
+                                val selectedConversation = currentState.selectedConversation
+                                val selectedType = currentState.selectedType
+                                if (selectedConversation?.conversationId != null && selectedType != null) {
+                                    viewModel.loadChatMessagesForQuiz(selectedConversation.conversationId, selectedType)
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colors.green
+                            )
+                        ) {
+                            Text(
+                                text = "Try again", color = colors.white
+                            )
+                        }
+
+                        androidx.compose.material3.OutlinedButton(
+                            onClick = navigateToUp,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = colors.green
+                            )
+                        ) {
+                            Text(
+                                text = "Go back", color = colors.green
+                            )
+                        }
                     }
                 }
             }
@@ -138,7 +162,6 @@ fun QuizPlayRoute(
         }
 
         else -> {
-            // 퀴즈 질문이 비어있으면 로딩 상태로 전환
             if (uiState.quizQuestions.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
@@ -146,12 +169,12 @@ fun QuizPlayRoute(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        androidx.compose.material3.CircularProgressIndicator(
-                            color = colors.green
+                        CircularProgressIndicator(
+                            color = colors.green,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "퀴즈 준비 중...", style = MalHaRangTheme.typography.bodyMedium.copy(
+                            text = "Ready to Quiz...", style = MalHaRangTheme.typography.bodyMedium.copy(
                                 color = colors.grayDark
                             )
                         )
@@ -162,44 +185,51 @@ fun QuizPlayRoute(
         }
     }
 
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var submitted by remember { mutableStateOf(false) }
-    var isCorrect by remember { mutableStateOf<Boolean?>(null) }
-    var selectedAnswer by remember { mutableStateOf<String?>(null) }
-    var correctCount by remember { mutableIntStateOf(0) }
+    val current = uiState.quizQuestions.getOrNull(uiState.currentQuestionIndex)
+    if (current == null) return
 
-    val current = uiState.quizQuestions[currentIndex]
+    val lastAnswerIndex = uiState.userAnswers.lastOrNull()
+    val isCorrect = if (lastAnswerIndex != null) {
+        lastAnswerIndex == current.answerIndex
+    } else {
+        false
+    }
 
     QuizPlayScreen(
         question = current.question,
         options = current.options,
-        isSubmitted = submitted,
+        isSubmitted = uiState.quizLoadingState == QuizContract.QuizLoadingState.RESULT,
         isCorrect = isCorrect,
-        selectedAnswer = selectedAnswer,
+        selectedAnswer = uiState.selectedAnswerIndex?.let { current.options[it] },
         onAnswerSelected = { answer ->
-            submitted = true
-            selectedAnswer = answer
-            isCorrect = answer == current.answer
-            if (isCorrect == true) correctCount++
-        },
-        onNextClick = {
-            if (currentIndex == uiState.quizQuestions.lastIndex) {
-                navigateToQuizResult()
-            } else {
-                currentIndex++
-                submitted = false
-                selectedAnswer = null
-                isCorrect = null
+            val index = current.options.indexOf(answer)
+            if (index >= 0) {
+                viewModel.selectAnswer(index)
+                viewModel.submitAnswer()
             }
         },
+        onNextClick = {
+            viewModel.nextQuestion()
+        },
         onBackClick = navigateToUp,
-        modifier = modifier,
+        currentQuestionIndex = uiState.currentQuestionIndex,
+        totalQuestions = uiState.quizQuestions.size,
     )
 }
 
 @Composable
 private fun QuizPlayScreen(
-    question: String, options: List<String>, isSubmitted: Boolean, isCorrect: Boolean?, selectedAnswer: String?, onAnswerSelected: (String) -> Unit, onNextClick: () -> Unit, onBackClick: () -> Unit, modifier: Modifier = Modifier, currentQuestionIndex: Int = 0, totalQuestions: Int = 1
+    question: String,
+    options: List<String>,
+    isSubmitted: Boolean,
+    isCorrect: Boolean,
+    selectedAnswer: String?,
+    onAnswerSelected: (String) -> Unit,
+    onNextClick: () -> Unit,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    currentQuestionIndex: Int = 0,
+    totalQuestions: Int = 1,
 ) {
     val progress = (currentQuestionIndex + 1).toFloat() / totalQuestions
 
@@ -213,11 +243,10 @@ private fun QuizPlayScreen(
                     )
                 )
             )
-            .windowInsetsPadding(WindowInsets.systemBars)
+            .systemBarsPadding(),
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(20.dp)
         ) {
             // Modern Header with Progress
@@ -234,12 +263,16 @@ private fun QuizPlayScreen(
                 if (submitted) {
                     // Result Screen
                     ModernResultDisplay(
-                        isCorrect = isCorrect ?: false, correctAnswer = selectedAnswer ?: "", onNextClick = onNextClick
+                        isCorrect = isCorrect,
+                        onNextClick = onNextClick,
                     )
                 } else {
                     // Question Screen  
                     ModernQuestionDisplay(
-                        question = question, options = options, selectedAnswer = selectedAnswer, onAnswerSelected = onAnswerSelected
+                        question = question,
+                        options = options,
+                        selectedAnswer = selectedAnswer,
+                        onAnswerSelected = onAnswerSelected,
                     )
                 }
             }
@@ -259,10 +292,16 @@ private fun ModernQuizHeader(
             Surface(
                 modifier = Modifier
                     .size(44.dp)
-                    .clickable { onBackClick() }, shape = RoundedCornerShape(12.dp), color = colors.white, shadowElevation = 4.dp
+                    .noRippleClickable(onClick = onBackClick),
+                shape = RoundedCornerShape(12.dp),
+                color = colors.white,
+                shadowElevation = 4.dp
             ) {
                 Icon(
-                    Icons.Rounded.ArrowBack, contentDescription = "Back", tint = colors.black, modifier = Modifier.padding(10.dp)
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_chat_arrow_back_black_24),
+                    contentDescription = "Back",
+                    tint = colors.black,
+                    modifier = Modifier.padding(10.dp),
                 )
             }
 
@@ -352,14 +391,16 @@ private fun ModernAnswerOption(
         targetValue = if (isSelected) 0.95f else 1f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onClick() }
-        .scale(scale), elevation = CardDefaults.cardElevation(
-        defaultElevation = if (isSelected) 12.dp else 4.dp
-    ), colors = CardDefaults.cardColors(
-        containerColor = if (isSelected) colors.green else colors.white
-    ), shape = RoundedCornerShape(16.dp)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .noRippleClickable(onClick = onClick)
+            .scale(scale), elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isSelected) 12.dp else 4.dp
+        ), colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) colors.green else colors.white
+        ), shape = RoundedCornerShape(16.dp)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -388,7 +429,8 @@ private fun ModernAnswerOption(
 
 @Composable
 private fun ModernResultDisplay(
-    isCorrect: Boolean, correctAnswer: String, onNextClick: () -> Unit
+    isCorrect: Boolean,
+    onNextClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
@@ -450,6 +492,15 @@ private fun ModernResultDisplay(
 @Composable
 private fun QuizPlayScreenPreview() {
     MalHaRangTheme {
-        QuizPlayScreen(question = "커피는 영어로?", options = listOf("Water", "Tea", "Coffee"), isSubmitted = false, isCorrect = null, selectedAnswer = null, onAnswerSelected = {}, onNextClick = {}, onBackClick = {})
+        QuizPlayScreen(
+            question = "커피는 영어로?",
+            options = listOf("Water", "Tea", "Coffee"),
+            isSubmitted = false,
+            isCorrect = true,
+            selectedAnswer = null,
+            onAnswerSelected = {},
+            onNextClick = {},
+            onBackClick = {}
+        )
     }
 }
