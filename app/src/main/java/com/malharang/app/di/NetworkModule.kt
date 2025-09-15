@@ -38,13 +38,13 @@ object NetworkModule {
             connectTimeout(30, TimeUnit.SECONDS)
             writeTimeout(30, TimeUnit.SECONDS)
             readTimeout(30, TimeUnit.SECONDS)
-            addInterceptor(loggingInterceptor)
             addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .addHeader("Accept", "*/*")
                     .build()
                 chain.proceed(request)
             }
+            addInterceptor(loggingInterceptor)
         }.build()
 
     @Provides
