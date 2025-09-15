@@ -9,7 +9,6 @@ import com.malharang.app.domain.mapper.toMessageData
 import com.malharang.app.domain.model.ChatStateData
 import com.malharang.app.domain.model.EvaluationRequestData
 import com.malharang.app.domain.model.MessageData
-import com.malharang.app.domain.model.GrammarErrorData
 import com.malharang.app.domain.usecase.ChatUseCase
 import com.malharang.app.domain.usecase.EvaluationUseCase
 import com.malharang.app.domain.usecase.GetConversationByIdUseCase
@@ -59,7 +58,7 @@ class ChatViewModel @Inject constructor(
     private val updateConversationModeUseCase: UpdateConversationModeUseCase,
     private val saveExportSentenceUseCase: SaveExportSentenceUseCase,
     private val evaluationUseCase: EvaluationUseCase,
-    private val updateMessageUseCase: UpdateMessageUseCase,
+    private val updateMessageUseCase: UpdateMessageUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -441,8 +440,8 @@ class ChatViewModel @Inject constructor(
 
             evaluationUseCase(
                 EvaluationRequestData(
-                    messages = _state.value.chatList.map { it.toMessageData(conversationId) },
-                ),
+                    messages = _state.value.chatList.map { it.toMessageData(conversationId) }
+                )
             ).onSuccess { response ->
                 val evaluationState = if (response.data.contextuality.pass) {
                     EvaluationState.PASS

@@ -31,5 +31,5 @@ data class MessageEntity(
     val contextualityComment: String? = null,
     val grammarPassed: Boolean? = null,
     val grammarComment: String? = null,
-    val grammarErrors: String? = null, // JSON string of grammar errors
+    val grammarErrors: String? = null // JSON string of grammar errors
 )

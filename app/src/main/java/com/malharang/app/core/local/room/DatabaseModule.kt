@@ -42,7 +42,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "malharang_db"
         ).addMigrations(MIGRATION_1_2)
-         .build()
+            .build()
     }
 
     @Provides

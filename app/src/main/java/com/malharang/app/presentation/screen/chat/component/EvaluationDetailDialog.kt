@@ -74,8 +74,11 @@ fun EvaluationDetailDialog(
 
                     Icon(
                         imageVector = ImageVector.vectorResource(
-                            if (evaluationData.data.contextuality.pass) R.drawable.ic_check_22
-                            else R.drawable.ic_caution_14
+                            if (evaluationData.data.contextuality.pass) {
+                                R.drawable.ic_check_22
+                            } else {
+                                R.drawable.ic_caution_14
+                            }
                         ),
                         contentDescription = null,
                         tint = Color.Unspecified,
@@ -159,7 +162,7 @@ private fun EvaluationSection(
             .border(
                 width = 1.dp,
                 color = if (passed) colors.green else colors.secondaryRed,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(12.dp)
             )
             .padding(12.dp)
     ) {
@@ -219,7 +222,7 @@ private fun GrammarErrorCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.greenLight30.copy(alpha = 0.45f)),
+        colors = CardDefaults.cardColors(containerColor = colors.greenLight30.copy(alpha = 0.45f))
     ) {
         Column(
             modifier = Modifier
@@ -278,7 +281,6 @@ private fun GrammarErrorCard(
         }
     }
 }
-
 
 @Preview
 @Composable

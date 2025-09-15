@@ -56,7 +56,7 @@ fun ChatBubble(
     onTranslateClick: (String) -> Unit = {},
     onVoiceClick: (String) -> Unit = {},
     onBookmarkClick: () -> Unit = {},
-    onEvaluationClick: () -> Unit = {},
+    onEvaluationClick: () -> Unit = {}
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
@@ -88,8 +88,8 @@ fun ChatBubble(
                     .align(Alignment.Bottom)
                     .padding(
                         end = 8.dp,
-                        bottom = 8.dp,
-                    ),
+                        bottom = 8.dp
+                    )
             )
         }
 
@@ -198,7 +198,7 @@ private fun EvaluationIcon(
                 strokeWidth = loadingStrokeWidthDp.dp,
                 color = colors.greenBasic,
                 modifier = modifier
-                    .size(16.dp),
+                    .size(16.dp)
             )
         }
 
@@ -209,7 +209,7 @@ private fun EvaluationIcon(
                 tint = Color.Unspecified,
                 modifier = modifier
                     .size(24.dp)
-                    .clickable { onClick() },
+                    .clickable { onClick() }
             )
         }
     }

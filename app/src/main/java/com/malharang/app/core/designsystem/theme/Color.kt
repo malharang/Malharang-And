@@ -62,7 +62,7 @@ data class MalHaRangColors(
     val andSysWhite: Color,
     val greenTint: Color,
     val transparent: Color,
-    val secondaryRed: Color,
+    val secondaryRed: Color
 )
 
 val defaultMalHaRangColors = MalHaRangColors(
@@ -86,7 +86,7 @@ val defaultMalHaRangColors = MalHaRangColors(
     andSysWhite = AndSysWhite,
     greenTint = GreenTint,
     transparent = Transparent,
-    secondaryRed = SecondaryRed,
+    secondaryRed = SecondaryRed
 )
 
 val LocalMalHaRangColorsProvider = staticCompositionLocalOf { defaultMalHaRangColors }
