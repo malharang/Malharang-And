@@ -33,9 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.malharang.app.R
 import com.malharang.app.presentation.model.SenderType
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import com.malharang.app.ui.theme.MalHaRangTheme.typography
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 
 @Composable
 fun ChatBubble(

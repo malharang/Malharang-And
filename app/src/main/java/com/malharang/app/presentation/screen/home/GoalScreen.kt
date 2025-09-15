@@ -1,4 +1,4 @@
-package com.malharang.app.presentation.screen.goal
+package com.malharang.app.presentation.screen.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,8 +20,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,28 +30,28 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.malharang.app.R
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun GoalRoute(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onConfirmClick: (String) -> Unit,
-    viewModel: GoalViewModel = hiltViewModel()
+    sharedViewModel: HomeViewModel
 ) {
-    val query by viewModel.query.collectAsState()
+    val uiState by sharedViewModel.uiState.collectAsStateWithLifecycle()
+    val query = uiState.goalQuery
 
     GoalScreen(
         modifier = modifier,
         query = query,
-        onQueryChange = viewModel::updateQuery,
+        onQueryChange = sharedViewModel::updateGoalQuery,
         onBackClick = onBackClick,
         onConfirmClick = {
             onConfirmClick(it)
-            viewModel.updateQuery("")
+            sharedViewModel.clearGoalQuery()
         }
     )
 }

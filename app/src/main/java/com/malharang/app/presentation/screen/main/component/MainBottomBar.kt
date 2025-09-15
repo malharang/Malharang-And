@@ -1,4 +1,4 @@
-package com.malharang.app.presentation.screen.main
+package com.malharang.app.presentation.screen.main.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -30,16 +30,19 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import com.malharang.app.ui.theme.MalHaRangTheme.typography
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
+import com.malharang.app.presentation.screen.main.MainTab
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MainBottomBar(
     visible: Boolean,
     currentTab: MainTab?,
     onTabSelected: (MainTab) -> Unit,
-    tabs: List<MainTab>,
+    tabs: ImmutableList<MainTab>,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
@@ -125,7 +128,7 @@ private fun PreviewMainBottomBar() {
             visible = true,
             currentTab = MainTab.HOME,
             onTabSelected = {},
-            tabs = MainTab.entries,
+            tabs = MainTab.entries.toImmutableList(),
             modifier = Modifier
         )
     }

@@ -1,52 +1,84 @@
 package com.malharang.app.presentation.screen.home.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
-import com.malharang.app.core.navigation.MainTabRoute
-import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
-import com.malharang.app.presentation.screen.goal.navigation.navigateToGoal
-import com.malharang.app.presentation.screen.home.HomeRoute
-import com.malharang.app.presentation.screen.placetype.navigation.navigateToPlaceType
+import androidx.navigation.compose.navigation
+import com.malharang.app.core.common.navigation.MainTabRoute
+import com.malharang.app.core.common.navigation.Route
+import com.malharang.app.core.util.sharedViewModel
+import com.malharang.app.presentation.screen.home.HomeRoute as HomeScreenRoute
+import com.malharang.app.presentation.screen.home.HomeViewModel
+import com.malharang.app.presentation.screen.home.GoalRoute
+import kotlinx.serialization.Serializable
 
 fun NavController.navigateToHome(
-    navOptions: NavOptions
-) {
-    navigate(
-        route = MainTabRoute.Home,
-        navOptions = navOptions
-    )
-}
+    navOptions: NavOptions? = null,
+) = navigate(Home, navOptions)
+
+fun NavController.navigateToGoal(navOptions: NavOptions? = null) =
+    navigate(Goal, navOptions)
 
 fun NavGraphBuilder.homeNavGraph(
+    navController: NavHostController,
     navigateToChat: () -> Unit,
-    navController: NavController,
-    modifier: Modifier
+    navigateToPlaceType: () -> Unit,
+    navigateToUp: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    composable<MainTabRoute.Home> {
-        val backStackEntry = it
-        val savedStateHandle = backStackEntry.savedStateHandle
+    navigation<Home>(
+        startDestination = HomeMain,
+    ) {
+        composable<HomeMain> { backStackEntry ->
+            val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
+            val savedStateHandle = backStackEntry.savedStateHandle
 
-        val selectedPlaceType = savedStateHandle.get<String>("selected_place_type")
-        val selectedGoal = savedStateHandle.get<String>("selected_goal")
+            val selectedPlaceType = savedStateHandle.get<String>("selected_place_type")
+            val selectedGoal = savedStateHandle.get<String>("selected_goal")
 
-        HomeRoute(
-            modifier = modifier,
-            placeTypeArg = selectedPlaceType,
-            goalArg = selectedGoal,
-            navigateToPlaceType = navController::navigateToPlaceType,
-            navigateToGoal = navController::navigateToGoal,
-            navigateToChat = navigateToChat
-        )
+            HomeScreenRoute(
+                modifier = modifier,
+                placeTypeArg = selectedPlaceType,
+                goalArg = selectedGoal,
+                navigateToPlaceType = navigateToPlaceType,
+                navigateToGoal = navController::navigateToGoal,
+                navigateToChat = navigateToChat,
+                viewModel = viewModel,
+            )
 
-        LaunchedEffect(Unit) {
-            savedStateHandle.remove<String>("selected_place_type")
-            savedStateHandle.remove<String>("selected_goal")
+            LaunchedEffect(Unit) {
+                savedStateHandle.remove<String>("selected_place_type")
+                savedStateHandle.remove<String>("selected_goal")
+            }
+        }
+        
+        composable<Goal> { backStackEntry ->
+            val viewModel = backStackEntry.sharedViewModel<HomeViewModel>(navController)
+            
+            GoalRoute(
+                modifier = modifier,
+                onBackClick = navigateToUp,
+                sharedViewModel = viewModel,
+                onConfirmClick = { selected ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selected_goal", selected)
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
+
+@Serializable
+data object Home : MainTabRoute
+
+@Serializable
+data object HomeMain : MainTabRoute
+
+@Serializable
+data object Goal : Route

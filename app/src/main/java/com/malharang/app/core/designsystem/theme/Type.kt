@@ -1,4 +1,4 @@
-package com.malharang.app.ui.theme
+package com.malharang.app.core.designsystem.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf

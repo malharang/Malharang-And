@@ -8,6 +8,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,8 +46,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.presentation.model.MissionCardModel
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun QuizStartRoute(
@@ -53,20 +56,20 @@ fun QuizStartRoute(
     viewModel: QuizViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isInitialized = remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
         if (!isInitialized.value) {
-            viewModel.getFinishedConversations()
+            viewModel.loadConversations()
             isInitialized.value = true
         }
     }
 
     QuizStartScreen(
-        scenarioList = reviewMissions,
+        scenarioList = uiState.conversations.toList(),
         onScenarioSelected = { selectedMission ->
-            viewModel.selectScenario(selectedMission.conversationId?.toInt() ?: 0)
+            viewModel.selectConversation(selectedMission)
             navigateToQuizType()
         },
         onBackClick = navigateToUp,
@@ -92,6 +95,7 @@ fun QuizStartScreen(
                     )
                 )
             )
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

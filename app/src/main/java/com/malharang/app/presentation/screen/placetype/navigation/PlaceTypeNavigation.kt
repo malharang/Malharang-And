@@ -5,11 +5,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.malharang.app.core.navigation.HomeRoute
+import com.malharang.app.core.common.navigation.Route
 import com.malharang.app.presentation.screen.placetype.PlaceTypeRoute
+import kotlinx.serialization.Serializable
 
 fun NavController.navigateToPlaceType() {
-    navigate(HomeRoute.PlaceType)
+    navigate(PlaceType)
 }
 
 fun NavGraphBuilder.placeTypeNavGraph(
@@ -18,7 +19,7 @@ fun NavGraphBuilder.placeTypeNavGraph(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    composable<HomeRoute.PlaceType> {
+    composable<PlaceType> {
         BackHandler {
             navigateToUp()
         }
@@ -32,3 +33,6 @@ fun NavGraphBuilder.placeTypeNavGraph(
         )
     }
 }
+
+@Serializable
+data object PlaceType : Route

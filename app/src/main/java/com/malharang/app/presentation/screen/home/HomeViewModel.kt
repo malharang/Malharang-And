@@ -17,16 +17,21 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.malharang.app.data.local.datastore.ConversationDataStore
 import com.malharang.app.domain.model.ConversationData
+import com.malharang.app.domain.usecase.GetAllConversationsUseCase
 import com.malharang.app.domain.usecase.InsertConversationUseCase
 import com.malharang.app.domain.usecase.ScenarioUseCase
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceInfoModel
 import com.malharang.app.presentation.model.PlaceTypeItem
-import com.malharang.app.presentation.model.UserStatusModel
+import com.malharang.app.presentation.screen.home.HomeContract.HomeSideEffect
+import com.malharang.app.presentation.screen.home.HomeContract.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -38,34 +43,19 @@ class HomeViewModel @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
     @ApplicationContext private val context: Context,
     private val scenarioUseCase: ScenarioUseCase,
-    private val insertConversationUseCase: InsertConversationUseCase
+    private val insertConversationUseCase: InsertConversationUseCase,
+    private val getAllConversationsUseCase: GetAllConversationsUseCase
 ) : ViewModel() {
 
-    private val _currentLocation = MutableStateFlow<LatLng?>(null)
-    val currentLocation: StateFlow<LatLng?> = _currentLocation.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val _placeInfo = MutableStateFlow<PlaceInfoModel?>(null)
-    val placeInfo: StateFlow<PlaceInfoModel?> = _placeInfo.asStateFlow()
-
-    private val _missionCardList = MutableStateFlow<List<MissionCardModel>>(emptyList())
-    val missionCardList: StateFlow<List<MissionCardModel>> = _missionCardList.asStateFlow()
-
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _sideEffect = MutableSharedFlow<HomeSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
 
     private val placesClient: PlacesClient by lazy {
         Places.createClient(context)
     }
-
-    val userStatusModel = UserStatusModel(
-        profileUrl = "https://avatars.githubusercontent.com/u/76648361?v=4&size=64",
-        name = "Malssi",
-        level = 5,
-        exp = 70
-    )
 
     fun saveRecentConversationId(id: Long) {
         viewModelScope.launch {
@@ -76,7 +66,7 @@ class HomeViewModel @Inject constructor(
     fun fetchScenario(placeType: String, goal: String?) {
         viewModelScope.launch {
             if (goal == null) {
-                _isLoading.value = true
+                updateIsLoading(true)
             }
             scenarioUseCase(location = placeType, goal = goal)
                 .onSuccess { scenarioList ->
@@ -89,15 +79,21 @@ class HomeViewModel @Inject constructor(
                     }
 
                     if (goal != null) {
-                        _missionCardList.update { it + newCards }
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                missionCardList = (currentState.missionCardList + newCards).toImmutableList()
+                            )
+                        }
                     } else {
-                        _missionCardList.value = newCards
+                        _uiState.update { currentState ->
+                            currentState.copy(missionCardList = newCards.toImmutableList())
+                        }
                     }
                 }
                 .onFailure { error ->
-                    _errorMessage.value = error.message
+                    updateErrorMessage(error.message)
                 }
-            _isLoading.value = false
+            updateIsLoading(false)
         }
     }
 
@@ -108,17 +104,16 @@ class HomeViewModel @Inject constructor(
         placesClient.fetchPlace(request)
             .addOnSuccessListener { response ->
                 val primaryType = response.place.primaryType
-
                 setSelectedPlaceType(primaryType)
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener { 
                 setSelectedPlaceType(null)
             }
     }
 
     fun setSelectedPlaceType(placeType: String?) {
         if (placeType != null) {
-            _placeInfo.value = _placeInfo.value?.copy(
+            val newPlaceInfo = _uiState.value.placeInfo?.copy(
                 locationType = PlaceTypeItem.Location(name = placeType),
                 goalTypes = emptyList()
             ) ?: PlaceInfoModel(
@@ -127,22 +122,30 @@ class HomeViewModel @Inject constructor(
                 locationType = PlaceTypeItem.Location(name = placeType),
                 goalTypes = emptyList()
             )
+            
+            _uiState.update { currentState ->
+                currentState.copy(placeInfo = newPlaceInfo)
+            }
             fetchScenario(placeType, null)
         } else {
-            _placeInfo.value = _placeInfo.value?.copy(
-                locationType = null
-            )
+            _uiState.update { currentState ->
+                currentState.copy(
+                    placeInfo = currentState.placeInfo?.copy(locationType = null)
+                )
+            }
         }
     }
 
     fun addGoal(goal: String) {
         val newGoal = PlaceTypeItem.Goal(goal)
-        val currentInfo = _placeInfo.value
-        val updatedGoals = currentInfo?.goalTypes.orEmpty().filterNot { it.name == goal } + newGoal
+        val currentInfo = _uiState.value.placeInfo ?: return
+        val updatedGoals = currentInfo.goalTypes.filterNot { it.name == goal } + newGoal
 
-        _placeInfo.value = currentInfo?.copy(
-            goalTypes = updatedGoals
-        ) ?: return
+        _uiState.update { currentState ->
+            currentState.copy(
+                placeInfo = currentInfo.copy(goalTypes = updatedGoals)
+            )
+        }
 
         currentInfo.locationType?.name?.let { placeType ->
             fetchScenario(placeType, goal)
@@ -150,15 +153,19 @@ class HomeViewModel @Inject constructor(
     }
 
     fun removeGoalAt(index: Int) {
-        val currentInfo = _placeInfo.value ?: return
-
+        val currentInfo = _uiState.value.placeInfo ?: return
+        
         if (index < 0 || index >= currentInfo.goalTypes.size) return
 
         val updatedGoals = currentInfo.goalTypes.toMutableList().also {
             it.removeAt(index)
         }
 
-        _placeInfo.value = currentInfo.copy(goalTypes = updatedGoals)
+        _uiState.update { currentState ->
+            currentState.copy(
+                placeInfo = currentInfo.copy(goalTypes = updatedGoals)
+            )
+        }
     }
 
     fun fetchCurrentLocation() {
@@ -169,62 +176,113 @@ class HomeViewModel @Inject constructor(
         ) {
             locationClient.lastLocation.addOnSuccessListener { loc ->
                 loc?.let {
-                    _currentLocation.value = LatLng(it.latitude, it.longitude)
+                    _uiState.update { currentState ->
+                        currentState.copy(currentLocation = LatLng(it.latitude, it.longitude))
+                    }
                 }
             }
         }
     }
 
     fun setSelectedPlaceInfo(name: String, latLng: LatLng) {
-        _placeInfo.value = _placeInfo.value?.copy(
+        val currentPlaceInfo = _uiState.value.placeInfo
+        val newPlaceInfo = currentPlaceInfo?.copy(
             name = name,
             latLng = latLng
         ) ?: PlaceInfoModel(
             name = name,
             latLng = latLng,
-            locationType = placeInfo.value?.locationType,
-            goalTypes = placeInfo.value?.goalTypes ?: emptyList()
+            locationType = currentPlaceInfo?.locationType,
+            goalTypes = currentPlaceInfo?.goalTypes ?: emptyList()
         )
+        
+        _uiState.update { currentState ->
+            currentState.copy(placeInfo = newPlaceInfo)
+        }
     }
 
     fun saveScenario(
         scenarioTitle: String?,
         onComplete: (Long) -> Unit
     ) {
-        val location = _placeInfo.value?.locationType?.name
+        val location = _uiState.value.placeInfo?.locationType?.name
         if (location.isNullOrEmpty()) {
-            _errorMessage.value = "장소 정보가 없습니다."
+            updateErrorMessage("장소 정보가 없습니다.")
             return
         }
 
         if (scenarioTitle.isNullOrEmpty()) {
-            _errorMessage.value = "시나리오 제목이 비어 있습니다."
+            updateErrorMessage("시나리오 제목이 비어 있습니다.")
             return
         }
 
-        val newConversation = ConversationData(
-            id = 0L,
-            mode = "scenario_selection",
-            selectedLocation = location,
-            selectedScenario = scenarioTitle
-        )
-
         viewModelScope.launch {
             try {
-                val conversationId = insertConversationUseCase(newConversation)
-                onComplete(conversationId)
+                val existingConversations = getAllConversationsUseCase()
+                val existingConversation = existingConversations.find { conversation ->
+                    conversation.selectedScenario == scenarioTitle && 
+                    conversation.mode != "finished"
+                }
+
+                if (existingConversation != null) {
+                    onComplete(existingConversation.id)
+                } else {
+                    val newConversation = ConversationData(
+                        id = 0L,
+                        mode = "scenario_selection",
+                        selectedLocation = location,
+                        selectedScenario = scenarioTitle
+                    )
+                    val conversationId = insertConversationUseCase(newConversation)
+                    onComplete(conversationId)
+                }
             } catch (e: Exception) {
-                _errorMessage.value = "시나리오 저장 실패: ${e.localizedMessage}"
+                updateErrorMessage("시나리오 처리 실패: ${e.localizedMessage}")
             }
         }
     }
 
     fun clearPlaceInfo() {
-        _placeInfo.value = null
-        _missionCardList.value = emptyList()
+        _uiState.update { currentState ->
+            currentState.copy(
+                placeInfo = null,
+                missionCardList = emptyList<MissionCardModel>().toImmutableList()
+            )
+        }
     }
 
     fun clearToastMessage() {
-        _errorMessage.value = null
+        _uiState.update { currentState ->
+            currentState.copy(errorMessage = null)
+        }
+    }
+
+    fun updateGoalQuery(newQuery: String) {
+        _uiState.update { currentState ->
+            currentState.copy(goalQuery = newQuery)
+        }
+    }
+
+    fun clearGoalQuery() {
+        _uiState.update { currentState ->
+            currentState.copy(goalQuery = "")
+        }
+    }
+
+    private fun updateIsLoading(isLoading: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(isLoading = isLoading)
+        }
+    }
+
+    private fun updateErrorMessage(message: String?) {
+        _uiState.update { currentState ->
+            currentState.copy(errorMessage = message)
+        }
+        message?.let {
+            viewModelScope.launch {
+                _sideEffect.emit(HomeSideEffect.ShowToast(it))
+            }
+        }
     }
 }

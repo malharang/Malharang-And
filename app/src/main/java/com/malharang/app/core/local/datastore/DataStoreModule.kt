@@ -1,4 +1,4 @@
-package com.malharang.app.di
+package com.malharang.app.core.local.datastore
 
 import android.content.Context
 import com.malharang.app.data.local.datastore.ConversationDataStore
@@ -12,7 +12,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
-
     @Provides
     @Singleton
     fun provideConversationDataStore(

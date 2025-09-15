@@ -4,12 +4,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.malharang.app.core.navigation.QuizRoute
-import com.malharang.app.core.navigation.QuizRoute.QuizPlay
-import com.malharang.app.core.navigation.QuizRoute.QuizStart
-import com.malharang.app.core.navigation.QuizRoute.QuizType
+import com.malharang.app.core.common.navigation.Route
 import com.malharang.app.core.util.sharedViewModel
 import com.malharang.app.presentation.screen.quiz.QuizPlayRoute
 import com.malharang.app.presentation.screen.quiz.QuizResultRoute
@@ -18,25 +16,20 @@ import com.malharang.app.presentation.screen.quiz.QuizTypeRoute
 import com.malharang.app.presentation.screen.quiz.QuizViewModel
 import kotlinx.serialization.Serializable
 
-fun NavController.navigateToQuiz(route: QuizRoute) {
-    navigate(route)
-}
+fun NavController.navigateToQuiz(navOptions: NavOptions? = null) =
+    navigate(Quiz, navOptions)
 
-fun NavController.navigateToQuizStart() {
-    navigateToQuiz(QuizStart)
-}
+fun NavController.navigateToQuizStart(navOptions: NavOptions? = null) =
+    navigate(QuizStart, navOptions)
 
-fun NavController.navigateToQuizType() {
-    navigateToQuiz(QuizType)
-}
+fun NavController.navigateToQuizType(navOptions: NavOptions? = null) =
+    navigate(QuizType, navOptions)
 
-fun NavController.navigateToQuizPlay() {
-    navigateToQuiz(QuizPlay)
-}
+fun NavController.navigateToQuizPlay(navOptions: NavOptions? = null) =
+    navigate(QuizPlay, navOptions)
 
-fun NavController.navigateToQuizResult() {
-    navigateToQuiz(QuizRoute.QuizResult)
-}
+fun NavController.navigateToQuizResult(navOptions: NavOptions? = null) =
+    navigate(QuizResult, navOptions)
 
 fun NavGraphBuilder.quizNavGraph(
     navController: NavHostController,
@@ -77,7 +70,7 @@ fun NavGraphBuilder.quizNavGraph(
             )
         }
 
-        composable<QuizRoute.QuizResult> { backStackEntry ->
+        composable<QuizResult> { backStackEntry ->
             val viewModel = backStackEntry.sharedViewModel<QuizViewModel>(navController)
             QuizResultRoute(
                 navigateToUp = navigateToUp,
@@ -91,4 +84,16 @@ fun NavGraphBuilder.quizNavGraph(
 }
 
 @Serializable
-data object Quiz
+data object Quiz : Route
+
+@Serializable
+data object QuizStart : Route
+
+@Serializable
+data object QuizType : Route
+
+@Serializable
+data object QuizPlay : Route
+
+@Serializable
+data object QuizResult : Route

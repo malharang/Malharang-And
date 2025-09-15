@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.malharang.app.R
 import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.domain.model.ExportSentenceData
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionSentenceItem(

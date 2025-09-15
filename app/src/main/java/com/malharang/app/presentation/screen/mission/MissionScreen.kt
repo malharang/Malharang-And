@@ -9,7 +9,6 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +22,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,33 +37,29 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.R
-import com.malharang.app.core.component.MissionCard
+import com.malharang.app.core.designsystem.component.MissionCard
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.screen.mission.component.MissionReviews
 import com.malharang.app.presentation.screen.mission.component.MissionSentenceItem
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
 
 @Composable
 fun MissionRoute(
     modifier: Modifier = Modifier,
-    navigateToQuizStart: () -> Unit,
+    navigateToQuiz: () -> Unit,
     navigateToChat: () -> Unit,
     viewModel: MissionViewModel = hiltViewModel()
 ) {
-    val availableMissions by viewModel.availableMissions.collectAsStateWithLifecycle()
-    val reviewMissions by viewModel.reviewMissions.collectAsStateWithLifecycle()
-    val exportList by viewModel.exportList.collectAsStateWithLifecycle()
-
-    val ttsPlayingId by viewModel.ttsPlayingId.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MissionScreen(
         modifier = modifier,
-        navigateToQuizStart = navigateToQuizStart,
-        availableMissions = availableMissions,
-        reviewMissions = reviewMissions,
-        exportSentences = exportList,
+        navigateToQuiz = navigateToQuiz,
+        availableMissions = uiState.availableMissions.toList(),
+        reviewMissions = uiState.reviewMissions.toList(),
+        exportSentences = uiState.exportList.toList(),
         navigateToChat = { id ->
             if (id != null) {
                 viewModel.saveRecentConversationId(id)
@@ -76,7 +70,7 @@ fun MissionRoute(
         onExportSoundClick = { id, text ->
             viewModel.playOrStopTTS(id = id, text = text)
         },
-        ttsPlayingId = ttsPlayingId,
+        ttsPlayingId = uiState.ttsPlayingId,
     )
 }
 
@@ -90,7 +84,7 @@ private fun MissionScreen(
     onExportBookmarkClick: (Long) -> Unit = {},
     onExportSoundClick: (Long, String) -> Unit = { _, _ -> },
     ttsPlayingId: Long? = null,
-    navigateToQuizStart: () -> Unit
+    navigateToQuiz: () -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -119,7 +113,7 @@ private fun MissionScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
 
-            QuizEntryCard(onClick = navigateToQuizStart)
+            QuizEntryCard(onClick = navigateToQuiz)
             Spacer(modifier = Modifier.height(20.dp))
             // 섹션: Available Missions
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -248,7 +242,7 @@ private fun PreviewMissionScreen() {
             availableMissions = missionCardList,
             reviewMissions = reviewMissions,
             navigateToChat = {},
-            navigateToQuizStart = {},
+            navigateToQuiz = {},
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.malharang.app.core.component
+package com.malharang.app.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceTypeItem
-import com.malharang.app.ui.theme.MalHaRangTheme
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
-import com.malharang.app.ui.theme.MalHaRangTheme.typography
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 
 @Composable
 fun MissionCard(

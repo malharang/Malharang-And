@@ -3,15 +3,22 @@ package com.malharang.app.presentation.screen.mission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malharang.app.data.local.datastore.ConversationDataStore
-import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.domain.usecase.GetAllConversationsUseCase
 import com.malharang.app.domain.usecase.GetExportSentencesUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
 import com.malharang.app.presentation.model.MissionCardModel
+import com.malharang.app.presentation.model.PlaceTypeItem
 import com.malharang.app.presentation.screen.chat.component.SpeechRecorderManager
+import com.malharang.app.presentation.screen.mission.MissionContract.MissionSideEffect
+import com.malharang.app.presentation.screen.mission.MissionContract.MissionUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,45 +31,63 @@ class MissionViewModel @Inject constructor(
     private val recorder: SpeechRecorderManager
 ) : ViewModel() {
 
-    private val _availableMissions = MutableStateFlow<List<MissionCardModel>>(emptyList())
-    val availableMissions: StateFlow<List<MissionCardModel>> = _availableMissions
+    private val _uiState = MutableStateFlow(MissionUiState())
+    val uiState: StateFlow<MissionUiState> = _uiState.asStateFlow()
 
-    private val _reviewMissions = MutableStateFlow<List<MissionCardModel>>(emptyList())
-    val reviewMissions: StateFlow<List<MissionCardModel>> = _reviewMissions
-
-    private val _exportList = MutableStateFlow<List<ExportSentenceData>>(emptyList())
-    val exportList: StateFlow<List<ExportSentenceData>> = _exportList
-
-    private val _ttsPlayingId = MutableStateFlow<Long?>(null)
-    val ttsPlayingId: StateFlow<Long?> = _ttsPlayingId
+    private val _sideEffect = MutableSharedFlow<MissionSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
 
     init {
+        loadMissions()
+        loadExportSentences()
+    }
+
+    private fun loadMissions() {
         viewModelScope.launch {
-            val allConversations = getAllConversationsUseCase()
-
-            val available = allConversations
-                .filter { it.mode == "role_play" }
-                .map {
+            updateIsLoading(true)
+            try {
+                val conversations = getAllConversationsUseCase()
+                
+                val available = conversations.filter { it.mode != "finished" }.map {
                     MissionCardModel(
-                        title = it.selectedScenario,
+                        title = it.selectedScenario ?: "Unknown",
+                        type = PlaceTypeItem.Location(it.selectedLocation ?: "Unknown"),
+                        conversationId = it.id
+                    )
+                }
+                
+                val completed = conversations.filter { it.mode == "finished" }.map {
+                    MissionCardModel(
+                        title = it.selectedScenario ?: "Unknown",
+                        type = PlaceTypeItem.Location(it.selectedLocation ?: "Unknown"),
                         conversationId = it.id
                     )
                 }
 
-            val review = allConversations
-                .filter { it.mode == "finished" }
-                .map {
-                    MissionCardModel(
-                        title = it.selectedScenario,
-                        conversationId = it.id
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        availableMissions = available.toImmutableList(),
+                        reviewMissions = completed.toImmutableList()
                     )
                 }
-
-            _availableMissions.value = available
-            _reviewMissions.value = review
+            } catch (e: Exception) {
+                updateErrorMessage("Failed to load missions: ${e.localizedMessage}")
+            }
+            updateIsLoading(false)
         }
+    }
 
-        loadExportedSentences()
+    private fun loadExportSentences() {
+        viewModelScope.launch {
+            try {
+                val exportSentences = getExportSentencesUseCase()
+                _uiState.update { currentState ->
+                    currentState.copy(exportList = exportSentences.toImmutableList())
+                }
+            } catch (e: Exception) {
+                updateErrorMessage("Failed to load export sentences: ${e.localizedMessage}")
+            }
+        }
     }
 
     fun saveRecentConversationId(id: Long) {
@@ -71,37 +96,63 @@ class MissionViewModel @Inject constructor(
         }
     }
 
-    private fun loadExportedSentences() {
+    fun playOrStopTTS(id: Long, text: String) {
         viewModelScope.launch {
-            _exportList.value = getExportSentencesUseCase()
+            val currentPlayingId = _uiState.value.ttsPlayingId
+            
+            if (currentPlayingId == id) {
+                // Stop current TTS
+                recorder.stopTTS {
+                    _uiState.update { currentState ->
+                        currentState.copy(ttsPlayingId = null)
+                    }
+                }
+                _sideEffect.emit(MissionSideEffect.StopTTS)
+            } else {
+                // Stop any current TTS and start new one
+                recorder.stopTTS { }
+                
+                _uiState.update { currentState ->
+                    currentState.copy(ttsPlayingId = id)
+                }
+                
+                ttsUseCase(text)
+                    .onSuccess { ttsData ->
+                        recorder.playTTSStream(
+                            responseBody = ttsData.audioStream,
+                            onComplete = {
+                                _uiState.update { currentState ->
+                                    currentState.copy(ttsPlayingId = null)
+                                }
+                            }
+                        )
+                    }
+                    .onFailure { throwable ->
+                        _uiState.update { currentState ->
+                            currentState.copy(ttsPlayingId = null)
+                        }
+                        updateErrorMessage("TTS Error: ${throwable.message}")
+                    }
+                
+                _sideEffect.emit(MissionSideEffect.PlayTTS(id, text))
+            }
         }
     }
 
-    fun playOrStopTTS(id: Long, text: String) {
-        viewModelScope.launch {
-            val isPlaying = _ttsPlayingId.value == id
+    private fun updateIsLoading(isLoading: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(isLoading = isLoading)
+        }
+    }
 
-            if (isPlaying) {
-                recorder.stopTTS {
-                    _ttsPlayingId.value = null
-                }
-                return@launch
+    private fun updateErrorMessage(message: String?) {
+        _uiState.update { currentState ->
+            currentState.copy(errorMessage = message)
+        }
+        message?.let {
+            viewModelScope.launch {
+                _sideEffect.emit(MissionSideEffect.ShowToast(it))
             }
-
-            _ttsPlayingId.value = id
-
-            ttsUseCase(text)
-                .onSuccess { ttsData ->
-                    recorder.playTTSStream(
-                        responseBody = ttsData.audioStream,
-                        onComplete = {
-                            _ttsPlayingId.value = null
-                        }
-                    )
-                }
-                .onFailure {
-                    _ttsPlayingId.value = null
-                }
         }
     }
 }

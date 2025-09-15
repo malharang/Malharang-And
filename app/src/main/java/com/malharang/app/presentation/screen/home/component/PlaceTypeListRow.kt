@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.malharang.app.R
 import com.malharang.app.core.util.noRippleClickable
 import com.malharang.app.presentation.model.PlaceTypeItem
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun PlaceTypeListRow(

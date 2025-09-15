@@ -8,8 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.malharang.app.core.navigation.MainTabRoute
 import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
+import com.malharang.app.presentation.screen.home.navigation.Home
 import com.malharang.app.presentation.screen.home.navigation.navigateToHome
 import com.malharang.app.presentation.screen.mission.navigation.navigateToMission
 import com.malharang.app.presentation.screen.profile.navigation.navigateToProfile
@@ -21,15 +21,12 @@ class MainNavigator(
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
 
-    val startDestination = MainTabRoute.Home
+    val startDestination = Home
 
     val currentTab: MainTab?
-        @Composable get() =
-            when {
-                else -> MainTab.find { tab -> currentDestination?.hasRoute(tab::class) == true }
-            }
-
-    var selectedConversationId: Long? = null
+        @Composable get() = MainTab.find {
+            currentDestination?.hasRoute(it::class) == true
+        }
 
     fun navigateUp() {
         navController.navigateUp()
@@ -57,10 +54,8 @@ class MainNavigator(
         val isMainTabRoute = MainTab.contains {
             currentDestination?.hasRoute(it::class) == true
         }
-
-        val currentRoute = currentDestination?.route
-
-        return isMainTabRoute && currentDestination?.hasRoute(MainTab.CHAT.route::class) != true
+        val tab = MainTab.find { currentDestination?.hasRoute(it::class) == true }
+        return isMainTabRoute && tab != MainTab.CHAT
     }
 }
 

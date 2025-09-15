@@ -15,10 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.malharang.app.core.component.MissionCard
+import com.malharang.app.core.designsystem.component.MissionCard
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceTypeItem
-import com.malharang.app.ui.theme.MalHaRangTheme.colors
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 
 @Composable
 fun HomeBottomSheet(

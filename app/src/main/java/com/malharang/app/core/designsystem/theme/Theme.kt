@@ -1,4 +1,4 @@
-package com.malharang.app.ui.theme
+package com.malharang.app.core.designsystem.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,4 @@
-package com.malharang.app.di
+package com.malharang.app.core.local.room
 
 import android.content.Context
 import androidx.room.Room
