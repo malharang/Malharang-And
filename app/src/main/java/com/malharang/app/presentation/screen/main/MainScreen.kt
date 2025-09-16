@@ -1,5 +1,7 @@
 package com.malharang.app.presentation.screen.main
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import com.malharang.app.presentation.screen.chat.navigation.chatNavGraph
 import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
 import com.malharang.app.presentation.screen.home.navigation.homeNavGraph
 import com.malharang.app.presentation.screen.home.navigation.navigateToGoal
+import com.malharang.app.presentation.screen.home.navigation.navigateToHome
 import com.malharang.app.presentation.screen.home.navigation.navigateToPlaceType
 import com.malharang.app.presentation.screen.main.component.MainBottomBar
 import com.malharang.app.presentation.screen.mission.navigation.Mission
@@ -22,6 +25,8 @@ import com.malharang.app.presentation.screen.mission.navigation.navigateToMissio
 import com.malharang.app.presentation.screen.profile.navigation.profileNavGraph
 import com.malharang.app.presentation.screen.quiz.navigation.navigateToQuiz
 import com.malharang.app.presentation.screen.quiz.navigation.quizNavGraph
+import com.malharang.app.presentation.screen.splash.navigation.Splash
+import com.malharang.app.presentation.screen.splash.navigation.splashGraph
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -56,9 +61,25 @@ private fun MainNavHost(
     modifier: Modifier = Modifier
 ) {
     NavHost(
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
         navController = navigator.navController,
         startDestination = navigator.startDestination
     ) {
+        splashGraph(
+            navigateToHome = {
+                navigator.navController.navigateToHome(
+                    navOptions = navOptions {
+                        popUpTo<Splash> {
+                            inclusive = true
+                        }
+                    }
+                )
+            },
+        )
+
         homeNavGraph(
             navController = navigator.navController,
             navigateToChat = navigator.navController::navigateToChat,
