@@ -10,6 +10,7 @@ fun MessageData.toEntity(): MessageEntity = MessageEntity(
     content = this.content,
     contextualityPassed = this.contextualityPassed,
     contextualityComment = this.contextualityComment,
+    contextualityErrors = this.contextualityErrors,
     grammarPassed = this.grammarPassed,
     grammarComment = this.grammarComment,
     grammarErrors = this.grammarErrors

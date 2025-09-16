@@ -1,11 +1,13 @@
 package com.malharang.app.data.mapper.todomain
 
 import com.malharang.app.data.remote.dto.response.ContextualityDto
+import com.malharang.app.data.remote.dto.response.ContextualityItemDto
 import com.malharang.app.data.remote.dto.response.EvaluationDataDto
 import com.malharang.app.data.remote.dto.response.EvaluationResponseDto
 import com.malharang.app.data.remote.dto.response.GrammarDto
 import com.malharang.app.data.remote.dto.response.GrammarItemDto
 import com.malharang.app.domain.model.ContextualityData
+import com.malharang.app.domain.model.ContextualityErrorData
 import com.malharang.app.domain.model.EvaluationResponseData
 import com.malharang.app.domain.model.EvaluationResultData
 import com.malharang.app.domain.model.GrammarData
@@ -29,8 +31,15 @@ fun EvaluationDataDto.toDomain(): EvaluationResultData {
 fun ContextualityDto.toDomain(): ContextualityData {
     return ContextualityData(
         comment = this.comment,
-        contextuality = emptyList(), // ContextualityItemDto는 사용하지 않으므로 빈 리스트
+        contextuality = this.contextuality.map { it.toDomain() },
         pass = this.pass
+    )
+}
+
+fun ContextualityItemDto.toDomain(): ContextualityErrorData {
+    return ContextualityErrorData(
+        originalSentence = this.originalSentence,
+        suggestedSentence = this.suggestedSentence
     )
 }
 

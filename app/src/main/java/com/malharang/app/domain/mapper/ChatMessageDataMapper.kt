@@ -5,6 +5,7 @@ import com.malharang.app.domain.model.MessageData
 import com.malharang.app.presentation.model.ChatMessageModel
 import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.presentation.screen.chat.type.EvaluationState
+import kotlinx.serialization.json.Json
 
 fun List<MessageData>.toChatMessageModelList(): List<ChatMessageModel> {
     return this.mapNotNull { msg ->
@@ -24,15 +25,19 @@ fun List<MessageData>.toChatMessageModelList(): List<ChatMessageModel> {
 
             val evaluationData = if (msg.role == "user" && msg.contextualityPassed != null && msg.grammarPassed != null) {
                 try {
+                    val contextualityErrors = msg.contextualityErrors?.let { json ->
+                        Json.decodeFromString<List<com.malharang.app.domain.model.ContextualityErrorData>>(json)
+                    } ?: emptyList()
+
                     val grammarErrors = msg.grammarErrors?.let { json ->
-                        kotlinx.serialization.json.Json.decodeFromString<List<com.malharang.app.domain.model.GrammarErrorData>>(json)
+                        Json.decodeFromString<List<com.malharang.app.domain.model.GrammarErrorData>>(json)
                     } ?: emptyList()
 
                     com.malharang.app.domain.model.EvaluationResponseData(
                         data = com.malharang.app.domain.model.EvaluationResultData(
                             contextuality = com.malharang.app.domain.model.ContextualityData(
                                 comment = msg.contextualityComment ?: "",
-                                contextuality = emptyList(),
+                                contextuality = contextualityErrors,
                                 pass = msg.contextualityPassed ?: false
                             ),
                             grammar = com.malharang.app.domain.model.GrammarData(

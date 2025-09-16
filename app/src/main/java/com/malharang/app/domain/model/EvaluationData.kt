@@ -24,7 +24,7 @@ data class EvaluationResultData(
 
 data class ContextualityData(
     val comment: String,
-    val contextuality: List<String>,
+    val contextuality: List<ContextualityErrorData>,
     val pass: Boolean
 )
 
@@ -32,6 +32,12 @@ data class GrammarData(
     val comment: String,
     val grammar: List<GrammarErrorData>,
     val pass: Boolean
+)
+
+@Serializable
+data class ContextualityErrorData(
+    val originalSentence: String,
+    val suggestedSentence: List<String>
 )
 
 @Serializable
