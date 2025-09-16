@@ -36,6 +36,7 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
 import com.malharang.app.domain.model.ContextualityData
+import com.malharang.app.domain.model.ContextualityErrorData
 import com.malharang.app.domain.model.EvaluationResponseData
 import com.malharang.app.domain.model.EvaluationResultData
 import com.malharang.app.domain.model.GrammarData
@@ -104,6 +105,22 @@ fun EvaluationDetailDialog(
                         )
                     }
 
+                    // Contextuality Errors
+                    if (!evaluationData.data.contextuality.pass) {
+                        item {
+                            Text(
+                                text = "Contextuality Suggestions",
+                                style = typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                color = colors.black,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+
+                        items(evaluationData.data.contextuality.contextuality) { contextualityError ->
+                            ContextualityErrorCard(contextualityError = contextualityError)
+                        }
+                    }
+
                     item {
                         EvaluationSection(
                             title = "Grammar",
@@ -113,7 +130,7 @@ fun EvaluationDetailDialog(
                     }
 
                     // Grammar Errors
-                    if (evaluationData.data.grammar.grammar.isNotEmpty()) {
+                    if (!evaluationData.data.grammar.pass) {
                         item {
                             Text(
                                 text = "Grammar Errors",
@@ -215,6 +232,63 @@ private fun EvaluationSection(
 }
 
 @Composable
+private fun ContextualityErrorCard(
+    contextualityError: ContextualityErrorData,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = colors.greenLight30.copy(alpha = 0.45f))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Original",
+                        style = typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = colors.secondaryRed
+                    )
+                    Text(
+                        text = contextualityError.originalSentence,
+                        style = typography.bodySmall,
+                        color = colors.black,
+                        modifier = Modifier.padding(top = 6.dp)
+                    )
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Suggestions",
+                        style = typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = colors.greenBasic
+                    )
+                    Column(
+                        modifier = Modifier.padding(top = 6.dp)
+                    ) {
+                        contextualityError.suggestedSentence.forEach { suggestion ->
+                            Text(
+                                text = "• $suggestion",
+                                style = typography.bodySmall,
+                                color = colors.black,
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun GrammarErrorCard(
     grammarError: GrammarErrorData,
     modifier: Modifier = Modifier
@@ -290,9 +364,14 @@ private fun EvaluationDetailDialogPreview() {
             evaluationData = EvaluationResponseData(
                 data = EvaluationResultData(
                     contextuality = ContextualityData(
-                        comment = "사용자의 응답이 상황에 적절하고 대화 흐름에 맞습니다.",
-                        contextuality = emptyList(),
-                        pass = true
+                        comment = "상황에 맞지 않는 표현이 사용되었습니다.",
+                        contextuality = listOf(
+                            ContextualityErrorData(
+                                originalSentence = "화장실 밥줘",
+                                suggestedSentence = listOf("아이스 아메리카노 한 잔 주세요.")
+                            )
+                        ),
+                        pass = false
                     ),
                     grammar = GrammarData(
                         comment = "문법적으로 약간의 오류가 있습니다.",

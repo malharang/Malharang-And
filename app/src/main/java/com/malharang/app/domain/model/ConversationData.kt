@@ -14,6 +14,7 @@ data class MessageData(
     val content: String,
     val contextualityPassed: Boolean? = null,
     val contextualityComment: String? = null,
+    val contextualityErrors: String? = null,
     val grammarPassed: Boolean? = null,
     val grammarComment: String? = null,
     val grammarErrors: String? = null

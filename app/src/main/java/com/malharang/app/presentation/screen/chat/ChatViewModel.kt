@@ -463,6 +463,7 @@ class ChatViewModel @Inject constructor(
                     val userMessageFromDb = allMessages.findLast { it.role == "user" && it.content == lastUserMessage.text }
 
                     userMessageFromDb?.let { dbMessage ->
+                        val contextualityErrorsJson = Json.encodeToString(response.data.contextuality.contextuality)
                         val grammarErrorsJson = Json.encodeToString(response.data.grammar.grammar)
 
                         val updatedMessage = MessageData(
@@ -472,6 +473,7 @@ class ChatViewModel @Inject constructor(
                             content = dbMessage.content,
                             contextualityPassed = response.data.contextuality.pass,
                             contextualityComment = response.data.contextuality.comment,
+                            contextualityErrors = contextualityErrorsJson,
                             grammarPassed = response.data.grammar.pass,
                             grammarComment = response.data.grammar.comment,
                             grammarErrors = grammarErrorsJson
