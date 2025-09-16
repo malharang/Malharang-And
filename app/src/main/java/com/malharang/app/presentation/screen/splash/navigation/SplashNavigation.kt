@@ -12,11 +12,11 @@ fun NavController.navigateToSplash(navOptions: NavOptions? = null) =
     navigate(Splash, navOptions)
 
 fun NavGraphBuilder.splashGraph(
-    navigateToHome: () -> Unit,
+    navigateToHome: () -> Unit
 ) {
     composable<Splash> {
         SplashRoute(
-            navigateToHome,
+            navigateToHome
         )
     }
 }

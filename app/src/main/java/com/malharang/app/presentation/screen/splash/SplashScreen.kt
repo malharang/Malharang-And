@@ -23,7 +23,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashRoute(
-    navigateToHome: () -> Unit,
+    navigateToHome: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         delay(1200)
@@ -39,23 +39,23 @@ private fun SplashScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(colors.white),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier.wrapContentSize(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.Bottom
         ) {
             Image(
                 painter = painterResource(id = R.drawable.img_splash_logo),
                 contentDescription = null,
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier.size(50.dp)
             )
 
             Image(
                 painter = painterResource(id = R.drawable.img_splash_name),
                 contentDescription = null,
-                modifier = Modifier.width(120.dp),
+                modifier = Modifier.width(120.dp)
             )
         }
     }

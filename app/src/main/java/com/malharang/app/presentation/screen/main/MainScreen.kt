@@ -77,7 +77,7 @@ private fun MainNavHost(
                         }
                     }
                 )
-            },
+            }
         )
 
         homeNavGraph(

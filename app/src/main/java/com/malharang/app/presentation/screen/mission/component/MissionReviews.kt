@@ -35,7 +35,8 @@ import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 fun MissionReviews(
     reviewMissions: List<MissionCardModel>,
     title: String = "Completed Missions",
-    navigateToChat: (Long?) -> Unit = {}
+    navigateToChat: (Long?) -> Unit = {},
+    onDeleteMission: (MissionCardModel) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -79,11 +80,10 @@ fun MissionReviews(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 reviewMissions.forEach { mission ->
-                    MissionSummaryCard(
-                        mission = mission,
-                        navigateToChat = {
-                            navigateToChat(mission.conversationId)
-                        }
+                    MissionSwipeItem(
+                        data = mission,
+                        onClick = { navigateToChat(mission.conversationId) },
+                        onDelete = { onDeleteMission(mission) }
                     )
                 }
             }

@@ -6,6 +6,8 @@ import com.malharang.app.data.local.datastore.ConversationDataStore
 import com.malharang.app.domain.usecase.GetAllConversationsUseCase
 import com.malharang.app.domain.usecase.GetExportSentencesUseCase
 import com.malharang.app.domain.usecase.TTSUseCase
+import com.malharang.app.domain.usecase.DeleteConversationUseCase
+import com.malharang.app.domain.usecase.GetConversationByIdUseCase
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.model.PlaceTypeItem
 import com.malharang.app.presentation.screen.chat.component.SpeechRecorderManager
@@ -28,7 +30,9 @@ class MissionViewModel @Inject constructor(
     private val conversationIdDataStore: ConversationDataStore,
     private val getExportSentencesUseCase: GetExportSentencesUseCase,
     private val ttsUseCase: TTSUseCase,
-    private val recorder: SpeechRecorderManager
+    private val recorder: SpeechRecorderManager,
+    private val deleteConversationUseCase: DeleteConversationUseCase,
+    private val getConversationByIdUseCase: GetConversationByIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MissionUiState())
@@ -135,6 +139,38 @@ class MissionViewModel @Inject constructor(
                     }
 
                 _sideEffect.emit(MissionSideEffect.PlayTTS(id, text))
+            }
+        }
+    }
+
+    fun deleteMission(missionCardModel: MissionCardModel) {
+        viewModelScope.launch {
+            try {
+                val conversationId = missionCardModel.conversationId
+                if (conversationId != null) {
+                    // 1. 먼저 UI에서 즉시 제거
+                    val currentState = _uiState.value
+                    val updatedAvailable = currentState.availableMissions.filterNot { it.conversationId == conversationId }
+                    val updatedReview = currentState.reviewMissions.filterNot { it.conversationId == conversationId }
+
+                    _uiState.update {
+                        it.copy(
+                            availableMissions = updatedAvailable.toImmutableList(),
+                            reviewMissions = updatedReview.toImmutableList()
+                        )
+                    }
+
+                    // 2. DB에서 삭제
+                    val conversation = getConversationByIdUseCase(conversationId)
+                    if (conversation != null) {
+                        deleteConversationUseCase(conversation)
+                        _sideEffect.emit(MissionSideEffect.ShowToast("Mission deleted successfully"))
+                    }
+                }
+            } catch (e: Exception) {
+                // 에러 발생시 데이터 다시 로드
+                loadMissions()
+                updateErrorMessage("Failed to delete mission: ${e.localizedMessage}")
             }
         }
     }
