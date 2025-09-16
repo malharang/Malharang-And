@@ -8,7 +8,10 @@ fun MessageEntity.toDomain(): MessageData = MessageData(
     conversationId = this.conversationId,
     role = this.role,
     content = this.content,
-    passed = this.passed,
-    commentContextuality = this.commentContextuality,
-    commentLexicalVariety = this.commentLexicalVariety
+    contextualityPassed = this.contextualityPassed,
+    contextualityComment = this.contextualityComment,
+    contextualityErrors = this.contextualityErrors,
+    grammarPassed = this.grammarPassed,
+    grammarComment = this.grammarComment,
+    grammarErrors = this.grammarErrors
 )

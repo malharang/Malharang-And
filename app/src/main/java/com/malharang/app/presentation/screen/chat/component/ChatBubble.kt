@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.vectorResource
@@ -32,10 +35,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.malharang.app.R
-import com.malharang.app.presentation.model.SenderType
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.core.designsystem.theme.MalHaRangTheme.typography
+import com.malharang.app.presentation.model.SenderType
+import com.malharang.app.presentation.screen.chat.type.EvaluationState
 
 @Composable
 fun ChatBubble(
@@ -43,12 +47,14 @@ fun ChatBubble(
     sender: SenderType,
     modifier: Modifier = Modifier,
     translatedText: String? = null,
+    isTranslating: Boolean = false,
+    isTranslationVisible: Boolean = false,
+    isSoundPlaying: Boolean = false,
+    evaluationState: EvaluationState = EvaluationState.EMPTY,
     onTranslateClick: (String) -> Unit = {},
     onVoiceClick: (String) -> Unit = {},
     onBookmarkClick: () -> Unit = {},
-    isTranslating: Boolean = false,
-    isSoundPlaying: Boolean = false,
-    isTranslationVisible: Boolean = false
+    onEvaluationClick: () -> Unit = {}
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 2 / 3
     val isFromBot = sender == SenderType.BOT
@@ -72,6 +78,19 @@ fun ChatBubble(
             .fillMaxWidth(),
         horizontalArrangement = if (isFromBot) Arrangement.Start else Arrangement.End
     ) {
+        if (!isFromBot) {
+            EvaluationIcon(
+                evaluationState = evaluationState,
+                onClick = onEvaluationClick,
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+                    .padding(
+                        end = 8.dp,
+                        bottom = 8.dp
+                    )
+            )
+        }
+
         Column(
             modifier = Modifier
                 .clip(shape)
@@ -158,6 +177,41 @@ private fun ChatIcon(icon: Int, description: String, onClick: () -> Unit) {
     )
 }
 
+@Composable
+private fun EvaluationIcon(
+    evaluationState: EvaluationState,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    loadingStrokeWidthDp: Float = 2f
+) {
+    when (evaluationState) {
+        EvaluationState.EMPTY -> {
+            // 아무것도 표시하지 않음
+        }
+
+        EvaluationState.Loading -> {
+            CircularProgressIndicator(
+                strokeWidth = loadingStrokeWidthDp.dp,
+                color = colors.greenBasic,
+                modifier = modifier
+                    .size(16.dp)
+            )
+        }
+
+        else -> {
+            Icon(
+                imageVector = ImageVector.vectorResource(evaluationState.icon),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .clickable(onClick = onClick)
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun ChatBubblePreview() {
@@ -173,7 +227,8 @@ private fun ChatBubblePreview() {
             )
             ChatBubble(
                 text = "아메리카노 한잔 주세요",
-                sender = SenderType.USER
+                sender = SenderType.USER,
+                evaluationState = EvaluationState.PASS
             )
         }
     }
