@@ -20,4 +20,8 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun deleteMessagesByConversationId(conversationId: Long) {
         messageDao.deleteMessagesByConversationId(conversationId)
     }
+
+    override suspend fun updateMessage(message: MessageEntity): Long {
+        return messageDao.insertMessage(message)
+    }
 }

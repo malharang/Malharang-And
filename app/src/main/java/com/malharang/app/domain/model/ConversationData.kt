@@ -12,7 +12,10 @@ data class MessageData(
     val conversationId: Long = 0,
     val role: String,
     val content: String,
-    val passed: Boolean? = null,
-    val commentContextuality: String? = null,
-    val commentLexicalVariety: String? = null
+    val contextualityPassed: Boolean? = null,
+    val contextualityComment: String? = null,
+    val contextualityErrors: String? = null,
+    val grammarPassed: Boolean? = null,
+    val grammarComment: String? = null,
+    val grammarErrors: String? = null
 )

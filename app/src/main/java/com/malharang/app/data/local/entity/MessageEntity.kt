@@ -26,7 +26,11 @@ data class MessageEntity(
     val role: String,
     val content: String,
 
-    val passed: Boolean? = null,
-    val commentContextuality: String? = null,
-    val commentLexicalVariety: String? = null
+    // Evaluation fields (only for user messages)
+    val contextualityPassed: Boolean? = null,
+    val contextualityComment: String? = null,
+    val contextualityErrors: String? = null, // JSON string of contextuality errors
+    val grammarPassed: Boolean? = null,
+    val grammarComment: String? = null,
+    val grammarErrors: String? = null // JSON string of grammar errors
 )

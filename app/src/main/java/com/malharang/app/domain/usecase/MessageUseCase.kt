@@ -29,3 +29,11 @@ class DeleteMessageUseCase @Inject constructor(
         repository.deleteMessagesByConversationId(conversationId)
     }
 }
+
+class UpdateMessageUseCase @Inject constructor(
+    private val repository: MessageRepository
+) {
+    suspend operator fun invoke(message: MessageData): Long {
+        return repository.updateMessage(message.toEntity())
+    }
+}

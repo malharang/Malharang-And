@@ -28,6 +28,8 @@ val Green = Color(0xFF00AC6D)
 val GreenBasic = Color(0xFF00AC6D)
 val GreenBasic20 = GreenBasic.copy(alpha = 0.2f)
 
+val SecondaryRed = Color(0xFFFF9AA7)
+
 // Android
 val AndSysGray = Color(0xFF858585)
 val AndSysWhite = Color(0xFFF6F6F8)
@@ -59,7 +61,8 @@ data class MalHaRangColors(
     val andSysGray: Color,
     val andSysWhite: Color,
     val greenTint: Color,
-    val transparent: Color
+    val transparent: Color,
+    val secondaryRed: Color
 )
 
 val defaultMalHaRangColors = MalHaRangColors(
@@ -82,7 +85,8 @@ val defaultMalHaRangColors = MalHaRangColors(
     andSysGray = AndSysGray,
     andSysWhite = AndSysWhite,
     greenTint = GreenTint,
-    transparent = Transparent
+    transparent = Transparent,
+    secondaryRed = SecondaryRed
 )
 
 val LocalMalHaRangColorsProvider = staticCompositionLocalOf { defaultMalHaRangColors }
