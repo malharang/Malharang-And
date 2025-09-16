@@ -26,7 +26,7 @@ fun SplashRoute(
     navigateToHome: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        delay(1500)
+        delay(1200)
         navigateToHome()
     }
 
