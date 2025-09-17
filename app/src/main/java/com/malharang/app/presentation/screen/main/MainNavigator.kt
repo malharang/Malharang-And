@@ -9,10 +9,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.malharang.app.presentation.screen.chat.navigation.navigateToChat
-import com.malharang.app.presentation.screen.home.navigation.Home
 import com.malharang.app.presentation.screen.home.navigation.navigateToHome
 import com.malharang.app.presentation.screen.mission.navigation.navigateToMission
 import com.malharang.app.presentation.screen.profile.navigation.navigateToProfile
+import com.malharang.app.presentation.screen.splash.navigation.Splash
 
 class MainNavigator(
     val navController: NavHostController
@@ -21,7 +21,7 @@ class MainNavigator(
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
 
-    val startDestination = Home
+    val startDestination = Splash
 
     val currentTab: MainTab?
         @Composable get() = MainTab.find {

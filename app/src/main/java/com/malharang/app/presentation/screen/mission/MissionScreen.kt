@@ -37,13 +37,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.malharang.app.R
-import com.malharang.app.core.designsystem.component.MissionCard
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme
+import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
 import com.malharang.app.domain.model.ExportSentenceData
 import com.malharang.app.presentation.model.MissionCardModel
 import com.malharang.app.presentation.screen.mission.component.MissionReviews
 import com.malharang.app.presentation.screen.mission.component.MissionSentenceItem
-import com.malharang.app.core.designsystem.theme.MalHaRangTheme
-import com.malharang.app.core.designsystem.theme.MalHaRangTheme.colors
+import com.malharang.app.presentation.screen.mission.component.MissionSwipeItem
 
 @Composable
 fun MissionRoute(
@@ -60,6 +60,9 @@ fun MissionRoute(
         availableMissions = uiState.availableMissions.toList(),
         reviewMissions = uiState.reviewMissions.toList(),
         exportSentences = uiState.exportList.toList(),
+        onDeleteMission = { missionCardModel ->
+            viewModel.deleteMission(missionCardModel)
+        },
         navigateToChat = { id ->
             if (id != null) {
                 viewModel.saveRecentConversationId(id)
@@ -81,6 +84,7 @@ private fun MissionScreen(
     reviewMissions: List<MissionCardModel>,
     exportSentences: List<ExportSentenceData>,
     navigateToChat: (Long?) -> Unit,
+    onDeleteMission: (MissionCardModel) -> Unit,
     onExportBookmarkClick: (Long) -> Unit = {},
     onExportSoundClick: (Long, String) -> Unit = { _, _ -> },
     ttsPlayingId: Long? = null,
@@ -123,9 +127,11 @@ private fun MissionScreen(
                 )
 
                 availableMissions.forEach { missionCardData ->
-                    MissionCard(
+
+                    MissionSwipeItem(
                         data = missionCardData,
-                        onClick = { navigateToChat(missionCardData.conversationId) }
+                        onClick = { navigateToChat(missionCardData.conversationId) },
+                        onDelete = { onDeleteMission(missionCardData) }
                     )
                 }
             }
@@ -143,7 +149,8 @@ private fun MissionScreen(
                 )
                 MissionReviews(
                     reviewMissions = reviewMissions,
-                    navigateToChat = navigateToChat
+                    navigateToChat = navigateToChat,
+                    onDeleteMission = onDeleteMission
                 )
                 MissionSentenceItem(
                     exportSentences = exportSentences,
@@ -241,7 +248,8 @@ private fun PreviewMissionScreen() {
             availableMissions = missionCardList,
             reviewMissions = reviewMissions,
             navigateToChat = {},
-            navigateToQuiz = {}
+            navigateToQuiz = {},
+            onDeleteMission = {}
         )
     }
 }
